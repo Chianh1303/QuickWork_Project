@@ -29,7 +29,7 @@ func main() {
 	fmt.Println("🔌 Kết nối MySQL thành công!")
 
 	// Tự động quét và sinh ra 3 bảng: users, students, businesses
-	err = DB.AutoMigrate(&models.User{}, &models.Student{}, &models.Business{},&models.Job{})
+	err = DB.AutoMigrate(&models.User{}, &models.Student{}, &models.Business{},&models.Job{},&models.Application{})
 	if err != nil {
 		log.Fatal("❌ Lỗi cấu trúc Migration: ", err)
 	}
@@ -72,6 +72,15 @@ app.Post("/api/jobs",
 	middlewares.Protected(), 
 	middlewares.RequireRole("business"), 
 	handlers.CreateJob(DB),
+)
+// 1. API xem Job công khai (Không cài Middleware -> Ai cũng vào được)
+app.Get("/api/jobs", handlers.GetAvailableJobs(DB))
+
+// 2. API Ứng tuyển (Bảo mật nghiêm ngặt, chỉ cho student vào)
+app.Post("/api/jobs/apply", 
+	middlewares.Protected(), 
+	middlewares.RequireRole("student"), 
+	handlers.ApplyJob(DB),
 )
 	log.Fatal(app.Listen(":3000"))
 }

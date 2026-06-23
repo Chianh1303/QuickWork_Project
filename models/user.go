@@ -51,3 +51,10 @@ type Job struct {
 	Status      string    `gorm:"type:varchar(20);default:'pending'" json:"status"` // pending, approved, closed
 	WorkingDate string    `gorm:"type:varchar(100)" json:"working_date"`
 }
+
+type Application struct {
+	ID        uint      `gorm:"primaryKey" json:"id"`
+	JobID     uint      `gorm:"not null" json:"job_id"`     // Khóa ngoại nối sang bảng Job
+	StudentID uint      `gorm:"not null" json:"student_id"` // Khóa ngoại nối sang bảng Student
+	Status    string    `gorm:"type:varchar(20);default:'applied'" json:"status"` // applied, approved, rejected
+}
