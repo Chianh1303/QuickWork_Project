@@ -29,7 +29,7 @@ func main() {
 	fmt.Println("🔌 Kết nối MySQL thành công!")
 
 	// Tự động quét và sinh ra 3 bảng: users, students, businesses
-	err = DB.AutoMigrate(&models.User{}, &models.Student{}, &models.Business{})
+	err = DB.AutoMigrate(&models.User{}, &models.Student{}, &models.Business{},&models.Job{})
 	if err != nil {
 		log.Fatal("❌ Lỗi cấu trúc Migration: ", err)
 	}
@@ -67,6 +67,11 @@ app.Put("/api/profile/business",
 	middlewares.Protected(), 
 	middlewares.RequireRole("business"), 
 	handlers.UpdateBusinessProfile(DB),
+)
+app.Post("/api/jobs", 
+	middlewares.Protected(), 
+	middlewares.RequireRole("business"), 
+	handlers.CreateJob(DB),
 )
 	log.Fatal(app.Listen(":3000"))
 }
