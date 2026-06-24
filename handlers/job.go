@@ -7,6 +7,11 @@ import (
 	"gorm.io/gorm"
 )
 
+type ReviewApplicationInput struct {
+	ApplicationID uint   `json:"application_id"`
+	Status        string `json:"status"`     // "accepted" hoặc "rejected"
+}
+
 // Struct nhận dữ liệu Đăng Job từ Doanh nghiệp gửi lên
 type CreateJobInput struct {
 	Title       string  `json:"title"`
@@ -16,6 +21,7 @@ type CreateJobInput struct {
 	Slots       int     `json:"slots"`
 	WorkingDate string  `json:"working_date"`
 }
+
 
 func CreateJob(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
@@ -59,5 +65,44 @@ func CreateJob(db *gorm.DB) fiber.Handler {
 		}
 
 		return c.Status(fiber.StatusCreated).JSON(fiber.Map{"message": "Đăng tin thành công! Vui lòng chờ Admin phê duyệt", "data":newJob})
+	}
+}
+
+func ReviewApplication(db *gorm.DB) fiber.Handler {
+	return func (c *fiber.Ctx) error {
+		// 1. Lấy user_id từ Token để xác định Doanh nghiệp đang đăng nhập
+		userID := c.Locals("user_id").(float64)
+
+		var business models.Business
+		if err := db.Where("user_id = ?",uint(userID)).First(&business).Error; err != nil{
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message":"Không tìm thấy tài khoản Doanh nghiệp"})
+		}
+		var input ReviewApplicationInput
+		if err :=c.BodyParser(&input); err != nil{
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message":"Dữ liệu không hợp lệ"})
+		}
+
+		if input.Status != "approved" && input.Status != "rejected"{
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message":"Trạng thái không hợp lệ"})
+		}
+		var application models.Application
+		if err :=db.First(&application,input.ApplicationID).Error; err != nil{
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message":"Không tìm thấy đơn ứng tuyển này"})
+		}
+		var job models.Job
+		if err := db.First(&job,application.JobID).Error; err != nil{
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message":"Không tìm thấy tin tuyển dụng này"})
+		}
+		if job.BusinessID != business.ID{
+			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message":"Bạn không có quyền chỉnh sửa đơn ứng tuyển này"})
+		}
+		application.Status=input.Status
+		if err := db.Save(&application).Error; err != nil{
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message":"Lỗi hệ thống"})
+		}
+		return c.JSON(fiber.Map{
+			"message": "🎉 Xử lý đơn ứng tuyển thành công!",
+			"data" : application,
+		})
 	}
 }

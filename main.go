@@ -82,5 +82,10 @@ app.Post("/api/jobs/apply",
 	middlewares.RequireRole("student"), 
 	handlers.ApplyJob(DB),
 )
+app.Put("/api/jobs/review-application", 
+	middlewares.Protected(), 
+	middlewares.RequireRole("business"), 
+	handlers.ReviewApplication(DB),
+)
 	log.Fatal(app.Listen(":3000"))
 }
