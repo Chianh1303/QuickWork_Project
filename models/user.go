@@ -57,4 +57,6 @@ type Application struct {
 	JobID     uint      `gorm:"not null" json:"job_id"`     // Khóa ngoại nối sang bảng Job
 	StudentID uint      `gorm:"not null" json:"student_id"` // Khóa ngoại nối sang bảng Student
 	Status    string    `gorm:"type:varchar(20);default:'applied'" json:"status"` // applied, approved, rejected
+	Job       Job       `gorm:"foreignKey:JobID" json:"job,omitempty"`
+	Student   Student   `gorm:"foreignKey:StudentID" json:"student,omitempty"`
 }

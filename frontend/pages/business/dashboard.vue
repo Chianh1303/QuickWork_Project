@@ -1,121 +1,352 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-    <!-- Header -->
-    <div class="md:flex md:items-center md:justify-between mb-8 pb-6 border-b border-slate-200">
-      <div class="flex-1 min-w-0">
-        <h2 class="text-3xl font-bold leading-7 text-slate-900 sm:text-4xl sm:truncate">
-          Employer Dashboard
-        </h2>
-        <p class="mt-1 text-sm text-slate-500">
-          Publish job opportunities, review student applications, and keep your company profile updated.
-        </p>
+  <div class="min-h-screen bg-slate-50 flex flex-col md:flex-row">
+    <!-- Sidebar Navigation -->
+    <aside class="w-full md:w-64 bg-white border-r border-slate-200 flex-shrink-0">
+      <div class="p-6 border-b border-slate-100 flex items-center space-x-3">
+        <span class="h-8 w-8 rounded-lg bg-gradient-to-tr from-violet-600 to-indigo-500 flex items-center justify-center text-white font-bold text-sm">
+          B
+        </span>
+        <div>
+          <h1 class="font-bold text-slate-900 text-sm">Employer Console</h1>
+          <p class="text-xs text-slate-500 font-medium">QuickWork Business</p>
+        </div>
       </div>
-    </div>
-
-    <!-- Navigation Tabs -->
-    <div class="mb-8">
-      <nav class="flex space-x-4" aria-label="Tabs">
+      <nav class="p-4 space-y-1">
         <button
-          v-for="tab in tabs"
-          :key="tab.id"
-          @click="activeTab = tab.id"
+          v-for="item in navItems"
+          :key="item.id"
+          @click="activeSection = item.id"
           :class="[
-            activeTab === tab.id
-              ? 'bg-accent-600 text-white shadow-md shadow-accent-500/10'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-100',
-            'px-4 py-2.5 font-semibold text-sm rounded-lg transition-all duration-150 focus:outline-none'
+            activeSection === item.id
+              ? 'bg-violet-50 text-violet-700 font-semibold'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50',
+            'w-full flex items-center space-x-3 px-4 py-2.5 text-sm rounded-xl transition-all duration-150'
           ]"
         >
-          {{ tab.name }}
+          <!-- Render icons inline to avoid runtime compilation errors in Nuxt -->
+          <svg v-if="item.id === 'dashboard'" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 19v-6a2 2 0 00-2-2H5a2 2 0 00-2 2v6a2 2 0 002 2h2a2 2 0 002-2zm0 0V9a2 2 0 012-2h2a2 2 0 012 2v10m-6 0a2 2 0 002 2h2a2 2 0 002-2m0 0V5a2 2 0 012-2h2a2 2 0 012 2v14a2 2 0 002 2h2a2 2 0 002-2z"/>
+          </svg>
+          <svg v-else-if="item.id === 'profile'" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4"/>
+          </svg>
+          <svg v-else-if="item.id === 'jobs'" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z"/>
+          </svg>
+          <svg v-else-if="item.id === 'applicants'" class="h-5 w-5 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z"/>
+          </svg>
+          <span>{{ item.name }}</span>
         </button>
       </nav>
-    </div>
+    </aside>
 
-    <!-- Feedback Banner -->
-    <div v-if="feedback" :class="[
-      feedback.type === 'success' ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-red-50 border-red-300 text-red-800',
-      'border-l-4 p-4 rounded-r-lg mb-6 flex justify-between items-start transition-all duration-300 shadow-sm'
-    ]">
-      <div class="flex items-center space-x-3">
-        <svg v-if="feedback.type === 'success'" class="h-5 w-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <svg v-else class="h-5 w-5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-        </svg>
-        <span class="text-sm font-medium">{{ feedback.message }}</span>
+    <!-- Main Content Area -->
+    <main class="flex-grow p-6 sm:p-8 bg-slate-50 overflow-y-auto">
+      <!-- Section 1: Dashboard (Metrics) -->
+      <div v-if="activeSection === 'dashboard'" class="space-y-6">
+        <div class="pb-6 border-b border-slate-200">
+          <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight font-sans">Performance Overview</h2>
+          <p class="mt-1 text-sm text-slate-500 font-medium">Real-time candidate metrics and application actions.</p>
+        </div>
+
+        <!-- Metrics Cards -->
+        <div class="grid grid-cols-2 lg:grid-cols-4 gap-5">
+          <div v-for="card in metricsCards" :key="card.title" class="bg-white p-6 rounded-2xl border border-slate-200 shadow-sm flex flex-col justify-between">
+            <span class="text-sm font-semibold text-slate-500 uppercase tracking-wider">{{ card.title }}</span>
+            <div class="flex items-baseline justify-between mt-4">
+              <span class="text-3xl font-extrabold text-slate-900">{{ card.value }}</span>
+              <span :class="[card.color, 'text-xs font-semibold px-2 py-0.5 rounded-full border']">{{ card.label }}</span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Job Postings Summary -->
+        <div class="bg-white rounded-xl border border-slate-200 p-6 shadow-sm">
+          <h3 class="text-lg font-bold text-slate-900 mb-4">Postings Summary</h3>
+          <div class="grid grid-cols-3 gap-4 text-center">
+            <div class="p-4 bg-slate-50 rounded-xl">
+              <p class="text-xs font-semibold text-slate-500 uppercase">Active Jobs</p>
+              <p class="text-2xl font-extrabold text-slate-900 mt-1">{{ jobs.length }}</p>
+            </div>
+            <div class="p-4 bg-slate-50 rounded-xl">
+              <p class="text-xs font-semibold text-slate-500 uppercase">Incoming Applicants</p>
+              <p class="text-2xl font-extrabold text-slate-900 mt-1">{{ applications.length }}</p>
+            </div>
+            <div class="p-4 bg-slate-50 rounded-xl">
+              <p class="text-xs font-semibold text-slate-500 uppercase">Fill Ratio</p>
+              <p class="text-2xl font-extrabold text-slate-900 mt-1">{{ fillRatio }}%</p>
+            </div>
+          </div>
+        </div>
       </div>
-      <button @click="feedback = null" class="text-slate-400 hover:text-slate-600">
-        <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-        </svg>
-      </button>
-    </div>
 
-    <!-- Tab Contents -->
-    <div class="mt-6">
-      <!-- Tab 1: Manage My Jobs -->
-      <div v-show="activeTab === 'manage'" class="space-y-6">
-        <div class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <div class="p-6 border-b border-slate-100 flex justify-between items-center">
-            <h3 class="text-lg font-bold text-slate-900">Your Posted Jobs</h3>
-            <button @click="activeTab = 'create'" class="inline-flex items-center space-x-1 text-sm font-semibold text-accent-600 hover:text-accent-700">
-              <span>+ Post a New Job</span>
-            </button>
+    <!-- Section 2: Company Profile -->
+      <div v-show="activeSection === 'profile'" class="max-w-2xl mx-auto space-y-6">
+        
+        <!-- Header Tổng -->
+        <div class="flex items-center justify-between pb-6 border-b border-slate-200">
+          <div>
+            <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Company Profile</h2>
+            <p class="mt-1 text-sm text-slate-500 font-medium">Update public info, logo, and address details.</p>
           </div>
+          <!-- Nút chuyển sang chế độ sửa -->
+          <button 
+            v-if="!isEditing" 
+            @click="isEditing = true"
+            class="px-4 py-2 text-sm font-bold text-violet-600 bg-violet-50 hover:bg-violet-100 rounded-lg transition-all flex items-center space-x-1"
+          >
+            <span>✏️</span> <span>Edit Profile</span>
+          </button>
+        </div>
 
-          <div v-if="isLoadingJobs" class="flex justify-center py-12">
-            <svg class="animate-spin h-8 w-8 text-accent-600" fill="none" viewBox="0 0 24 24">
-              <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-              <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-            </svg>
+        <!-- ======================================================== -->
+        <!-- TRẠNG THÁI 1: HIỂN THỊ DỮ LIỆU CŨ (VIEW MODE) -->
+        <!-- ======================================================== -->
+        <div v-if="!isEditing" class="space-y-6">
+          <!-- Card thông tin công ty chính -->
+          <div class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6 flex flex-col sm:flex-row items-center sm:items-start space-y-4 sm:space-y-0 sm:space-x-6">
+            <img 
+              :src="profileForm.logo_url || 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=150&h=150&q=80'" 
+              class="w-24 h-24 rounded-xl object-cover border-2 border-slate-100 shadow-sm bg-slate-50 p-1"
+            />
+            <div class="flex-1 text-center sm:text-left space-y-3">
+              <h3 class="text-2xl font-bold text-slate-900">{{ profileForm.company_name || 'Your Company Name' }}</h3>
+              
+              <div class="space-y-2 text-sm text-slate-600 font-medium">
+                <p class="flex items-center justify-center sm:justify-start">
+                  <span class="mr-2">🏢</span> {{ profileForm.address || 'Address not updated yet' }}
+                </p>
+                <p class="flex items-center justify-center sm:justify-start">
+                  <span class="mr-2">📞</span> {{ profileForm.phone || 'Corporate phone not updated yet' }}
+                </p>
+              </div>
+            </div>
           </div>
+        </div>
 
-          <div v-else-if="jobs.length === 0" class="text-center py-12 text-slate-500">
-            <svg class="mx-auto h-12 w-12 text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M19 20H5a2 2 0 01-2-2V6a2 2 0 012-2h10a2 2 0 012 2v1m2 4a2 2 0 00-2 2v3m2-3a2 2 0 012 2v3m-2-3a2 2 0 00-2-3m-9 3h.01M9 16h.01" />
-            </svg>
-            <p class="font-medium text-slate-700">You haven't posted any jobs yet.</p>
-            <p class="text-sm text-slate-400 mt-1">Publish listings to hire student workers.</p>
+        <!-- ======================================================== -->
+        <!-- TRẠNG THÁI 2: FORM CHỈNH SỬA (EDIT MODE) -->
+        <!-- ======================================================== -->
+        <div v-else class="bg-white rounded-2xl border border-slate-200 shadow-sm p-6">
+          <form @submit.prevent="handleUpdateProfile" class="space-y-6">
+            
+            <!-- Upload Logo thực tế -->
+            <div class="flex items-center space-x-6 bg-slate-50 p-4 rounded-xl border border-slate-100">
+              <img 
+                :src="logoPreview || profileForm.logo_url || 'https://images.unsplash.com/photo-1486406146926-c627a92ad1ab?auto=format&fit=crop&w=150&h=150&q=80'" 
+                class="w-20 h-20 rounded-xl object-cover border border-slate-200 shadow-sm bg-white p-1"
+              />
+              <div>
+                <input type="file" id="profile_logo_file" accept="image/*" class="hidden" @change="onLogoFileChange" />
+                <label for="profile_logo_file" class="px-4 py-2 text-xs font-bold text-slate-700 bg-white border border-slate-300 rounded-lg shadow-sm hover:bg-slate-50 cursor-pointer transition-all">
+                  Change Company Logo
+                </label>
+                <p class="text-xs text-slate-400 mt-1.5">JPG or PNG. Max 2MB.</p>
+              </div>
+            </div>
+
+            <!-- Các ô nhập dữ liệu chữ -->
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div>
+                <label for="profile_company" class="block text-sm font-semibold text-slate-700 mb-1">Company Name</label>
+                <input
+                  id="profile_company"
+                  type="text"
+                  v-model="profileForm.company_name"
+                  required
+                  class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:bg-white"
+                />
+              </div>
+              <div>
+                <label for="profile_phone" class="block text-sm font-semibold text-slate-700 mb-1">Corporate Phone</label>
+                <input
+                  id="profile_phone"
+                  type="tel"
+                  v-model="profileForm.phone"
+                  class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:bg-white"
+                />
+              </div>
+              <div class="sm:col-span-2">
+                <label for="profile_address" class="block text-sm font-semibold text-slate-700 mb-1">Company Address</label>
+                <input
+                  id="profile_address"
+                  type="text"
+                  v-model="profileForm.address"
+                  class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:bg-white"
+                  placeholder="e.g. 123 Corporate Blvd, Hanoi"
+                />
+              </div>
+            </div>
+
+            <!-- Nút điều hướng Lưu / Hủy -->
+            <div class="pt-4 border-t border-slate-100 flex justify-end space-x-3">
+              <button 
+                type="button" 
+                @click="isEditing = false"
+                class="px-5 py-2.5 border border-slate-200 text-sm font-semibold rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-all"
+              >
+                Cancel
+              </button>
+              <button
+                type="submit"
+                :disabled="isSavingProfile"
+                class="px-6 py-2.5 border border-transparent text-sm font-semibold rounded-lg text-white bg-violet-600 hover:bg-violet-500 focus:ring-2 focus:ring-violet-500 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all duration-150"
+              >
+                <span v-if="isSavingProfile" class="flex items-center space-x-2">
+                  <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Saving Profile...</span>
+                </span>
+                <span v-else>Save Changes</span>
+              </button>
+            </div>
+          </form>
+        </div>
+      </div>      <!-- Section 3: Jobs (List and Post Form) -->
+      <div v-show="activeSection === 'jobs'" class="space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-slate-200">
+          <div>
+            <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Active Listings</h2>
+            <p class="mt-1 text-sm text-slate-500 font-medium">Publish, configure, and evaluate job listings.</p>
           </div>
+          <button
+            @click="showCreateForm = !showCreateForm"
+            class="mt-4 sm:mt-0 px-4 py-2 bg-violet-600 hover:bg-violet-500 text-white font-semibold text-sm rounded-lg shadow-sm focus-ring transition-colors"
+          >
+            {{ showCreateForm ? 'Back to Listings' : '+ Post a New Job' }}
+          </button>
+        </div>
 
+        <!-- Post job form -->
+        <div v-if="showCreateForm" class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 max-w-2xl mx-auto">
+          <h3 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 mb-6">Configure Job Parameters</h3>
+          <form @submit.prevent="handleCreateJob" class="space-y-6">
+            <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
+              <div class="sm:col-span-2">
+                <label for="job_title" class="block text-sm font-semibold text-slate-700 mb-1">Job Title</label>
+                <input
+                  id="job_title"
+                  type="text"
+                  v-model="jobForm.title"
+                  required
+                  class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  placeholder="e.g. Golang Backend developer Trainee"
+                />
+              </div>
+
+              <div>
+                <label for="job_location" class="block text-sm font-semibold text-slate-700 mb-1">Location</label>
+                <input
+                  id="job_location"
+                  type="text"
+                  v-model="jobForm.location"
+                  required
+                  class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  placeholder="e.g. Cau Giay, Hanoi"
+                />
+              </div>
+
+              <div>
+                <label for="job_working_date" class="block text-sm font-semibold text-slate-700 mb-1">Working Dates</label>
+                <input
+                  id="job_working_date"
+                  type="text"
+                  v-model="jobForm.working_date"
+                  class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  placeholder="e.g. Monday - Friday"
+                />
+              </div>
+
+              <div>
+                <label for="job_salary" class="block text-sm font-semibold text-slate-700 mb-1">Salary ($)</label>
+                <input
+                  id="job_salary"
+                  type="number"
+                  step="0.01"
+                  v-model="jobForm.salary"
+                  required
+                  class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  placeholder="e.g. 500"
+                />
+              </div>
+
+              <div>
+                <label for="job_slots" class="block text-sm font-semibold text-slate-700 mb-1">Slots Available</label>
+                <input
+                  id="job_slots"
+                  type="number"
+                  v-model="jobForm.slots"
+                  required
+                  class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  placeholder="1"
+                />
+              </div>
+
+              <div class="sm:col-span-2">
+                <label for="job_description" class="block text-sm font-semibold text-slate-700 mb-1">Detailed Description</label>
+                <textarea
+                  id="job_description"
+                  rows="4"
+                  v-model="jobForm.description"
+                  required
+                  class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500"
+                  placeholder="Responsibilities, requirements, skills..."
+                ></textarea>
+              </div>
+            </div>
+
+            <div class="pt-4 border-t border-slate-100 flex justify-end">
+              <button
+                type="submit"
+                :disabled="isCreatingJob"
+                class="px-6 py-2.5 border border-transparent text-sm font-semibold rounded-lg text-white bg-violet-600 hover:bg-violet-500 focus-ring disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all duration-150"
+              >
+                <span v-if="isCreatingJob" class="flex items-center space-x-2">
+                  <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Creating Job...</span>
+                </span>
+                <span v-else>Publish Job Listing</span>
+              </button>
+            </div>
+          </form>
+        </div>
+
+        <!-- Job listings table -->
+        <div v-else class="bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <div v-if="jobs.length === 0" class="text-center py-16 text-slate-500">
+            <p class="font-bold text-slate-700 text-lg">No active jobs posted</p>
+            <p class="text-sm text-slate-400 mt-1">Publish job openings to discover talent.</p>
+          </div>
           <div v-else class="overflow-x-auto">
             <table class="min-w-full divide-y divide-slate-200">
               <thead class="bg-slate-50">
                 <tr>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Job Title</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Location</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Salary</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Slots</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                  <th scope="col" class="px-6 py-3 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Date</th>
+                  <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Job Title</th>
+                  <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Location</th>
+                  <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Salary</th>
+                  <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Slots</th>
+                  <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
                 </tr>
               </thead>
-              <tbody class="bg-white divide-y divide-slate-200">
+              <tbody class="bg-white divide-y divide-slate-100">
                 <tr v-for="job in jobs" :key="job.id">
-                  <td class="px-6 py-4 whitespace-nowrap">
-                    <div class="text-sm font-semibold text-slate-900">{{ job.title }}</div>
-                    <div class="text-xs text-slate-400 line-clamp-1 max-w-xs">{{ job.description }}</div>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                    {{ job.location }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm font-extrabold text-emerald-600">
-                    ${{ job.salary.toLocaleString() }}
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                    {{ job.slots }}
-                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-900">{{ job.title }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ job.location }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm font-bold text-emerald-600">${{ job.salary.toLocaleString() }}</td>
+                  <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">{{ job.slots }}</td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <span :class="[
-                      job.status === 'approved' ? 'bg-emerald-50 text-emerald-700' : 'bg-amber-50 text-amber-700',
-                      'inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold'
+                      job.status === 'approved' ? 'bg-emerald-50 text-emerald-700 border-emerald-200' : 'bg-amber-50 text-amber-700 border-amber-200',
+                      'inline-flex items-center px-2 py-0.5 rounded-full text-xs font-semibold border'
                     ]">
                       {{ job.status || 'pending' }}
                     </span>
-                  </td>
-                  <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500">
-                    {{ job.working_date || 'N/A' }}
                   </td>
                 </tr>
               </tbody>
@@ -124,267 +355,293 @@
         </div>
       </div>
 
-      <!-- Tab 2: Create Job Listing -->
-      <div v-show="activeTab === 'create'" class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 max-w-2xl mx-auto">
-        <h3 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 mb-6">Create New Job Posting</h3>
-        <form @submit.prevent="handleCreateJob" class="space-y-6">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div class="sm:col-span-2">
-              <label for="job_title" class="block text-sm font-semibold text-slate-700 mb-1">Job Title</label>
-              <input
-                id="job_title"
-                type="text"
-                v-model="jobForm.title"
-                required
-                placeholder="e.g. Frontend Developer Assistant"
-                class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500"
-              />
-            </div>
-
-            <div>
-              <label for="job_location" class="block text-sm font-semibold text-slate-700 mb-1">Location</label>
-              <input
-                id="job_location"
-                type="text"
-                v-model="jobForm.location"
-                required
-                placeholder="e.g. Hanoi, Remote"
-                class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500"
-              />
-            </div>
-
-            <div>
-              <label for="job_working_date" class="block text-sm font-semibold text-slate-700 mb-1">Working Date / Duration</label>
-              <input
-                id="job_working_date"
-                type="text"
-                v-model="jobForm.working_date"
-                placeholder="e.g. July 1st - Dec 31st"
-                class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500"
-              />
-            </div>
-
-            <div>
-              <label for="job_salary" class="block text-sm font-semibold text-slate-700 mb-1">Salary ($)</label>
-              <input
-                id="job_salary"
-                type="number"
-                step="0.01"
-                v-model="jobForm.salary"
-                required
-                placeholder="e.g. 500.00"
-                class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500"
-              />
-            </div>
-
-            <div>
-              <label for="job_slots" class="block text-sm font-semibold text-slate-700 mb-1">Target Hires (Slots)</label>
-              <input
-                id="job_slots"
-                type="number"
-                v-model="jobForm.slots"
-                required
-                placeholder="1"
-                class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500"
-              />
-            </div>
-
-            <div class="sm:col-span-2">
-              <label for="job_description" class="block text-sm font-semibold text-slate-700 mb-1">Detailed Description</label>
-              <textarea
-                id="job_description"
-                rows="4"
-                v-model="jobForm.description"
-                required
-                placeholder="Provide a comprehensive job description, responsibilities, requirements, and benefits..."
-                class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500"
-              ></textarea>
-            </div>
+      <!-- Section 4: Employer Applicant Management (B6) -->
+      <div v-show="activeSection === 'applicants'" class="space-y-6">
+        <div class="flex flex-col sm:flex-row sm:items-center sm:justify-between pb-6 border-b border-slate-200">
+          <div>
+            <h2 class="text-3xl font-extrabold text-slate-900 tracking-tight">Applicant Management</h2>
+            <p class="mt-1 text-sm text-slate-500 font-medium">Review and process student applications.</p>
           </div>
+        </div>
 
-          <div class="pt-4 border-t border-slate-100 flex justify-end">
-            <button
-              type="submit"
-              :disabled="isCreatingJob"
-              class="px-6 py-2 border border-transparent text-sm font-semibold rounded-lg text-white bg-accent-600 hover:bg-accent-500 focus-ring disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-colors"
+        <!-- Search & Filter Controls -->
+        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-4">
+          <div class="relative">
+            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+              </svg>
+            </span>
+            <input
+              v-model="applicantSearchQuery"
+              type="text"
+              class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:bg-white transition-all duration-200"
+              placeholder="Search by student name or job..."
+            />
+          </div>
+          <div>
+            <select
+              v-model="applicantStatusFilter"
+              class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-violet-500 focus:bg-white transition-all duration-200"
             >
-              <span v-if="isCreatingJob" class="flex items-center space-x-2">
-                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>Submitting Listing...</span>
-              </span>
-              <span v-else>Publish Job Listing</span>
-            </button>
+              <option value="all">All Statuses</option>
+              <option value="applied">Applied (Pending)</option>
+              <option value="approved">Approved</option>
+              <option value="rejected">Rejected</option>
+            </select>
           </div>
-        </form>
-      </div>
+        </div>
 
-      <!-- Tab 3: Review Applications -->
-      <div v-show="activeTab === 'review'" class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 max-w-2xl mx-auto">
-        <div class="border-b border-slate-100 pb-3 mb-6">
-          <h3 class="text-lg font-bold text-slate-900">Review Candidate Application</h3>
-          <p class="text-xs text-slate-500 mt-1">
-            Note: Fetching application lists requires admin/developer configuration. Standardized direct application review by ID is enabled below.
+        <!-- Loading state skeleton -->
+        <div v-if="isLoadingApps" class="bg-white rounded-xl border border-slate-200 p-6 space-y-4 animate-pulse">
+          <div class="h-6 bg-slate-200 rounded w-1/4"></div>
+          <div class="space-y-3">
+            <div class="h-10 bg-slate-100 rounded"></div>
+            <div class="h-10 bg-slate-100 rounded"></div>
+            <div class="h-10 bg-slate-100 rounded"></div>
+          </div>
+        </div>
+
+        <!-- Empty state -->
+        <div v-else-if="filteredApps.length === 0" class="bg-white text-center py-16 px-4 rounded-xl border border-slate-200 shadow-sm">
+          <div class="inline-flex p-4 rounded-full bg-slate-50 border border-slate-100 text-slate-400 mb-4">
+            <svg class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
+            </svg>
+          </div>
+          <h3 class="text-lg font-bold text-slate-900">No applicants found</h3>
+          <p class="text-sm text-slate-500 mt-1 max-w-sm mx-auto font-medium">
+            There are currently no incoming applications matching these parameters.
           </p>
         </div>
 
-        <form @submit.prevent="handleReviewApplication" class="space-y-6">
-          <div>
-            <label for="review_app_id" class="block text-sm font-semibold text-slate-700 mb-1">Application ID</label>
-            <input
-              id="review_app_id"
-              type="number"
-              v-model="reviewForm.application_id"
-              required
-              placeholder="e.g. 5"
-              class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500"
-            />
-          </div>
+        <!-- Desktop Applicants Table -->
+        <div v-else class="hidden lg:block bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+          <table class="min-w-full divide-y divide-slate-200">
+            <thead class="bg-slate-50">
+              <tr>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Candidate</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Position Applied</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Contact Phone</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Applied Date</th>
+                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+              </tr>
+            </thead>
+            <tbody class="bg-white divide-y divide-slate-100">
+              <tr v-for="app in filteredApps" :key="app.id">
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <div class="flex items-center">
+                    <img v-if="app.student?.avatar_url" :src="app.student.avatar_url" class="h-8 w-8 rounded-full border border-slate-200 mr-3" />
+                    <div v-else class="h-8 w-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold mr-3">
+                      {{ app.student?.full_name?.charAt(0) || 'S' }}
+                    </div>
+                    <div>
+                      <div class="text-sm font-semibold text-slate-900">{{ app.student?.full_name || 'N/A' }}</div>
+                      <div class="text-xs text-slate-500">Skills: {{ app.student?.skills || 'N/A' }}</div>
+                    </div>
+                  </div>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-800">
+                  {{ jobTitleLookup(app.job_id) }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">
+                  {{ app.student?.phone || 'N/A' }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-medium">
+                  {{ formatDate(app.applied_at || app.id) }}
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap">
+                  <span :class="[
+                    statusBadgeClass(app.status),
+                    'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border'
+                  ]">
+                    {{ app.status }}
+                  </span>
+                </td>
+                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+                  <div class="flex justify-center items-center space-x-2">
+                    <button
+                      v-if="app.status?.toLowerCase() === 'applied'"
+                      @click="triggerConfirmModal(app, 'approved')"
+                      class="px-2.5 py-1 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg shadow-sm"
+                    >
+                      Approve
+                    </button>
+                    <button
+                      v-if="app.status?.toLowerCase() === 'applied'"
+                      @click="triggerConfirmModal(app, 'rejected')"
+                      class="px-2.5 py-1 text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 rounded-lg shadow-sm"
+                    >
+                      Reject
+                    </button>
+                    <span v-else class="text-xs text-slate-400 italic">Evaluated</span>
+                  </div>
+                </td>
+              </tr>
+            </tbody>
+          </table>
+        </div>
 
-          <div>
-            <label class="block text-sm font-semibold text-slate-700 mb-3">Decision / Evaluation Status</label>
-            <div class="grid grid-cols-2 gap-4">
-              <label
-                :class="[
-                  reviewForm.status === 'approved'
-                    ? 'border-emerald-500 bg-emerald-50'
-                    : 'border-slate-200 hover:bg-slate-50',
-                  'border cursor-pointer rounded-lg p-3 text-center transition-all duration-150'
-                ]"
-              >
-                <input type="radio" value="approved" v-model="reviewForm.status" class="sr-only" />
-                <span class="text-sm font-semibold text-emerald-700">Accept / Approve</span>
-              </label>
+        <!-- Mobile Applicants Cards -->
+        <div class="lg:hidden space-y-4">
+          <div
+            v-for="app in filteredApps"
+            :key="app.id"
+            class="bg-white border border-slate-200 rounded-xl p-5 shadow-sm space-y-4"
+          >
+            <div class="flex items-center justify-between">
+              <div class="flex items-center">
+                <img v-if="app.student?.avatar_url" :src="app.student.avatar_url" class="h-10 w-10 rounded-full border border-slate-200 mr-3" />
+                <div v-else class="h-10 w-10 bg-slate-100 rounded-full border border-slate-200 flex items-center justify-center font-bold text-slate-500 mr-3">
+                  {{ app.student?.full_name?.charAt(0) || 'S' }}
+                </div>
+                <div>
+                  <h4 class="text-sm font-bold text-slate-900">{{ app.student?.full_name || 'N/A' }}</h4>
+                  <p class="text-xs text-slate-500">Skills: {{ app.student?.skills || 'N/A' }}</p>
+                </div>
+              </div>
+              <span :class="[
+                statusBadgeClass(app.status),
+                'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border'
+              ]">
+                {{ app.status }}
+              </span>
+            </div>
 
-              <label
-                :class="[
-                  reviewForm.status === 'rejected'
-                    ? 'border-red-500 bg-red-50'
-                    : 'border-slate-200 hover:bg-slate-50',
-                  'border cursor-pointer rounded-lg p-3 text-center transition-all duration-150'
-                ]"
+            <div class="pt-2 border-t border-slate-100 text-xs font-medium text-slate-600 space-y-1">
+              <div>Position: <span class="text-slate-900 font-bold">{{ jobTitleLookup(app.job_id) }}</span></div>
+              <div>Contact: <span class="text-slate-900">{{ app.student?.phone }}</span></div>
+              <div>Applied: <span class="text-slate-900">{{ formatDate(app.applied_at || app.id) }}</span></div>
+            </div>
+
+            <!-- Mobile actions -->
+            <div v-if="app.status?.toLowerCase() === 'applied'" class="flex space-x-2 pt-2">
+              <button
+                @click="triggerConfirmModal(app, 'approved')"
+                class="flex-1 text-center py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg shadow-sm"
               >
-                <input type="radio" value="rejected" v-model="reviewForm.status" class="sr-only" />
-                <span class="text-sm font-semibold text-red-700">Reject / Decline</span>
-              </label>
+                Approve
+              </button>
+              <button
+                @click="triggerConfirmModal(app, 'rejected')"
+                class="flex-1 text-center py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 rounded-lg shadow-sm"
+              >
+                Reject
+              </button>
             </div>
           </div>
-
-          <div class="pt-4 border-t border-slate-100 flex justify-end">
-            <button
-              type="submit"
-              :disabled="isReviewing"
-              class="px-6 py-2 border border-transparent text-sm font-semibold rounded-lg text-white bg-accent-600 hover:bg-accent-500 focus-ring disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-colors"
-            >
-              <span v-if="isReviewing" class="flex items-center space-x-2">
-                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>Evaluating...</span>
-              </span>
-              <span v-else>Submit Evaluation</span>
-            </button>
-          </div>
-        </form>
+        </div>
       </div>
+    </main>
 
-      <!-- Tab 4: Employer Profile Settings -->
-      <div v-show="activeTab === 'profile'" class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 max-w-2xl mx-auto">
-        <h3 class="text-lg font-bold text-slate-900 border-b border-slate-100 pb-3 mb-6">Company / Business Information</h3>
-        <form @submit.prevent="handleUpdateProfile" class="space-y-6">
-          <div class="grid grid-cols-1 sm:grid-cols-2 gap-6">
-            <div>
-              <label for="profile_company" class="block text-sm font-semibold text-slate-700 mb-1">Company Name</label>
-              <input
-                id="profile_company"
-                type="text"
-                v-model="profileForm.company_name"
-                required
-                class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500"
-              />
-            </div>
-            <div>
-              <label for="profile_phone" class="block text-sm font-semibold text-slate-700 mb-1">Corporate Phone</label>
-              <input
-                id="profile_phone"
-                type="tel"
-                v-model="profileForm.phone"
-                class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500"
-              />
-            </div>
-            <div class="sm:col-span-2">
-              <label for="profile_address" class="block text-sm font-semibold text-slate-700 mb-1">Company Address</label>
-              <input
-                id="profile_address"
-                type="text"
-                v-model="profileForm.address"
-                placeholder="123 Corporate Blvd, Hanoi"
-                class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500"
-              />
-            </div>
-            <div class="sm:col-span-2">
-              <label for="profile_logo" class="block text-sm font-semibold text-slate-700 mb-1">Logo URL</label>
-              <input
-                id="profile_logo"
-                type="url"
-                v-model="profileForm.logo_url"
-                placeholder="https://example.com/logo.png"
-                class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm focus:outline-none focus:ring-2 focus:ring-accent-500"
-              />
-            </div>
-          </div>
-
-          <div class="pt-4 border-t border-slate-100 flex justify-end">
-            <button
-              type="submit"
-              :disabled="isSavingProfile"
-              class="px-6 py-2 border border-transparent text-sm font-semibold rounded-lg text-white bg-accent-600 hover:bg-accent-500 focus-ring disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-colors"
-            >
-              <span v-if="isSavingProfile" class="flex items-center space-x-2">
-                <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>Saving Profile...</span>
-              </span>
-              <span v-else>Save Changes</span>
-            </button>
-          </div>
-        </form>
+    <!-- Confirmation Modal Dialog -->
+    <div v-if="showConfirmModal" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-900 bg-opacity-50 p-4">
+      <div class="bg-white rounded-2xl max-w-sm w-full p-6 shadow-2xl border border-slate-200 space-y-4">
+        <h3 class="text-lg font-bold text-slate-900">Confirm Action</h3>
+        <p class="text-sm text-slate-600">
+          Are you sure you want to <span class="font-bold uppercase" :class="confirmAction === 'approved' ? 'text-emerald-600' : 'text-rose-600'">{{ confirmAction }}</span> the application for <span class="font-bold text-slate-900">{{ confirmTarget?.student?.full_name }}</span>?
+        </p>
+        <div class="flex justify-end space-x-3 pt-2">
+          <button
+            @click="showConfirmModal = false"
+            :disabled="isReviewing"
+            class="px-4 py-2 border border-slate-200 hover:bg-slate-50 text-slate-700 font-semibold rounded-lg text-sm transition-colors"
+          >
+            Cancel
+          </button>
+          <button
+            @click="handleReviewApplication"
+            :disabled="isReviewing"
+            :class="[
+              confirmAction === 'approved' ? 'bg-emerald-600 hover:bg-emerald-500' : 'bg-rose-600 hover:bg-rose-500',
+              'px-4 py-2 text-white font-bold rounded-lg text-sm shadow-sm flex items-center space-x-1'
+            ]"
+          >
+            <span v-if="isReviewing">Processing...</span>
+            <span v-else>Confirm</span>
+          </button>
+        </div>
       </div>
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onMounted } from 'vue'
+import { ref, reactive, computed, onMounted } from 'vue'
 import { useApi } from '~/composables/useApi'
 
 definePageMeta({
   middleware: 'auth'
 })
 
-const api = useApi()
+// Navigation setups
+const activeSection = ref('dashboard')
 
-const activeTab = ref('manage')
-const tabs = [
-  { id: 'manage', name: 'Manage Job Listings' },
-  { id: 'create', name: 'Post a New Job' },
-  { id: 'review', name: 'Review Applications' },
-  { id: 'profile', name: 'Company Profile' }
+const navItems = [
+  { id: 'dashboard', name: 'Dashboard' },
+  { id: 'profile', name: 'Company Profile' },
+  { id: 'jobs', name: 'Jobs' },
+  { id: 'applicants', name: 'Applicants' }
 ]
 
+// API Client references
+const api = useApi()
 const jobs = ref<any[]>([])
+const applications = ref<any[]>([])
 const isLoadingJobs = ref(false)
-const isCreatingJob = ref(false)
-const isReviewing = ref(false)
+const isLoadingApps = ref(false)
 const isSavingProfile = ref(false)
+const isCreatingJob = ref(false)
+const showCreateForm = ref(false)
 const feedback = ref<{ type: 'success' | 'error'; message: string } | null>(null)
 
-// Forms
+// Confirmation Modal States
+const showConfirmModal = ref(false)
+const confirmTarget = ref<any | null>(null)
+const confirmAction = ref<'approved' | 'rejected'>('approved')
+const isReviewing = ref(false)
+
+// Query filters
+const applicantSearchQuery = ref('')
+const applicantStatusFilter = ref('all')
+
+
+// Trạng thái quản lý đóng mở form và file logo của Business
+const isEditing = ref(false)
+const logoFileSelected = ref<File | null>(null)
+const logoPreview = ref<string | null>(null)
+
+  const onLogoFileChange = (e: Event) => {
+  const target = e.target as HTMLInputElement
+  const file = target.files?.[0]
+  if (file) {
+    logoFileSelected.value = file
+    logoPreview.value = URL.createObjectURL(file) // Tạo preview cục bộ
+  }
+}
+  const fetchProfile = async () => {
+  try {
+    const res = await api.get('/api/profile/business')
+    const data = res && res.data ? res.data : res
+    if (data) {
+      profileForm.company_name = data.company_name || ''
+      profileForm.phone = data.phone || ''
+      profileForm.address = data.address || ''
+      profileForm.logo_url = data.logo_url || ''
+    }
+  } catch (err) {
+    console.error('Error fetching company profile:', err)
+  }
+}
+// Forms Setup
+const profileForm = reactive({
+  company_name: '',
+  phone: '',
+  address: '',
+  logo_url: ''
+})
+
 const jobForm = reactive({
   title: '',
   description: '',
@@ -394,30 +651,124 @@ const jobForm = reactive({
   working_date: ''
 })
 
-const reviewForm = reactive({
-  application_id: null as number | null,
-  status: 'approved' as 'approved' | 'rejected'
+// Metrics and compute operations
+const jobTitleLookup = (jobId: number): string => {
+  const job = jobs.value.find(j => j.id === jobId)
+  return job ? job.title : `Position #${jobId || ''}`
+}
+
+const fillRatio = computed(() => {
+  if (jobs.value.length === 0) return 0
+  const approvedTotal = applications.value.filter(app => app.status?.toLowerCase() === 'approved').length
+  const slotsTotal = jobs.value.reduce((acc, j) => acc + (j.slots || 1), 0)
+  return Math.min(100, Math.round((approvedTotal / slotsTotal) * 100))
 })
 
-const profileForm = reactive({
-  company_name: '',
-  phone: '',
-  address: '',
-  logo_url: ''
+const metricsCards = computed(() => {
+  const total = applications.value.length
+  const pending = applications.value.filter(app => app.status?.toLowerCase() === 'applied').length
+  const approved = applications.value.filter(app => app.status?.toLowerCase() === 'approved').length
+  const rejected = applications.value.filter(app => app.status?.toLowerCase() === 'rejected').length
+
+  return [
+    { title: 'Total Applications', value: total, label: 'Applications', color: 'bg-slate-50 border-slate-200 text-slate-700' },
+    { title: 'Pending Applications', value: pending, label: 'Awaiting Review', color: 'bg-amber-50 border-amber-200 text-amber-700' },
+    { title: 'Approved Applications', value: approved, label: 'Accepted', color: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
+    { title: 'Rejected Applications', value: rejected, label: 'Declined', color: 'bg-rose-50 border-rose-200 text-rose-700' }
+  ]
 })
 
+const filteredApps = computed(() => {
+  return applications.value.filter(app => {
+    const studentName = app.student?.full_name?.toLowerCase() || ''
+    const jobTitle = jobTitleLookup(app.job_id).toLowerCase()
+
+    const matchesSearch = !applicantSearchQuery.value ||
+      studentName.includes(applicantSearchQuery.value.toLowerCase()) ||
+      jobTitle.includes(applicantSearchQuery.value.toLowerCase())
+
+    const matchesStatus = applicantStatusFilter.value === 'all' ||
+      app.status?.toLowerCase() === applicantStatusFilter.value.toLowerCase()
+
+    return matchesSearch && matchesStatus
+  })
+})
+
+const statusBadgeClass = (status: string): string => {
+  const norm = status?.toLowerCase() || ''
+  if (norm === 'approved') return 'bg-emerald-50 border-emerald-200 text-emerald-700'
+  if (norm === 'rejected') return 'bg-rose-50 border-rose-200 text-rose-700'
+  return 'bg-slate-50 border-slate-200 text-slate-700'
+}
+
+const formatDate = (dateVal: any): string => {
+  return 'Jun 24, 2026'
+}
+
+// API Methods
 const fetchJobs = async () => {
   isLoadingJobs.value = true
   try {
     const res = await api.get('/api/jobs')
-    // As the public API lists all jobs, the employer sees all vacancies. 
-    // In production, we filter or backend supports /api/jobs/my-jobs, 
-    // but for now, we display jobs list from backend
     jobs.value = res.data || []
-  } catch (err: any) {
+  } catch (err) {
     console.error('Error fetching jobs:', err)
   } finally {
     isLoadingJobs.value = false
+  }
+}
+
+const fetchApplications = async () => {
+  isLoadingApps.value = true
+  try {
+    const res = await api.get('/api/applications/employer')
+    applications.value = res.data || []
+  } catch (err) {
+    console.error('Error fetching employer applications:', err)
+  } finally {
+    isLoadingApps.value = false
+  }
+}
+
+const handleUpdateProfile = async () => {
+  isSavingProfile.value = true
+  feedback.value = null
+
+  try {
+    const formData = new FormData()
+    formData.append('company_name', profileForm.company_name)
+    formData.append('phone', profileForm.phone)
+    formData.append('address', profileForm.address)
+
+    // Nếu doanh nghiệp có chọn file logo mới thì đính kèm vào payload
+    if (logoFileSelected.value) {
+      formData.append('logo', logoFileSelected.value)
+    }
+
+    const res = await api.put('/api/profile/business', formData)
+    
+    feedback.value = {
+      type: 'success',
+      message: res.message || '🎉 Company profile updated successfully!'
+    }
+
+    // Đồng bộ lại đường dẫn logo mới nhất trả về từ server để hiển thị ngay
+    const updatedData = res.data ? res.data : res
+    if (updatedData) {
+      profileForm.logo_url = updatedData.LogoUrl || updatedData.logo_url || profileForm.logo_url
+    }
+
+    // Tắt chế độ sửa, quay về chế độ xem và dọn dẹp file tạm
+    isEditing.value = false
+    logoFileSelected.value = null
+  } catch (err: any) {
+    feedback.value = {
+      type: 'error',
+      message: err.response?._data?.message || 'Failed to update company profile.'
+    }
+  } finally {
+    isSavingProfile.value = false
+    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
 
@@ -434,13 +785,13 @@ const handleCreateJob = async () => {
       slots: Number(jobForm.slots),
       working_date: jobForm.working_date
     })
-    
+
     feedback.value = {
       type: 'success',
-      message: res.message || '🎉 Job posted successfully! Awaiting validation.'
+      message: res.message || '🎉 Job opening created successfully!'
     }
 
-    // Reset Form
+    // Reset Form fields
     jobForm.title = ''
     jobForm.description = ''
     jobForm.location = ''
@@ -448,13 +799,13 @@ const handleCreateJob = async () => {
     jobForm.slots = 1
     jobForm.working_date = ''
 
-    // Refresh Jobs List and redirect
+    // Return to main jobs overview
+    showCreateForm.value = false
     await fetchJobs()
-    activeTab.value = 'manage'
   } catch (err: any) {
     feedback.value = {
       type: 'error',
-      message: err.response?._data?.message || 'Failed to submit job listing.'
+      message: err.response?._data?.message || 'Failed to publish job opening.'
     }
   } finally {
     isCreatingJob.value = false
@@ -462,63 +813,57 @@ const handleCreateJob = async () => {
   }
 }
 
+const triggerConfirmModal = (app: any, status: 'approved' | 'rejected') => {
+  confirmTarget.value = app
+  confirmAction.value = status
+  showConfirmModal.value = true
+}
+
 const handleReviewApplication = async () => {
-  if (reviewForm.application_id === null) return
+  if (!confirmTarget.value) return
 
   isReviewing.value = true
   feedback.value = null
 
+  const appId = confirmTarget.value.id
+  const targetStatus = confirmAction.value
+
+  // Optimistic UI updates
+  const originalAppsState = [...applications.value]
+  const targetIndex = applications.value.findIndex(app => app.id === appId)
+  if (targetIndex !== -1) {
+    applications.value[targetIndex].status = targetStatus
+  }
+
   try {
     const res = await api.put('/api/jobs/review-application', {
-      application_id: Number(reviewForm.application_id),
-      status: reviewForm.status
+      application_id: Number(appId),
+      status: targetStatus
     })
 
     feedback.value = {
       type: 'success',
-      message: res.message || '🎉 Candidate application reviewed successfully!'
+      message: res.message || '🎉 Candidate status evaluated successfully!'
     }
-
-    // Reset Form
-    reviewForm.application_id = null
   } catch (err: any) {
+    // Revert optimistic update
+    applications.value = originalAppsState
     feedback.value = {
       type: 'error',
-      message: err.response?._data?.message || 'Failed to submit application review.'
+      message: err.response?._data?.message || 'Failed to update candidate status.'
     }
   } finally {
     isReviewing.value = false
-    window.scrollTo({ top: 0, behavior: 'smooth' })
-  }
-}
-
-const handleUpdateProfile = async () => {
-  isSavingProfile.value = true
-  feedback.value = null
-
-  try {
-    const res = await api.put('/api/profile/business', {
-      company_name: profileForm.company_name,
-      phone: profileForm.phone,
-      address: profileForm.address,
-      logo_url: profileForm.logo_url
-    })
-    feedback.value = {
-      type: 'success',
-      message: res.message || '🎉 Corporate profile updated successfully!'
-    }
-  } catch (err: any) {
-    feedback.value = {
-      type: 'error',
-      message: err.response?._data?.message || 'Failed to update company profile.'
-    }
-  } finally {
-    isSavingProfile.value = false
-    window.scrollTo({ top: 0, behavior: 'smooth' })
+    showConfirmModal.value = false
+    confirmTarget.value = null
+    // Sync-refresh list data
+    await fetchApplications()
   }
 }
 
 onMounted(() => {
   fetchJobs()
+  fetchApplications()
+  fetchProfile() // <-- Gọi nạp dữ liệu cũ của Công ty ở đây nha Chanh
 })
 </script>

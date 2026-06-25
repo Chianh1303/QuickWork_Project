@@ -8,6 +8,20 @@ import (
 )
 
 func SeedDatabase(db *gorm.DB) {
+	// Kiểm tra kết nối DB
+	if db == nil {
+		log.Fatal("❌ Database connection is nil")
+	}
+
+	// Nếu đã có user thì bỏ qua seed
+	var userCount int64
+	db.Model(&models.User{}).Count(&userCount)
+
+	if userCount > 0 {
+		log.Println("⚠️ Database đã có dữ liệu, bỏ qua seed.")
+		return
+	}
+
 	log.Println("🌱 Đang bắt đầu seed data thực tế khớp cấu trúc Model...")
 
 	// 1. Tạo mật khẩu mã hóa chung: 12345678

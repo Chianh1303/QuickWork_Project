@@ -2,55 +2,83 @@ package handlers
 
 import (
 	"QuickWork/models"
+	"fmt"
+	"path/filepath"
+	"time"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
-// 1. Struct nhận dữ liệu cập nhật cho Sinh viên
-type UpdateStudentInput struct {
-	FullName  string `json:"full_name"`
-	Phone     string `json:"phone"`
-	Gender    string `json:"gender"`
-	AvatarUrl string `json:"avatar_url"`
-	Skills    string `json:"skills"` // Chuỗi JSON dạng ["Go", "React"]
-	CvUrl     string `json:"cv_url"`
-}
+// ==========================================
+// 1. CÁC API DÀNH CHO SINH VIÊN (STUDENT)
+// ==========================================
 
-// 2. Struct nhận dữ liệu cập nhật cho Doanh nghiệp
-type UpdateBusinessInput struct {
-	CompanyName string `json:"company_name"`
-	Phone       string `json:"phone"`
-	Address     string `json:"address"`
-	LogoUrl     string `json:"logo_url"`
-}
-
-// Handler cập nhật hồ sơ Sinh viên
-func UpdateStudentProfile(db *gorm.DB) fiber.Handler {
+// [GET] API Lấy profile hiện tại của Sinh viên (Để hiển thị lên FE Nuxt)
+func GetStudentProfile(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// Lấy user_id do Middleware Protected() bốc từ Token ra cắm vào trước đó
-		userID := c.Locals("user_id").(float64) // Fiber ép kiểu số trong JWT mặc định là float64
+		userID := c.Locals("user_id").(float64)
 
-		var input UpdateStudentInput
-		if err := c.BodyParser(&input); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Dữ liệu không hợp lệ"})
-		}
-
-		// Tìm hồ sơ Student dựa theo user_id
 		var student models.Student
 		if err := db.Where("user_id = ?", uint(userID)).First(&student).Error; err != nil {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "Không tìm thấy hồ sơ sinh viên"})
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"success": false, "message": "Không tìm thấy hồ sơ sinh viên"})
 		}
 
-		// Cập nhật các trường dữ liệu mới vào DB
-		db.Model(&student).Updates(models.Student{
-			FullName:  input.FullName,
-			Phone:     input.Phone,
-			Gender:    input.Gender,
-			AvatarUrl: input.AvatarUrl,
-			Skills:    input.Skills,
-			CvUrl:     input.CvUrl,
+		return c.JSON(fiber.Map{
+			"success": true,
+			"data":    student,
 		})
+	}
+}
+
+// [PUT] API Cập nhật profile Sinh viên + Upload file vật lý (Avatar & CV)
+func UpdateStudentProfile(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		userID := c.Locals("user_id").(float64)
+
+		var student models.Student
+		if err := db.Where("user_id = ?", uint(userID)).First(&student).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"success": false, "message": "Không tìm thấy hồ sơ sinh viên"})
+		}
+
+		// Đọc các trường chữ từ Form-data gửi lên (Nếu rỗng thì giữ nguyên giá trị cũ trong DB)
+		student.FullName = c.FormValue("full_name", student.FullName)
+		student.Phone = c.FormValue("phone", student.Phone)
+		student.Gender = c.FormValue("gender", student.Gender)
+		student.Skills = c.FormValue("skills", student.Skills) // Nhận chuỗi JSON dạng ["Go", "React"]
+
+		// Xử lý tải file thực tế: Ảnh đại diện (Avatar)
+		avatarFile, err := c.FormFile("avatar")
+		if err == nil {
+			avatarName := fmt.Sprintf("%d_%s", time.Now().Unix(), filepath.Base(avatarFile.Filename))
+			avatarPath := filepath.Join("./uploads/avatars", avatarName)
+
+			if err := c.SaveFile(avatarFile, avatarPath); err != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"success": false, "message": "Lỗi khi lưu file ảnh đại diện"})
+			}
+			student.AvatarUrl = fmt.Sprintf("http://localhost:3000/uploads/avatars/%s", avatarName)
+		}
+
+		// Xử lý tải file thực tế: Hồ sơ (CV PDF)
+		cvFile, err := c.FormFile("cv")
+		if err == nil {
+			if filepath.Ext(cvFile.Filename) != ".pdf" {
+				return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"success": false, "message": "Hồ sơ đính kèm bắt buộc phải là định dạng file PDF"})
+			}
+
+			cvName := fmt.Sprintf("%d_%s", time.Now().Unix(), filepath.Base(cvFile.Filename))
+			cvPath := filepath.Join("./uploads/cvs", cvName)
+
+			if err := c.SaveFile(cvFile, cvPath); err != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"success": false, "message": "Lỗi khi lưu file CV PDF"})
+			}
+			student.CvUrl = fmt.Sprintf("http://localhost:3000/uploads/cvs/%s", cvName)
+		}
+
+		// Lưu toàn bộ cập nhật vào Database
+		if err := db.Save(&student).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"success": false, "message": "Không thể cập nhật DB"})
+		}
 
 		return c.JSON(fiber.Map{
 			"message": "🎉 Cập nhật hồ sơ sinh viên thành công!",
@@ -59,28 +87,57 @@ func UpdateStudentProfile(db *gorm.DB) fiber.Handler {
 	}
 }
 
-// Handler cập nhật hồ sơ Doanh nghiệp
+// ==========================================
+// 2. CÁC API DÀNH CHO DOANH NGHIỆP (BUSINESS)
+// ==========================================
+
+// [GET] API Lấy profile hiện tại của Doanh nghiệp
+func GetBusinessProfile(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+		userID := c.Locals("user_id").(float64)
+
+		var business models.Business
+		if err := db.Where("user_id = ?", uint(userID)).First(&business).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"success": false, "message": "Không tìm thấy hồ sơ doanh nghiệp"})
+		}
+
+		return c.JSON(fiber.Map{
+			"success": true,
+			"data":    business,
+		})
+	}
+}
+
+// [PUT] API Cập nhật profile Doanh nghiệp + Upload Logo thực tế
 func UpdateBusinessProfile(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
 		userID := c.Locals("user_id").(float64)
 
-		var input UpdateBusinessInput
-		if err := c.BodyParser(&input); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Dữ liệu không hợp lệ"})
-		}
-
 		var business models.Business
 		if err := db.Where("user_id = ?", uint(userID)).First(&business).Error; err != nil {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "Không tìm thấy hồ sơ doanh nghiệp"})
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"success": false, "message": "Không tìm thấy hồ sơ doanh nghiệp"})
 		}
 
-		// Cập nhật thông tin doanh nghiệp
-		db.Model(&business).Updates(models.Business{
-			CompanyName: input.CompanyName,
-			Phone:       input.Phone,
-			Address:     input.Address,
-			LogoUrl:     input.LogoUrl,
-		})
+		// Đọc dữ liệu text từ Form-data
+		business.CompanyName = c.FormValue("company_name", business.CompanyName)
+		business.Phone = c.FormValue("phone", business.Phone)
+		business.Address = c.FormValue("address", business.Address)
+
+		// Xử lý tải file thực tế: Logo Công ty
+		logoFile, err := c.FormFile("logo")
+		if err == nil {
+			logoName := fmt.Sprintf("%d_%s", time.Now().Unix(), filepath.Base(logoFile.Filename))
+			logoPath := filepath.Join("./uploads/avatars", logoName) // Dùng chung thư mục lưu ảnh đại diện
+
+			if err := c.SaveFile(logoFile, logoPath); err != nil {
+				return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"success": false, "message": "Lỗi khi lưu file Logo công ty"})
+			}
+			business.LogoUrl = fmt.Sprintf("http://localhost:3000/uploads/avatars/%s", logoName)
+		}
+
+		if err := db.Save(&business).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"success": false, "message": "Không thể cập nhật DB doanh nghiệp"})
+		}
 
 		return c.JSON(fiber.Map{
 			"message": "🎉 Cập nhật hồ sơ doanh nghiệp thành công!",
