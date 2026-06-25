@@ -50,6 +50,8 @@ type Job struct {
 	Slots       int       `gorm:"not null;default:1" json:"slots"`
 	Status      string    `gorm:"type:varchar(20);default:'pending'" json:"status"` // pending, approved, closed
 	WorkingDate string    `gorm:"type:varchar(100)" json:"working_date"`
+	Category    string    `json:"category"`     // Ngành nghề (e.g., "IT", "Marketing")
+    JobType     string    `json:"job_type"`
 }
 
 type Application struct {

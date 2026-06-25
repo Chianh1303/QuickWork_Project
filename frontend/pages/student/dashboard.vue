@@ -70,37 +70,62 @@
           </button>
         </div>
 
-        <!-- Filters -->
-        <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm grid grid-cols-1 sm:grid-cols-2 gap-4">
-          <div class="relative">
-            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
-              </svg>
-            </span>
-            <input
-              v-model="jobsSearchQuery"
-              type="text"
-              class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200"
-              placeholder="Search by job title or keyword..."
-            />
-          </div>
-          <div class="relative">
-            <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
-              </svg>
-            </span>
-            <input
-              v-model="jobsLocationQuery"
-              type="text"
-              class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white transition-all duration-200"
-              placeholder="Filter by location..."
-            />
-          </div>
-        </div>
+       <!-- Filters -->
+       <div class="bg-white p-6 rounded-xl border border-slate-200 shadow-sm space-y-4">
+          <form @submit.prevent="fetchJobs" class="space-y-4">
+            
+            <div class="grid grid-cols-1 md:grid-cols-2 gap-4">
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">🔍</span>
+                <input v-model="jobsSearchQuery" type="text" class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white" placeholder="Search by title, keyword, skills..." />
+              </div>
 
+              <div class="relative">
+                <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">📍</span>
+                <input v-model="jobsLocationQuery" type="text" class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white" placeholder="Filter by location (e.g. Hanoi, Ho Chi Minh)..." />
+              </div>
+            </div>
+
+            <div class="grid grid-cols-1 sm:grid-cols-3 gap-4 pt-2">
+              <div>
+                <select v-model="filterCategory" class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
+                  <option value="all">📁 All Categories (Ngành nghề)</option>
+                  <option value="it">Information Technology</option>
+                  <option value="marketing">Marketing</option>
+                  <option value="design">Graphic Design</option>
+                </select>
+              </div>
+
+              <div>
+                <select v-model="filterJobType" class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
+                  <option value="all">⏱️ All Job Types (Hình thức)</option>
+                  <option value="full-time">Full-time</option>
+                  <option value="part-time">Part-time</option>
+                  <option value="intern">Internship</option>
+                </select>
+              </div>
+
+              <div>
+                <select v-model="filterMinSalary" class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white">
+                  <option value="">💵 Any Salary (Mức lương)</option>
+                  <option value="2000000">> 2,000,000 VND</option>
+                  <option value="5000000">> 5,000,000 VND</option>
+                  <option value="10000000">> 10,000,000 VND</option>
+                </select>
+              </div>
+            </div>
+
+            <div class="flex items-center gap-2 justify-end pt-2 border-t border-slate-100">
+              <button type="button" @click="resetFilters" class="px-4 py-2 border border-slate-200 text-sm font-semibold rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-all">
+                Clear Filters
+              </button>
+              <button type="submit" class="px-6 py-2 border border-transparent text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-500 shadow-sm transition-all">
+                Apply Filters
+              </button>
+            </div>
+
+          </form>
+        </div>
         <!-- Skeleton / Loading -->
         <div v-if="isLoadingJobs" class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6">
           <div v-for="n in 6" :key="n" class="bg-white rounded-xl border border-slate-200 p-6 space-y-4 animate-pulse">
@@ -486,6 +511,28 @@ const navItems = [
   { id: 'profile', name: 'Profile' },
   { id: 'applications', name: 'My Applications' }
 ]
+const filterSearch = ref('')
+const filterLocation = ref('all') // Mặc định là 'all' (Tất cả địa điểm)
+const filterCategory = ref('all')
+const filterJobType = ref('all')
+const filterMinSalary = ref('')
+
+const resetFilters = () => {
+  jobsSearchQuery.value = ''
+  jobsLocationQuery.value = ''
+  filterCategory.value = 'all'
+  filterJobType.value = 'all'
+  filterMinSalary.value = ''
+  fetchJobs()
+}
+
+// Các lựa chọn địa điểm hiển thị lên giao diện
+const locationsList = [
+  { value: 'all', label: '📍 All Locations' },
+  { value: 'hanoi', label: 'Hanoi' },
+  { value: 'hcm', label: 'Ho Chi Minh City' },
+  { value: 'danang', label: 'Da Nang' }
+]
 
 // State setup
 const api = useApi()
@@ -590,12 +637,42 @@ const filteredApps = computed(() => {
 const fetchJobs = async () => {
   isLoadingJobs.value = true
   try {
-    const res = await api.get('/api/jobs')
-    jobs.value = Array.isArray(res)
-      ? res
-      : (res && Array.isArray(res.data) ? res.data : [])
-  } catch (err: any) {
-    console.error('Error fetching jobs:', err)
+    // 1. Dựng query object gọn gàng chứa tất cả 5 tiêu chí lọc theo kế hoạch
+    const queryParams: Record<string, string> = {}
+    
+    // Tiêu chí 1: Từ khóa tìm kiếm (Title / Keyword)
+    if (jobsSearchQuery.value && jobsSearchQuery.value.trim()) {
+      queryParams.search = jobsSearchQuery.value.trim()
+    }
+    
+    // Tiêu chí 2: Địa điểm (Location)
+    if (jobsLocationQuery.value && jobsLocationQuery.value.trim()) {
+      queryParams.location = jobsLocationQuery.value.trim()
+    }
+
+    // Tiêu chí 3: Ngành nghề (Category - Loại trừ giá trị mặc định 'all')
+    if (filterCategory.value && filterCategory.value !== 'all') {
+      queryParams.category = filterCategory.value
+    }
+
+    // Tiêu chí 4: Hình thức làm việc (Job Type - Loại trừ giá trị mặc định 'all')
+    if (filterJobType.value && filterJobType.value !== 'all') {
+      queryParams.job_type = filterJobType.value
+    }
+
+    // Tiêu chí 5: Mức lương tối thiểu (Salary)
+    if (filterMinSalary.value) {
+      queryParams.max_salary = filterMinSalary.value
+    }
+
+    // 2. Gửi request kèm theo toàn bộ params lên Backend Go
+    // URL thực tế sẽ có dạng: /api/jobs?search=golang&location=hanoi&category=it&job_type=intern&max_salary=5000000
+    const res = await api.get('/api/jobs', { params: queryParams })
+    
+    // Đổ dữ liệu đã được Server lọc về lại mảng gốc để hiển thị
+    jobs.value = res.data || []
+  } catch (err) {
+    console.error('Error fetching filtered jobs:', err)
   } finally {
     isLoadingJobs.value = false
   }

@@ -6,21 +6,54 @@ import (
 	"gorm.io/gorm"
 )
 
-// 1. API Lấy danh sách Job công khai (Ai cũng xem được, không cần Token)
 func GetAvailableJobs(db *gorm.DB) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		var jobs []models.Job
-		
-		// Thực tế tin phải 'approved' mới hiện, nhưng hiện tại chúng ta lấy hết ra để test cho dễ nhé Chanh
-		if err := db.Find(&jobs).Error; err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Không thể lấy danh sách công việc"})
-		}
+    return func(c *fiber.Ctx) error {
+        // 1. Đón đầu toàn bộ 5 tham số từ URL Query String
+        search := c.Query("search")
+        location := c.Query("location")
+        category := c.Query("category")
+        jobType := c.Query("job_type")
+        maxSalary := c.Query("max_salary") // Lọc các công việc có lương từ mức này trở lên chẳng hạn
 
-		return c.JSON(fiber.Map{
-			"message": "🎨 Lấy danh sách công việc thành công!",
-			"data":    jobs,
-		})
-	}
+        var jobs []models.Job
+        query := db.Model(&models.Job{})
+
+        // 2. Lọc theo Từ khóa (Title)
+        if search != "" {
+            query = query.Where("LOWER(title) LIKE LOWER(?)", "%"+search+"%")
+        }
+
+        // 3. Lọc theo Địa điểm
+        if location != "" && location != "all" {
+            query = query.Where("LOWER(location) LIKE LOWER(?)", "%"+location+"%")
+        }
+// 4. Lọc theo Ngành nghề (Category) - Chỉ ép lọc khi param truyền lên hợp lệ
+if category != "" && category != "all" {
+    query = query.Where("LOWER(category) = LOWER(?)", category)
+}
+
+// 5. Lọc theo Hình thức (Job Type) - Chỉ ép lọc khi param truyền lên hợp lệ
+if jobType != "" && jobType != "all" {
+    query = query.Where("LOWER(job_type) = LOWER(?)", jobType)
+}
+
+        // 6. Lọc theo Mức lương tối thiểu (Sinh viên muốn tìm việc từ X triệu trở lên)
+        if maxSalary != "" {
+            query = query.Where("salary >= ?", maxSalary)
+        }
+
+        // Thực thi truy vấn đưa ra danh sách
+        if err := query.Order("id DESC").Find(&jobs).Error; err != nil {
+            return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+                "message": "Không thể lấy danh sách công việc toàn diện",
+            })
+        }
+
+        return c.JSON(fiber.Map{
+            "message": "🎨 Lấy danh sách công việc thành công!",
+            "data":    jobs,
+        })
+    }
 }
 
 // Struct nhận dữ liệu ứng tuyển từ Sinh viên
