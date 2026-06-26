@@ -180,8 +180,7 @@
 
             <div class="mt-6 pt-4 border-t border-slate-100">
               <button
-                @click="handleApply(job.id)"
-                :disabled="isApplying === job.id"
+                @click="handleApply(job)"
                 class="w-full flex justify-center py-2.5 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-500 transition-colors focus-ring disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
               >
                 <span v-if="isApplying === job.id" class="flex items-center space-x-2">
@@ -434,33 +433,69 @@
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Compensation</th>
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Applied Date</th>
                 <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+                <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
               </tr>
             </thead>
-            <tbody class="bg-white divide-y divide-slate-100">
-              <tr v-for="app in filteredApps" :key="app.id">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="text-sm font-semibold text-slate-900">{{ app.job?.title || 'Unknown Position' }}</div>
-                  <div class="text-xs text-slate-500 font-medium">{{ companyNameLookup(app.job?.business_id) }}</div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">
-                  {{ app.job?.location || 'Location N/A' }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-extrabold text-emerald-600">
-                  ${{ Number(app.job?.salary || 0).toLocaleString() }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-medium">
-                  {{ formatDate(app.applied_at || app.id) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span :class="[
-                    statusBadgeClass(app.status),
-                    'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border'
-                  ]">
-                    {{ app.status }}
-                  </span>
-                </td>
-              </tr>
-            </tbody>
+          <tbody class="bg-white divide-y divide-slate-100">
+  <tr v-for="app in filteredApps" :key="app.id">
+    <td class="px-6 py-4 whitespace-nowrap">
+      <div class="text-sm font-semibold text-slate-900">{{ app.job?.title || 'Unknown Position' }}</div>
+      <div class="text-xs text-slate-500 font-medium">{{ companyNameLookup(app.job?.business_id) }}</div>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">
+      {{ app.job?.location || 'Location N/A' }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm font-extrabold text-emerald-600">
+      ${{ Number(app.job?.salary || 0).toLocaleString() }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-medium">
+      {{ formatDate(app.applied_at || app.id) }}
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap">
+      <span :class="[
+        statusBadgeClass(app.status),
+        'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border'
+      ]">
+        {{ app.status }}
+      </span>
+    </td>
+    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+      <!-- 1. Trạng thái PENDING: Giữ nguyên logic Hủy ứng tuyển hiện tại của Chanh -->
+      <button
+        v-if="(app.status || '').toLowerCase() === 'pending'"
+        :disabled="isCancellingApp === app.id"
+        @click="triggerCancelConfirm(app.id)"
+        class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
+      >
+        <svg v-if="isCancellingApp === app.id" class="animate-spin h-3 w-3 text-red-600" fill="none" viewBox="0 0 24 24">
+          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+        </svg>
+        <span>Hủy ứng tuyển</span>
+      </button>
+
+      <!-- 2. Trạng thái APPROVED: Hiển thị nút bấm bung lụa mở Modal Offer -->
+      <button
+        v-else-if="(app.status || '').toLowerCase() === 'approved'"
+        @click="openOfferModal(app)"
+        class="inline-flex items-center px-3 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 rounded-lg shadow-sm transition-all duration-150 animate-pulse"
+      >
+        <span>✨ Xem Offer</span>
+      </button>
+
+      <!-- 3. Trạng thái OFFER_ACCEPTED: Sinh viên đã đồng ý nhận việc -->
+      <span 
+        v-else-if="(app.status || '').toLowerCase() === 'offer_accepted'" 
+        class="inline-flex items-center px-2.5 py-1 text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg select-none"
+      >
+        🎉 Đã nhận việc
+      </span>
+
+      <!-- 4. Các trạng thái còn lại (rejected, offer_declined): Hiển thị dấu gạch ngang thanh lịch -->
+      <span v-else class="text-xs font-medium text-slate-400 select-none">-</span>
+    </td>
+  </tr>
+</tbody>
           </table>
         </div>
 
@@ -494,6 +529,138 @@
       </div>
     </main>
   </div>
+  <div v-if="selectedJobForApply" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+    
+    <div class="p-6 pb-4 border-b border-slate-100">
+      <h3 class="text-xl font-bold text-slate-900">Apply Opportunity</h3>
+      <p class="text-sm font-medium text-slate-500 mt-1">
+        You are applying for: <span class="text-blue-600 font-semibold">{{ selectedJobForApply.title }}</span>
+      </p>
+    </div>
+
+    <form @submit.prevent="submitApplication" class="p-6 space-y-4">
+      <div>
+        <label class="block text-sm font-bold text-slate-700 mb-2">
+          Cover Note (Lời nhắn gửi nhà tuyển dụng)
+        </label>
+        <textarea
+          v-model="coverNoteText"
+          rows="4"
+          maxlength="500"
+          class="block w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white placeholder-slate-400 resize-none transition-all"
+          placeholder="Giới thiệu ngắn gọn về thế mạnh của bạn hoặc lý do bạn mong muốn ứng tuyển vị trí này..."
+        ></textarea>
+        <div class="text-right text-xs font-medium text-slate-400 mt-1">
+          {{ coverNoteText.length }}/500 characters
+        </div>
+      </div>
+
+      <div class="flex items-center gap-3 justify-end pt-2 border-t border-slate-100">
+        <button
+          type="button"
+          @click="selectedJobForApply = null"
+          class="px-4 py-2 border border-slate-200 text-sm font-semibold rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-all"
+        >
+          Cancel
+        </button>
+        <button
+          type="submit"
+          :disabled="isSubmittingApply"
+          class="px-5 py-2 border border-transparent text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-500 shadow-sm transition-all flex items-center space-x-2"
+        >
+          <span v-if="isSubmittingApply" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
+          <span>Submit Application</span>
+        </button>
+      </div>
+    </form>
+
+  </div>
+</div>
+<div v-if="appIdToCancel !== null" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+    <div class="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-sm w-full p-6 animate-in fade-in zoom-in-95 duration-150 text-center">
+      <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-50 text-red-600 mb-4">
+        <svg class="h-6 w-6" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+          <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01m-6.938 4h13.856c1.54 0 2.502-1.667 1.732-3L13.732 4c-.77-1.333-2.694-1.333-3.464 0L3.34 16c-.77 1.333.192 3 1.732 3z" />
+        </svg>
+      </div>
+      
+      <h3 class="text-lg font-bold text-slate-900 mb-2">Xác nhận hủy ứng tuyển</h3>
+      <p class="text-sm text-slate-500 mb-6">
+        Bạn có chắc chắn muốn rút hồ sơ khỏi vị trí này không? Hành động này không thể hoàn tác.
+      </p>
+
+      <div class="flex items-center gap-3 justify-center">
+        <button
+          type="button"
+          @click="appIdToCancel = null"
+          class="flex-1 px-4 py-2 border border-slate-200 text-sm font-semibold rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-all"
+        >
+          Không, quay lại
+        </button>
+        <button
+          type="button"
+          @click="confirmCancelApplication"
+          class="flex-1 px-4 py-2 border border-transparent text-sm font-semibold rounded-lg text-white bg-red-600 hover:bg-red-500 shadow-sm transition-all"
+        >
+          Vâng, hủy đơn
+        </button>
+      </div>
+    </div>
+  </div>
+  <div v-if="selectedOffer" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full overflow-hidden text-left animate-in fade-in zoom-in-95 duration-150">
+    
+    <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 text-white text-center relative">
+      <span class="text-4xl block mb-1">💼</span>
+      <h3 class="text-lg font-bold">Lời Mời Nhận Việc (Job Offer)</h3>
+      <p class="text-xs text-indigo-100 mt-1">Hồ sơ ứng tuyển của bạn đã được doanh nghiệp phê duyệt</p>
+    </div>
+
+    <div class="p-6 space-y-4">
+      <div>
+        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Vị trí & Công ty</label>
+        <div class="text-sm font-bold text-slate-800">{{ selectedOffer.job?.title || 'Unknown Position' }}</div>
+      </div>
+
+      <div class="grid grid-cols-2 gap-4 border-t border-b border-slate-100 py-3 my-2">
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">💰 Mức lương Offer</label>
+          <div class="text-sm font-extrabold text-emerald-600">{{ selectedOffer.offer_salary || 'Thỏa thuận' }}</div>
+        </div>
+        <div>
+          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">📅 Ngày bắt đầu</label>
+          <div class="text-sm font-bold text-slate-700">{{ selectedOffer.offer_start_date || 'Trao đổi sau' }}</div>
+        </div>
+      </div>
+
+      <div>
+        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">✉️ Thư chào mời từ phía HR</label>
+        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-600 whitespace-pre-line leading-relaxed">
+          {{ selectedOffer.offer_message || 'Chào mừng bạn đến với công ty!' }}
+        </div>
+      </div>
+    </div>
+
+    <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between space-x-3">
+      <button 
+        @click="handleOfferResponse('decline')"
+        :disabled="isResponding"
+        class="w-1/2 px-4 py-2.5 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl border border-rose-200 transition-all text-center"
+      >
+        Từ chối Offer
+      </button>
+      <button 
+        @click="handleOfferResponse('accept')"
+        :disabled="isResponding"
+        class="w-1/2 px-4 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all text-center shadow-md"
+      >
+        {{ isResponding ? 'Đang gửi...' : 'Đồng ý nhận việc' }}
+      </button>
+    </div>
+
+  </div>
+</div>
 </template>
 
 <script setup lang="ts">
@@ -516,6 +683,12 @@ const filterLocation = ref('all') // Mặc định là 'all' (Tất cả địa 
 const filterCategory = ref('all')
 const filterJobType = ref('all')
 const filterMinSalary = ref('')
+
+
+// Các biến điều khiển trạng thái Modal Cover Note
+const selectedJobForApply = ref<any>(null)
+const coverNoteText = ref('')
+const isSubmittingApply = ref(false)
 
 const resetFilters = () => {
   jobsSearchQuery.value = ''
@@ -557,6 +730,15 @@ const jobsSearchQuery = ref('')
 const jobsLocationQuery = ref('')
 const appSearchQuery = ref('')
 const appStatusFilter = ref('all')
+
+const appIdToCancel = ref<number | null>(null)
+const isCancellingApp = ref<number | null>(null)
+
+// Hàm này kích hoạt khi bấm nút "Hủy ứng tuyển" ở bảng -> Chỉ mở Modal chứ chưa gọi API
+const triggerCancelConfirm = (id: number) => {
+  appIdToCancel.value = id
+  feedback.value = null
+}
 
 // Profile update form reactive state
 const profileForm = reactive({
@@ -728,16 +910,35 @@ const fetchProfile = async () => {
   }
 }
 
-const handleApply = async (jobId: number) => {
-  isApplying.value = jobId
+const handleApply = (job: any) => {
+  selectedJobForApply.value = job
+  coverNoteText.value = '' // Xóa sạch text cũ của lần nhập trước
+  feedback.value = null
+}
+
+// 2. Hàm thực tế gửi đơn ứng tuyển kèm Cover Note lên Backend Go (C5)
+const submitApplication = async () => {
+  if (!selectedJobForApply.value) return
+  
+  isSubmittingApply.value = true
   feedback.value = null
 
   try {
-    const res = await api.post('/api/jobs/apply', { job_id: jobId })
+    // Gửi payload kèm cả job_id và cover_note theo kế hoạch
+    const res = await api.post('/api/jobs/apply', { 
+      job_id: selectedJobForApply.value.id,
+      cover_note: coverNoteText.value.trim()
+    })
+    
     feedback.value = {
       type: 'success',
-      message: res.message || '🚀 Applied successfully! Waiting for Employer review.'
+      message: res.message || '🚀 Applied successfully with cover note! Waiting for Employer review.'
     }
+    
+    // Đóng modal ứng tuyển
+    selectedJobForApply.value = null
+    
+    // Tải lại danh sách đơn ứng tuyển để cập nhật tab My Applications
     await fetchApplications()
   } catch (err: any) {
     feedback.value = {
@@ -745,10 +946,41 @@ const handleApply = async (jobId: number) => {
       message: err.response?._data?.message || 'Failed to submit application.'
     }
   } finally {
-    isApplying.value = null
+    isSubmittingApply.value = false
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
+
+// 3. Hàm xử lý Hủy ứng tuyển dành cho sinh viên (C6)
+const confirmCancelApplication = async () => {
+  if (!appIdToCancel.value) return
+
+  const targetId = appIdToCancel.value
+  isCancellingApp.value = targetId
+  feedback.value = null
+  appIdToCancel.value = null // Đóng modal ngay sau khi bấm
+
+  try {
+    const res = await api.post(`/api/applications/${targetId}/cancel`)
+    
+    feedback.value = {
+      type: 'success',
+      message: res.message || '❌ Đã hủy đơn ứng tuyển thành công.'
+    }
+    
+    // Tải lại danh sách để cập nhật giao diện
+    await fetchApplications()
+  } catch (err: any) {
+    console.error('Error cancelling application:', err)
+    feedback.value = {
+      type: 'error',
+      message: err.response?._data?.message || 'Failed to cancel application.'
+    }
+  } finally {
+    isCancellingApp.value = null
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+} 
 
 // 🌟 LOGIC ĐỒNG BỘ FILE KHI KHÁCH HÀNG CHỌN FILE TRÊN INTERFACE
 const onAvatarFileChange = (e: Event) => {
@@ -825,9 +1057,49 @@ const handleUpdateProfile = async () => {
   }
 }
 
+const selectedOffer = ref<any>(null)
+const isResponding = ref(false)
+
+const openOfferModal = (app: any) => {
+  selectedOffer.value = app
+}
+
+const handleOfferResponse = async (responseType: 'accept' | 'decline') => {
+  if (!selectedOffer.value) return
+  
+  isResponding.value = true
+  try {
+    const payload = {
+      application_id: selectedOffer.value.id,
+      response: responseType
+    }
+    
+    // Gửi phản hồi lên API mới xây dựng của Go
+    await api.post('/api/applications/respond-offer', payload)
+    
+    // 💡 Tự động dò tìm tên hàm refresh dữ liệu cũ của bạn để reload table lập tức
+    const anyWindow = window as any
+    if (typeof anyWindow.fetchStudentApplications === 'function') {
+      await anyWindow.fetchStudentApplications()
+    } else if (typeof anyWindow.fetchApplications === 'function') {
+      await anyWindow.fetchApplications()
+    } else {
+      window.location.reload()
+    }
+    
+    selectedOffer.value = null // Đóng modal thành công
+  } catch (err) {
+    console.error('Lỗi khi gửi phản hồi Offer:', err)
+    alert('Không thể gửi phản hồi lúc này, vui lòng thử lại!')
+  } finally {
+    isResponding.value = false
+  }
+}
+
 onMounted(() => {
   fetchJobs()
   fetchApplications()
   fetchProfile() // Gọi hàm tải profile cũ ngay khi mở trang
 })
+
 </script>

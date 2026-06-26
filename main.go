@@ -3,7 +3,7 @@ package main
 import (
     "fmt"
     "log"
-	"os"
+    "os"
     "QuickWork/handlers"
     "QuickWork/middlewares"
     "QuickWork/models"
@@ -18,7 +18,7 @@ import (
 var DB *gorm.DB
 
 func main() {
-	_ = os.MkdirAll("./uploads/avatars", os.ModePerm)
+    _ = os.MkdirAll("./uploads/avatars", os.ModePerm)
     _ = os.MkdirAll("./uploads/cvs", os.ModePerm)
     // 1. Khởi tạo chuỗi kết nối MySQL
     dsn := "root:root@123@tcp(127.0.0.1:3306)/quickwork_db?charset=utf8mb4&parseTime=True&loc=Local"
@@ -51,7 +51,7 @@ func main() {
         AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",
         AllowCredentials: true,
     }))
-	app.Static("/uploads", "./uploads")
+    app.Static("/uploads", "./uploads")
 
 
     // ==========================================
@@ -74,7 +74,7 @@ func main() {
         })
     })
 
-    // Profile Routes
+    
    // Profile Routes
     // --- Đối với Sinh viên ---
     app.Get("/api/profile/student", middlewares.Protected(), middlewares.RequireRole("student"), handlers.GetStudentProfile(DB))
@@ -83,6 +83,7 @@ func main() {
     // --- Đối với Doanh nghiệp ---
     app.Get("/api/profile/business", middlewares.Protected(), middlewares.RequireRole("business"), handlers.GetBusinessProfile(DB))
     app.Put("/api/profile/business", middlewares.Protected(), middlewares.RequireRole("business"), handlers.UpdateBusinessProfile(DB))
+    
     // Jobs & Applications Routes
     app.Post("/api/jobs", middlewares.Protected(), middlewares.RequireRole("business"), handlers.CreateJob(DB))
     app.Get("/api/jobs", handlers.GetAvailableJobs(DB)) // Công khai
@@ -91,11 +92,18 @@ func main() {
     app.Put("/api/jobs/review-application", middlewares.Protected(), middlewares.RequireRole("business"), handlers.ReviewApplication(DB))
 
 
-	// Sinh viên xem lịch sử ứng tuyển của mình (C6)
+    // Sinh viên xem lịch sử ứng tuyển của mình (C6)
     app.Get("/api/applications/my-applications", 
         middlewares.Protected(), 
         middlewares.RequireRole("student"), 
         handlers.GetStudentApplications(DB),
+    )
+
+    // 🌟 THÊM ROUTE: Sinh viên thực hiện hủy ứng tuyển đơn còn chờ duyệt (C6)
+    app.Post("/api/applications/:id/cancel",
+        middlewares.Protected(),
+        middlewares.RequireRole("student"),
+        handlers.CancelApplication(DB),
     )
 
     // Doanh nghiệp xem danh sách ứng viên nộp đơn (B6)
@@ -104,6 +112,13 @@ func main() {
         middlewares.RequireRole("business"), 
         handlers.GetEmployerApplications(DB),
     )
+    
+	// Đặt cùng nhóm với các route của Student nhé Chanh
+app.Post("/api/applications/respond-offer", 
+    middlewares.Protected(), 
+    middlewares.RequireRole("student"), 
+    handlers.RespondToOffer(DB),
+)
     // Khởi động Server tại cổng 3000
     log.Fatal(app.Listen(":3000"))
 }

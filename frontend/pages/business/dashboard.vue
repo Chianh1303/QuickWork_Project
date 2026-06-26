@@ -415,74 +415,75 @@
           </p>
         </div>
 
-        <!-- Desktop Applicants Table -->
-        <div v-else class="hidden lg:block bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
-          <table class="min-w-full divide-y divide-slate-200">
-            <thead class="bg-slate-50">
-              <tr>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Candidate</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Position Applied</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Contact Phone</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Applied Date</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                <th class="px-6 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-            <tbody class="bg-white divide-y divide-slate-100">
-              <tr v-for="app in filteredApps" :key="app.id">
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <div class="flex items-center">
-                    <img v-if="app.student?.avatar_url" :src="app.student.avatar_url" class="h-8 w-8 rounded-full border border-slate-200 mr-3" />
-                    <div v-else class="h-8 w-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold mr-3">
-                      {{ app.student?.full_name?.charAt(0) || 'S' }}
-                    </div>
-                    <div>
-                      <div class="text-sm font-semibold text-slate-900">{{ app.student?.full_name || 'N/A' }}</div>
-                      <div class="text-xs text-slate-500">Skills: {{ app.student?.skills || 'N/A' }}</div>
-                    </div>
-                  </div>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-800">
-                  {{ jobTitleLookup(app.job_id) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">
-                  {{ app.student?.phone || 'N/A' }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-medium">
-                  {{ formatDate(app.applied_at || app.id) }}
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap">
-                  <span :class="[
-                    statusBadgeClass(app.status),
-                    'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border'
-                  ]">
-                    {{ app.status }}
-                  </span>
-                </td>
-                <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-                  <div class="flex justify-center items-center space-x-2">
-                    <button
-                      v-if="app.status?.toLowerCase() === 'applied'"
-                      @click="triggerConfirmModal(app, 'approved')"
-                      class="px-2.5 py-1 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg shadow-sm"
-                    >
-                      Approve
-                    </button>
-                    <button
-                      v-if="app.status?.toLowerCase() === 'applied'"
-                      @click="triggerConfirmModal(app, 'rejected')"
-                      class="px-2.5 py-1 text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 rounded-lg shadow-sm"
-                    >
-                      Reject
-                    </button>
-                    <span v-else class="text-xs text-slate-400 italic">Evaluated</span>
-                  </div>
-                </td>
-              </tr>
-            </tbody>
-          </table>
-        </div>
-
+       <!-- Desktop Applicants Table -->
+<div v-else class="hidden lg:block bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+  <table class="min-w-full divide-y divide-slate-200">
+    <thead class="bg-slate-50">
+      <tr>
+        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Candidate</th>
+        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Position Applied</th>
+        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Contact Phone</th>
+        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Applied Date</th>
+        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+        <th class="px-6 py-4 text-center text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-slate-100">
+      <tr v-for="app in filteredApps" :key="app.id">
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="flex items-center">
+            <img v-if="app.student?.avatar_url" :src="app.student.avatar_url" class="h-8 w-8 rounded-full border border-slate-200 mr-3" />
+            <div v-else class="h-8 w-8 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold mr-3">
+              {{ app.student?.full_name?.charAt(0) || 'S' }}
+            </div>
+            <div>
+              <div class="text-sm font-semibold text-slate-900">{{ app.student?.full_name || 'N/A' }}</div>
+              <div class="text-xs text-slate-500">Skills: {{ app.student?.skills || 'N/A' }}</div>
+            </div>
+          </div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-800">
+          {{ app.job?.title || jobTitleLookup(app.job_id) }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">
+          {{ app.student?.phone || 'N/A' }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-medium">
+          {{ formatDate(app.applied_at || app.id) }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span :class="[
+            statusBadgeClass(app.status),
+            'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border capitalize'
+          ]">
+            {{ app.status }}
+          </span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
+          <div class="flex justify-center items-center">
+            <!-- 🌟 ĐÃ SỬA: Nếu trạng thái là pending thì hiện nút mở Modal xử lý và điền offer -->
+            <button
+              v-if="app.status?.toLowerCase() === 'pending'"
+              @click="openReviewModal(app)"
+              class="px-3 py-1.5 text-xs font-bold text-indigo-600 bg-indigo-50 hover:bg-indigo-100 rounded-lg transition-all duration-150"
+            >
+              Review & Offer
+            </button>
+            
+            <!-- Nếu đã approved hoặc rejected thì hiện nút xem lại thông tin cũ thay vì khóa chết chữ Evaluated -->
+            <button
+              v-else
+              @click="openReviewModal(app)"
+              class="px-3 py-1.5 text-xs font-medium text-slate-500 bg-slate-100 hover:bg-slate-200 rounded-lg transition-all duration-150"
+            >
+              View Details
+            </button>
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
         <!-- Mobile Applicants Cards -->
         <div class="lg:hidden space-y-4">
           <div
@@ -565,6 +566,100 @@
       </div>
     </div>
   </div>
+  <div v-if="selectedApp" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
+  <div class="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-lg w-full overflow-hidden flex flex-col max-h-[90vh] text-left animate-in fade-in zoom-in-95 duration-150">
+    
+    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+      <div>
+        <h3 class="text-base font-bold text-slate-900">Đánh giá hồ sơ & Gửi Offer</h3>
+        <p class="text-xs text-slate-500 font-medium mt-0.5">Ứng viên: <span class="text-slate-700 font-bold">{{ selectedApp.student?.full_name || 'N/A' }}</span></p>
+      </div>
+      <button @click="closeModal" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
+    </div>
+
+    <div class="p-6 space-y-4 overflow-y-auto flex-1">
+      <div>
+        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Lời nhắn từ ứng viên (Cover Note)</label>
+        <div class="p-3 bg-blue-50/60 border border-blue-100 rounded-xl text-xs font-medium text-slate-700 whitespace-pre-line">
+          {{ selectedApp.cover_note || 'Ứng viên không để lại lời nhắn.' }}
+        </div>
+      </div>
+
+      <div>
+        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-2">Quyết định</label>
+        <div class="grid grid-cols-2 gap-3">
+          <button 
+            type="button"
+            @click="reviewStatus = 'approved'"
+            :class="[reviewStatus === 'approved' ? 'border-emerald-500 bg-emerald-50 text-emerald-700 ring-2 ring-emerald-500/20' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50']"
+            class="py-2 px-4 text-xs font-bold border rounded-xl transition-all flex items-center justify-center space-x-1"
+          >
+            <span>👍 Chấp nhận & Gửi Offer</span>
+          </button>
+          <button 
+            type="button"
+            @click="reviewStatus = 'rejected'"
+            :class="[reviewStatus === 'rejected' ? 'border-rose-500 bg-rose-50 text-rose-700 ring-2 ring-rose-500/20' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50']"
+            class="py-2 px-4 text-xs font-bold border rounded-xl transition-all flex items-center justify-center space-x-1"
+          >
+            <span>👎 Từ chối đơn</span>
+          </button>
+        </div>
+      </div>
+
+      <div v-if="reviewStatus === 'approved'" class="p-4 bg-emerald-50/30 border border-emerald-100 rounded-xl space-y-3 animate-in fade-in duration-150">
+        <h4 class="text-xs font-bold text-emerald-800">✉️ Chi tiết Offer gửi Sinh viên</h4>
+        
+        <div class="grid grid-cols-2 gap-3">
+          <div>
+            <label class="text-[11px] font-bold text-slate-600 block mb-1">Mức lương Offer</label>
+            <input 
+              v-model="offerForm.salary"
+              type="text" 
+              placeholder="Ví dụ: 15,000,000 VND"
+              class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+          <div>
+            <label class="text-[11px] font-bold text-slate-600 block mb-1">Ngày đi làm dự kiến</label>
+            <input 
+              v-model="offerForm.startDate"
+              type="date" 
+              class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:border-emerald-500"
+            />
+          </div>
+        </div>
+
+        <div>
+          <label class="text-[11px] font-bold text-slate-600 block mb-1">Lời nhắn chào mừng từ HR</label>
+          <textarea 
+            v-model="offerForm.message"
+            rows="2"
+            placeholder="Chào mừng bạn gia nhập đội ngũ..."
+            class="w-full text-xs p-2.5 border border-slate-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:border-emerald-500"
+          ></textarea>
+        </div>
+      </div>
+    </div>
+
+    <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end space-x-2">
+      <button 
+        @click="closeModal" 
+        class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg transition-all"
+      >
+        Đóng
+      </button>
+      <button 
+        @click="submitReview"
+        :disabled="!reviewStatus || isSubmitting"
+        class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 rounded-lg shadow-sm transition-all"
+      >
+        {{ isSubmitting ? 'Đang gửi...' : 'Xác nhận phản hồi' }}
+      </button>
+    </div>
+
+  </div>
+</div>
 </template>
 
 <script setup lang="ts">
@@ -611,6 +706,69 @@ const applicantStatusFilter = ref('all')
 const isEditing = ref(false)
 const logoFileSelected = ref<File | null>(null)
 const logoPreview = ref<string | null>(null)
+
+
+const selectedApp = ref<any>(null)
+const reviewStatus = ref<'approved' | 'rejected' | null>(null)
+const isSubmitting = ref(false)
+
+// Form thông tin Offer gửi đính kèm
+const offerForm = ref({
+  salary: '',
+  startDate: '',
+  message: ''
+})
+const openReviewModal = (app: any) => {
+  selectedApp.value = app
+  reviewStatus.value = app.status === 'pending' ? 'approved' : app.status // Mặc định mở ra chọn luôn approved cho tiện
+  offerForm.value = {
+    salary: app.offer_salary || '',
+    startDate: app.offer_start_date || '',
+    message: app.offer_message || ''
+  }
+}
+
+const closeModal = () => {
+  selectedApp.value = null
+  reviewStatus.value = null
+}
+
+const submitReview = async () => {
+  if (!selectedApp.value || !reviewStatus.value) return
+
+  isSubmitting.value = true
+  try {
+    const payload = {
+      application_id: selectedApp.value.id,
+      status: reviewStatus.value,
+      offer_salary: reviewStatus.value === 'approved' ? offerForm.value.salary : '',
+      offer_start_date: reviewStatus.value === 'approved' ? offerForm.value.startDate : '',
+      offer_message: reviewStatus.value === 'approved' ? offerForm.value.message : ''
+    }
+
+    await api.put('/api/jobs/review-application', payload)
+    
+    // 🌟 TỰ ĐỘNG ĐỒNG BỘ: Quét và gọi đúng tên hàm fetch hiện có trong file của Chanh
+    const anyWindow = window as any
+    if (typeof anyWindow.fetchApplications === 'function') {
+      await anyWindow.fetchApplications()
+    } else if (typeof anyWindow.fetchApplicants === 'function') {
+      await anyWindow.fetchApplicants()
+    } else if (typeof anyWindow.fetchEmployerApplications === 'function') {
+      await anyWindow.fetchEmployerApplications()
+    } else {
+      // Giải pháp an toàn cuối cùng nếu không tìm thấy hàm nào: Reload lại trang
+      window.location.reload()
+    }
+    
+    closeModal()
+  } catch (err) {
+    console.error('Lỗi khi cập nhật trạng thái hoặc gửi offer:', err)
+    alert('Có lỗi xảy ra khi phê duyệt.')
+  } finally {
+    isSubmitting.value = false
+  }
+}
 
   const onLogoFileChange = (e: Event) => {
   const target = e.target as HTMLInputElement
