@@ -3,10 +3,7 @@ import { defineNuxtConfig } from 'nuxt/config'
 export default defineNuxtConfig({
   compatibilityDate: '2026-06-24',
   
-  // Enable Nuxt 4 compatibility version
-  future: {
-    compatibilityVersion: 4,
-  },
+
 
   // Since pages, composables, stores, middleware, and assets are at the root level of the frontend/ folder,
   // we point the app directory to the root directory '.'.

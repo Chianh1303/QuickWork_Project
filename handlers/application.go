@@ -13,7 +13,12 @@ func GetStudentApplications(db *gorm.DB) fiber.Handler {
 		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "❌ Không tìm thấy hồ sơ sinh viên của tài khoản này",})
 	}
 	var apps []models.Application
-	if err := db.Preload("Job").Where("student_id = ?", student.ID).Find(&apps).Error; err != nil {
+	if err := db.
+Preload("Job").
+Preload("Job.Business").
+Preload("Job.Business.User").
+Where("student_id = ?", student.ID).
+Find(&apps).Error; err != nil {
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "❌ Lỗi hệ thống khi lấy lịch sử ứng tuyển",})
 	}
 	return c.JSON(fiber.Map{
@@ -33,10 +38,15 @@ func GetEmployerApplications(db *gorm.DB) fiber.Handler {
 		}
 
 		var apps []models.Application
-        err := db.Preload("Student").
-            Joins("JOIN jobs ON jobs.id = applications.job_id").
-            Where("jobs.business_id = ?", business.ID).
-            Find(&apps).Error
+    err := db.
+Preload("Student").
+Preload("Student.User").
+Preload("Job").
+Preload("Job.Business").
+Preload("Job.Business.User").
+Joins("JOIN jobs ON jobs.id = applications.job_id").
+Where("jobs.business_id = ?", business.ID).
+Find(&apps).Error
 
         if err != nil {
             return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{

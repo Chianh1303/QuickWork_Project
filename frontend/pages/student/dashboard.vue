@@ -422,82 +422,90 @@
         </div>
 
         <!-- Desktop Applications Table -->
-<div
+<<div
   v-if="filteredApps.length > 0"
   class="hidden md:block bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden"
->          <table class="min-w-full divide-y divide-slate-200">
-            <thead class="bg-slate-50">
-              <tr>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Position & Company</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Location</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Compensation</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Applied Date</th>
-                <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
-                <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
-              </tr>
-            </thead>
-          <tbody class="bg-white divide-y divide-slate-100">
-  <tr v-for="app in filteredApps" :key="app.id">
-    <td class="px-6 py-4 whitespace-nowrap">
-      <div class="text-sm font-semibold text-slate-900">{{ app.job?.title || 'Unknown Position' }}</div>
-      <div class="text-xs text-slate-500 font-medium">{{ companyNameLookup(app.job?.business_id) }}</div>
-    </td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">
-      {{ app.job?.location || 'Location N/A' }}
-    </td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm font-extrabold text-emerald-600">
-      ${{ Number(app.job?.salary || 0).toLocaleString() }}
-    </td>
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-medium">
-      {{ formatDate(app.applied_at || app.id) }}
-    </td>
-    <td class="px-6 py-4 whitespace-nowrap">
-      <span :class="[
-        statusBadgeClass(app.status),
-        'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border'
-      ]">
-        {{ app.status }}
-      </span>
-    </td>
-    <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
-      <!-- 1. Trạng thái PENDING: Giữ nguyên logic Hủy ứng tuyển hiện tại của Chanh -->
-      <button
-        v-if="(app.status || '').toLowerCase() === 'pending'"
-        :disabled="isCancellingApp === app.id"
-        @click="triggerCancelConfirm(app.id)"
-        class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
-      >
-        <svg v-if="isCancellingApp === app.id" class="animate-spin h-3 w-3 text-red-600" fill="none" viewBox="0 0 24 24">
-          <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-          <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-        </svg>
-        <span>Hủy ứng tuyển</span>
-      </button>
+>
+  <table class="min-w-full divide-y divide-slate-200">
+    <thead class="bg-slate-50">
+      <tr>
+        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Position & Company</th>
+        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Location</th>
+        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Compensation</th>
+        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Applied Date</th>
+        <th class="px-6 py-4 text-left text-xs font-bold text-slate-500 uppercase tracking-wider">Status</th>
+        <th class="px-6 py-4 text-right text-xs font-bold text-slate-500 uppercase tracking-wider">Actions</th>
+      </tr>
+    </thead>
+    <tbody class="bg-white divide-y divide-slate-100">
+      <tr v-for="app in filteredApps" :key="app.id">
+        <td class="px-6 py-4 whitespace-nowrap">
+          <div class="text-sm font-semibold text-slate-900">{{ app.job?.title || 'Unknown Position' }}</div>
+          <div class="text-xs text-slate-500 font-medium">{{ companyNameLookup(app.job?.business_id) }}</div>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">
+          {{ app.job?.location || 'Location N/A' }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm font-extrabold text-emerald-600">
+          ${{ Number(app.job?.salary || 0).toLocaleString() }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-medium">
+          {{ formatDate(app.applied_at || app.id) }}
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap">
+          <span :class="[
+            statusBadgeClass(app.status),
+            'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border'
+          ]">
+            {{ app.status }}
+          </span>
+        </td>
+        <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+          <div class="flex items-center justify-end gap-2">
+            
+            <button 
+              @click="openChatModal(app)" 
+              class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold uppercase tracking-wider rounded-lg border border-slate-700/60 transition-all flex items-center space-x-1.5"
+            >
+              <span>💬 Chat với HR</span>
+            </button>
 
-      <!-- 2. Trạng thái APPROVED: Hiển thị nút bấm bung lụa mở Modal Offer -->
-      <button
-        v-else-if="(app.status || '').toLowerCase() === 'approved'"
-        @click="openOfferModal(app)"
-        class="inline-flex items-center px-3 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 rounded-lg shadow-sm transition-all duration-150 animate-pulse"
-      >
-        <span>✨ Xem Offer</span>
-      </button>
+            <button
+              v-if="(app.status || '').toLowerCase() === 'pending'"
+              :disabled="isCancellingApp === app.id"
+              @click="triggerCancelConfirm(app.id)"
+              class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold text-red-600 hover:text-red-700 hover:bg-red-50 rounded-lg border border-transparent hover:border-red-200 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
+            >
+              <svg v-if="isCancellingApp === app.id" class="animate-spin h-3 w-3 text-red-600" fill="none" viewBox="0 0 24 24">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+              </svg>
+              <span>Hủy ứng tuyển</span>
+            </button>
 
-      <!-- 3. Trạng thái OFFER_ACCEPTED: Sinh viên đã đồng ý nhận việc -->
-      <span 
-        v-else-if="(app.status || '').toLowerCase() === 'offer_accepted'" 
-        class="inline-flex items-center px-2.5 py-1 text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg select-none"
-      >
-        🎉 Đã nhận việc
-      </span>
+            <button
+              v-else-if="(app.status || '').toLowerCase() === 'approved'"
+              @click="openOfferModal(app)"
+              class="inline-flex items-center px-3 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 rounded-lg shadow-sm transition-all duration-150 animate-pulse"
+            >
+              <span>✨ Xem Offer</span>
+            </button>
 
-      <!-- 4. Các trạng thái còn lại (rejected, offer_declined): Hiển thị dấu gạch ngang thanh lịch -->
-      <span v-else class="text-xs font-medium text-slate-400 select-none">-</span>
-    </td>
-  </tr>
-</tbody>
-          </table>
-        </div>
+            <span 
+              v-else-if="(app.status || '').toLowerCase() === 'offer_accepted'" 
+              class="inline-flex items-center px-2.5 py-1 text-xs font-bold text-emerald-600 bg-emerald-50 border border-emerald-200 rounded-lg select-none"
+            >
+              🎉 Đã nhận việc
+            </span>
+
+            <span v-else class="text-xs font-medium text-slate-400 select-none">-</span>
+            
+          </div>
+        </td>
+      </tr>
+    </tbody>
+  </table>
+</div>
 
         <!-- Mobile Applications Cards -->
         <div v-show="filteredApps.length > 0" class="md:hidden space-y-4">
@@ -616,51 +624,101 @@
       <h3 class="text-lg font-bold">Lời Mời Nhận Việc (Job Offer)</h3>
       <p class="text-xs text-indigo-100 mt-1">Hồ sơ ứng tuyển của bạn đã được doanh nghiệp phê duyệt</p>
     </div>
-
-    <div class="p-6 space-y-4">
+<div class="p-6 space-y-5 bg-slate-900">
       <div>
-        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block">Vị trí & Công ty</label>
-        <div class="text-sm font-bold text-slate-800">{{ selectedOffer.job?.title || 'Unknown Position' }}</div>
+        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Vị trí & Công ty</label>
+        <div class="text-sm font-black text-white uppercase tracking-wide">{{ selectedOffer.job?.title || 'Unknown Position' }}</div>
       </div>
 
-      <div class="grid grid-cols-2 gap-4 border-t border-b border-slate-100 py-3 my-2">
+      <div class="grid grid-cols-2 gap-4 border-t border-b border-slate-800/60 py-3.5 my-2">
         <div>
-          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">💰 Mức lương Offer</label>
-          <div class="text-sm font-extrabold text-emerald-600">{{ selectedOffer.offer_salary || 'Thỏa thuận' }}</div>
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">💰 Mức lương Offer</label>
+          <div class="text-sm font-black text-brand-400 tracking-wider">{{ selectedOffer.offer_salary || 'Thỏa thuận' }}</div>
         </div>
         <div>
-          <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-0.5">📅 Ngày bắt đầu</label>
-          <div class="text-sm font-bold text-slate-700">{{ selectedOffer.offer_start_date || 'Trao đổi sau' }}</div>
+          <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">📅 Ngày bắt đầu</label>
+          <div class="text-sm font-bold text-slate-300 tracking-wide">{{ selectedOffer.offer_start_date || 'Trao đổi sau' }}</div>
         </div>
       </div>
 
       <div>
-        <label class="text-[10px] font-bold text-slate-400 uppercase tracking-wider block mb-1">✉️ Thư chào mời từ phía HR</label>
-        <div class="p-3 bg-slate-50 border border-slate-200 rounded-xl text-xs font-medium text-slate-600 whitespace-pre-line leading-relaxed">
+        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1.5">✉️ Thư chào mời từ phía HR</label>
+        <div class="p-4 bg-slate-950 border border-slate-800 rounded-xl text-xs font-medium text-slate-300 whitespace-pre-line leading-relaxed">
           {{ selectedOffer.offer_message || 'Chào mừng bạn đến với công ty!' }}
         </div>
       </div>
+
+      <div class="pt-4 border-t border-slate-800/60">
+        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-3">💬 Thảo luận trực tuyến với HR</label>
+        <ChatBox 
+          :applicationId="selectedOffer.id"
+          :targetId="selectedOffer.job?.business_id"
+          :currentUserId="currentUserId"
+        />
+      </div>
     </div>
 
-    <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-between space-x-3">
+    <div class="p-4 bg-slate-950/60 border-t border-slate-800/80 flex items-center justify-between space-x-3">
       <button 
         @click="handleOfferResponse('decline')"
         :disabled="isResponding"
-        class="w-1/2 px-4 py-2.5 text-xs font-bold text-rose-600 bg-rose-50 hover:bg-rose-100 rounded-xl border border-rose-200 transition-all text-center"
+        class="w-1/2 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-rose-400 bg-rose-500/10 hover:bg-rose-500/20 rounded-xl border border-rose-500/10 transition-all text-center"
       >
         Từ chối Offer
       </button>
       <button 
         @click="handleOfferResponse('accept')"
         :disabled="isResponding"
-        class="w-1/2 px-4 py-2.5 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-700 rounded-xl transition-all text-center shadow-md"
+        class="w-1/2 px-4 py-2.5 text-xs font-bold uppercase tracking-wider text-white bg-emerald-600 hover:bg-emerald-500 rounded-xl transition-all text-center shadow-lg shadow-emerald-600/10"
       >
         {{ isResponding ? 'Đang gửi...' : 'Đồng ý nhận việc' }}
       </button>
     </div>
-
   </div>
-</div>
+  </div>
+  <!-- ======================================================== -->
+  <!-- 🌟 MODAL CỬA SỔ CHAT REAL-TIME (DÀNH CHO STUDENT) -->
+  <!-- ======================================================== -->
+  <div v-if="isChatModalOpen && selectedChatApp" class="fixed inset-0 z-50 flex items-center justify-center p-4">
+    <!-- Lớp phủ mờ nền sau -->
+    <div class="absolute inset-0 bg-slate-950/60 backdrop-blur-sm" @click="isChatModalOpen = false"></div>
+    
+    <!-- Thân Modal -->
+    <div class="relative w-full max-w-2xl bg-slate-950 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden animate-in fade-in zoom-in-95 duration-150">
+      
+      <!-- Header Modal -->
+      <div class="p-4 bg-slate-900 border-b border-slate-800/80 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+          <div>
+            <h3 class="text-xs font-black text-white uppercase tracking-wider">
+              Trò chuyện cùng {{ selectedChatApp.job?.business?.company_name || 'Nhà Tuyển Dụng' }}
+            </h3>
+            <p class="text-[10px] text-slate-500 font-bold uppercase mt-0.5 tracking-wide">
+              Vị trí: {{ selectedChatApp.job?.title }} — Mã đơn: #{{ selectedChatApp.id }}
+            </p>
+          </div>
+        </div>
+        <button 
+          @click="isChatModalOpen = false" 
+          class="text-slate-400 hover:text-white text-xs font-bold px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all"
+        >
+          Đóng ✕
+        </button>
+      </div>
+
+      <!-- Ruột Modal: Gọi component ChatBox truyền các tham số tương ứng -->
+<div class="p-4 bg-slate-900/40">
+        <ChatBox 
+          v-if="currentUserId"
+          :applicationId="selectedChatApp.id"
+          :targetId="selectedChatApp.job?.business.user_id || selectedChatApp.business_id"
+          :currentUserId="currentUserId"
+        />
+      </div>
+
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
@@ -887,7 +945,7 @@ const fetchProfile = async () => {
       profileForm.avatar_url = data.avatar_url || ''
       profileForm.cv_url = data.cv_url || ''
       profileForm.skills = data.skills || ''
-
+currentUserId.value = data.user_id || data.id
       // Xử lý bóc tách Skills phục vụ cho cả 2 Mode (View và Edit)
       if (data.skills) {
         try {
@@ -949,6 +1007,17 @@ const submitApplication = async () => {
     isSubmittingApply.value = false
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
+}
+
+const isChatModalOpen = ref(false)
+const selectedChatApp = ref<any>(null)
+
+// Sử dụng luôn ID của Chanh (hoặc bóc tách từ authStore/user profile của bạn nếu có)
+const currentUserId = ref<number | null>(null)
+
+const openChatModal = (app: any) => {
+  selectedChatApp.value = app
+  isChatModalOpen.value = true
 }
 
 // 3. Hàm xử lý Hủy ứng tuyển dành cho sinh viên (C6)

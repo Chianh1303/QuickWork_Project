@@ -415,8 +415,7 @@
           </p>
         </div>
 
-       <!-- Desktop Applicants Table -->
-<div v-else class="hidden lg:block bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
+      <div v-else class="hidden lg:block bg-white rounded-xl border border-slate-200 shadow-sm overflow-hidden">
   <table class="min-w-full divide-y divide-slate-200">
     <thead class="bg-slate-50">
       <tr>
@@ -460,8 +459,15 @@
           </span>
         </td>
         <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-          <div class="flex justify-center items-center">
-            <!-- 🌟 ĐÃ SỬA: Nếu trạng thái là pending thì hiện nút mở Modal xử lý và điền offer -->
+          <div class="flex justify-center items-center gap-2">
+            
+            <button 
+              @click="openChatModal(app)" 
+              class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold uppercase tracking-wider rounded-lg border border-slate-700/60 transition-all flex items-center space-x-1.5"
+            >
+              <span>💬 Chat với Ứng viên</span>
+            </button>
+
             <button
               v-if="app.status?.toLowerCase() === 'pending'"
               @click="openReviewModal(app)"
@@ -470,7 +476,6 @@
               Review & Offer
             </button>
             
-            <!-- Nếu đã approved hoặc rejected thì hiện nút xem lại thông tin cũ thay vì khóa chết chữ Evaluated -->
             <button
               v-else
               @click="openReviewModal(app)"
@@ -478,6 +483,7 @@
             >
               View Details
             </button>
+
           </div>
         </td>
       </tr>
@@ -660,11 +666,54 @@
 
   </div>
 </div>
+<div 
+    v-if="isChatModalOpen && selectedChatApp" 
+    class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
+  >
+    <div 
+      class="fixed inset-0 bg-slate-950/80 backdrop-blur-md" 
+      @click="isChatModalOpen = false"
+    ></div>
+    
+    <div class="relative w-full max-w-2xl bg-slate-950 border border-slate-800 rounded-2xl shadow-2xl overflow-hidden z-10">
+      
+      <div class="p-4 bg-slate-900 border-b border-slate-800/80 flex items-center justify-between">
+        <div class="flex items-center space-x-3">
+          <div class="w-2 h-2 bg-emerald-500 rounded-full animate-pulse"></div>
+          <div>
+            <h3 class="text-xs font-black text-white uppercase tracking-wider">
+              Trò chuyện cùng Ứng viên: {{ selectedChatApp.student?.full_name || 'Sinh viên' }}
+            </h3>
+            <p class="text-[10px] text-slate-500 font-bold uppercase mt-0.5 tracking-wide">
+              Vị trí ứng tuyển: {{ selectedChatApp.job?.title }} — Mã đơn: #{{ selectedChatApp.id }}
+            </p>
+          </div>
+        </div>
+        <button 
+          @click="isChatModalOpen = false" 
+          class="text-slate-400 hover:text-white text-xs font-bold px-2.5 py-1.5 bg-slate-800 hover:bg-slate-700 rounded-xl transition-all"
+        >
+          Đóng ✕
+        </button>
+      </div>
+
+      <div class="p-4 bg-slate-900/40 min-h-[400px]">
+        <ChatBox 
+          v-if="currentBusinessUserId"
+          :applicationId="selectedChatApp.id"
+          :currentUserId="currentBusinessUserId"
+          :targetId="selectedChatApp.student?.user_id || selectedChatApp.student_id"
+        />
+      </div>
+
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted } from 'vue'
 import { useApi } from '~/composables/useApi'
+import ChatBox from '~/components/ChatBox.vue'
 
 definePageMeta({
   middleware: 'auth'
@@ -787,10 +836,23 @@ const submitReview = async () => {
       profileForm.phone = data.phone || ''
       profileForm.address = data.address || ''
       profileForm.logo_url = data.logo_url || ''
+      currentBusinessUserId.value = data.user_id || data.id
     }
   } catch (err) {
     console.error('Error fetching company profile:', err)
   }
+}
+
+// 🌟 CẤU HÌNH ĐIỀU KHIỂN MODAL CHAT (THÊM VÀO SCRIPT PHÍA DOANH NGHIỆP)
+const isChatModalOpen = ref(false)
+const selectedChatApp = ref<any>(null)
+
+// Biến hứng ID Doanh nghiệp (Chanh nhớ gán data.user_id vào biến này trong hàm fetchProfile/fetchCompany của bạn nhé)
+const currentBusinessUserId = ref<number | null>(2) // Tạm thời để 1 để test, hoặc ref(null) nếu gán động
+
+const openChatModal = (app: any) => {
+  selectedChatApp.value = app
+  isChatModalOpen.value = true
 }
 // Forms Setup
 const profileForm = reactive({

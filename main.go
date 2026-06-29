@@ -1,18 +1,20 @@
 package main
 
 import (
-    "fmt"
-    "log"
-    "os"
-    "QuickWork/handlers"
-    "QuickWork/middlewares"
-    "QuickWork/models"
-    "QuickWork/database"
-    "github.com/gofiber/fiber/v2"
-    "github.com/gofiber/fiber/v2/middleware/logger"
-    "github.com/gofiber/fiber/v2/middleware/cors" // Bổ sung CORS để gọi mượt từ Nuxt 4 (Port 3001)
-    "gorm.io/driver/mysql"
-    "gorm.io/gorm"
+	"QuickWork/database"
+	"QuickWork/handlers"
+	"QuickWork/middlewares"
+	"QuickWork/models"
+	"fmt"
+	"log"
+	"os"
+
+	"github.com/gofiber/fiber/v2"
+	"github.com/gofiber/fiber/v2/middleware/cors" // Bổ sung CORS để gọi mượt từ Nuxt 4 (Port 3001)
+	"github.com/gofiber/fiber/v2/middleware/logger"
+	"github.com/gofiber/websocket/v2"
+	"gorm.io/driver/mysql"
+	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
@@ -31,7 +33,7 @@ func main() {
     fmt.Println("🔌 Kết nối MySQL thành công!")
 
     // 2. Chạy AutoMigrate để sinh cấu trúc bảng trước
-    err = DB.AutoMigrate(&models.User{}, &models.Student{}, &models.Business{}, &models.Job{}, &models.Application{})
+    err = DB.AutoMigrate(&models.User{}, &models.Student{}, &models.Business{}, &models.Job{}, &models.Application{},&models.Message{})
     if err != nil {
         log.Fatal("❌ Lỗi cấu trúc Migration: ", err)
     }
@@ -45,12 +47,15 @@ func main() {
     app.Use(logger.New())
 
     // 5. Cấu hình CORS (BẮT BUỘC để tránh lỗi chặn liên cổng khi Nuxt 3001 gọi sang Go 3000)
-    app.Use(cors.New(cors.Config{
-        AllowOrigins:     "http://localhost:3001",
-        AllowHeaders:     "Origin, Content-Type, Accept, Authorization",
-        AllowMethods:     "GET, POST, PUT, DELETE, OPTIONS",
-        AllowCredentials: true,
-    }))
+  app.Use(cors.New(cors.Config{
+    AllowOrigins: "http://localhost:3001,http://127.0.0.1:3001",
+
+    AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
+
+    AllowHeaders: "Origin,Content-Type,Accept,Authorization",
+
+    AllowCredentials: true,
+}))
     app.Static("/uploads", "./uploads")
 
 
@@ -119,6 +124,27 @@ app.Post("/api/applications/respond-offer",
     middlewares.RequireRole("student"), 
     handlers.RespondToOffer(DB),
 )
+// =========================
+// CHAT
+// =========================
+
+// Khởi động Hub
+handlers.StartChatHub(DB)
+
+// Middleware Upgrade WebSocket
+app.Use("/api/chat/ws", func(c *fiber.Ctx) error {
+	if websocket.IsWebSocketUpgrade(c) {
+		return c.Next()
+	}
+	return fiber.ErrUpgradeRequired
+})
+
+// REST API
+app.Get("/api/chat/history", handlers.GetChatHistory(DB))
+
+// WebSocket
+app.Get("/api/chat/ws", websocket.New(handlers.HandleWS))
+
     // Khởi động Server tại cổng 3000
     log.Fatal(app.Listen(":3000"))
 }
