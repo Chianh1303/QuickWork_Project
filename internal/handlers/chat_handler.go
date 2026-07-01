@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"QuickWork/models"
+	"QuickWork/internal/models"
 	"encoding/json"
 	"log"
 	"strconv"
@@ -176,11 +176,8 @@ func GetChatHistory(db *gorm.DB) fiber.Handler {
 		var messages []models.Message
 
 		if err := db.
-
 			Where("application_id = ?", appID).
-
 			Order("created_at asc").
-
 			Find(&messages).Error; err != nil {
 
 			return c.Status(500).JSON(fiber.Map{

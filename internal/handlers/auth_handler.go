@@ -1,7 +1,7 @@
 package handlers
 
 import (
-	"QuickWork/models"
+	"QuickWork/internal/models"
 	"fmt"
 	"net/http"
 	"time"

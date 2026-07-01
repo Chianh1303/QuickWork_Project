@@ -1,20 +1,22 @@
-package middlewares
+package middleware
 
 import (
-	"strings"
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
+	"strings"
 )
+
 var jwtSecret = []byte("quickwork_secret_key_2026")
-func Protected() fiber.Handler{
-	return func(c *fiber.Ctx) error{
+
+func Protected() fiber.Handler {
+	return func(c *fiber.Ctx) error {
 		authHeader := c.Get("Authorization")
-		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer "){
+		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "Header không hợp lệ"})
 		}
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
-			return jwtSecret,nil
+			return jwtSecret, nil
 		})
 		if err != nil || !token.Valid {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "❌ Token không hợp lệ hoặc đã hết hạn"})
@@ -25,7 +27,7 @@ func Protected() fiber.Handler{
 		}
 		c.Locals("user_id", claims["user_id"])
 		c.Locals("role", claims["role"])
-		return c.Next() 
+		return c.Next()
 	}
 }
 func RequireRole(allowedRoles ...string) fiber.Handler {

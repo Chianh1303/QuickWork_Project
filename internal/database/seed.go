@@ -1,10 +1,10 @@
 package database
 
 import (
-	"log"
+	"QuickWork/internal/models" // Chanh nhớ chỉnh lại đường dẫn package models đúng với dự án của bạn nhé
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"QuickWork/models" // Chanh nhớ chỉnh lại đường dẫn package models đúng với dự án của bạn nhé
+	"log"
 )
 
 func SeedDatabase(db *gorm.DB) {
@@ -124,7 +124,7 @@ func SeedDatabase(db *gorm.DB) {
 	// ==========================================
 	// 💼 SEED 10 JOB TUYỂN DỤNG INTERN/FRESHER CHUẨN ĐẸP
 	// ==========================================
-// ==========================================
+	// ==========================================
 	// 💼 SEED 10 JOB TUYỂN DỤNG INTERN/FRESHER CHUẨN ĐẸP
 	// ==========================================
 	if len(businessIDs) < 5 {
@@ -135,16 +135,16 @@ func SeedDatabase(db *gorm.DB) {
 	jobs := []models.Job{
 		{BusinessID: businessIDs[0], Title: "Golang Backend Intern", Location: "Quận Cầu Giấy, Hà Nội", Salary: 4500000.00, Slots: 5, Status: "approved", WorkingDate: "Thứ 2 - Thứ 6 (8:30 - 17:30)", Description: "Yêu cầu kiến thức cơ bản về Go, Gin/Fiber framework, biết sử dụng Git và tư duy database tốt. Hỗ trợ dấu thực tập."},
 		{BusinessID: businessIDs[0], Title: "VueJS/NuxtJS Frontend Fresher", Location: "Quận 9, TP. Hồ Chí Minh", Salary: 9500000.00, Slots: 3, Status: "approved", WorkingDate: "Thứ 2 - Thứ 6", Description: "Tham gia phát triển các dự án Outsource lớn sử dụng Vue 3, Nuxt 3/4. Ưu tiên các bạn làm đồ án tốt nghiệp bằng Vue/Nuxt."},
-		
+
 		{BusinessID: businessIDs[1], Title: "Fullstack Web Developer Intern", Location: "Quận 7, TP. Hồ Chí Minh", Salary: 5000000.00, Slots: 2, Status: "approved", WorkingDate: "Linh hoạt 4 ngày/tuần", Description: "Thực tập tại ZaloPay team. Làm việc với NodeJS/React. Có cơ hội trở thành nhân viên chính thức sau 3 tháng."},
 		{BusinessID: businessIDs[1], Title: "Game Development Trainee (C++)", Location: "Quận Cầu Giấy, Hà Nội", Salary: 7000000.00, Slots: 4, Status: "approved", WorkingDate: "Thứ 2 - Thứ 6", Description: "Đam mê ngành game, tư duy logic tốt, cấu trúc dữ liệu và giải thuật vững vàng. Được đào tạo bài bản từ đầu."},
-		
+
 		{BusinessID: businessIDs[2], Title: "Backend Engineer Intern (Java)", Location: "Quận Đống Đa, Hà Nội", Salary: 5500000.00, Slots: 3, Status: "approved", WorkingDate: "Thứ 2 - Thứ 6", Description: "Nghiên cứu và phát triển hệ sinh thái Viettel Money. Yêu cầu biết Java Core, kiến thức căn bản về SQL Server/MySQL."},
 		{BusinessID: businessIDs[2], Title: "DevOps Engineer Intern", Location: "Quận Đống Đa, Hà Nội", Salary: 4000000.00, Slots: 2, Status: "approved", WorkingDate: "Thứ 2 - Thứ 6", Description: "Làm quen với Docker, K8s, CI/CD pipelines (Jenkins/GitLab) dưới sự hướng dẫn trực tiếp của các Senior."},
-		
+
 		{BusinessID: businessIDs[3], Title: "Fresher Automation Tester", Location: "Quận Hà Đông, Hà Nội", Salary: 8500000.00, Slots: 5, Status: "approved", WorkingDate: "Thứ 2 - Thứ 6", Description: "Đọc hiểu tài liệu nghiệp vụ, viết testcase và thực hiện test các phần mềm kế toán, ERP của MISA. Được hướng dẫn viết script test tự động."},
 		{BusinessID: businessIDs[3], Title: "Business Analyst (BA) Intern", Location: "Quận Cầu Giấy, Hà Nội", Salary: 3000000.00, Slots: 2, Status: "approved", WorkingDate: "Tối thiểu 3 ngày/tuần", Description: "Cầu nối giữa khách hàng khối doanh nghiệp và team phát triển phần mềm. Kỹ năng giao tiếp, lắng nghe và làm tài liệu tốt."},
-		
+
 		{BusinessID: businessIDs[4], Title: "React Native Mobile Intern", Location: "Quận 3, TP. Hồ Chí Minh", Salary: 4500000.00, Slots: 3, Status: "approved", WorkingDate: "Thứ 2 - Thứ 6", Description: "Phát triển ứng dụng Mobile đa nền tảng bằng React Native. Hiểu biết về ES6, React Hooks là lợi thế lớn."},
 		{BusinessID: businessIDs[4], Title: "Data Engineer Fresher", Location: "Quận Cầu Giấy, Hà Nội", Salary: 11000000.00, Slots: 2, Status: "approved", WorkingDate: "Thứ 2 - Thứ 6", Description: "Xây dựng luồng dữ liệu ETL/ELT. Có kiến thức về Python, SQL nâng cao. Có tư duy phân tích dữ liệu nhạy bén."},
 	}
