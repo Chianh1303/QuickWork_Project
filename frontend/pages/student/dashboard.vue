@@ -1,8 +1,72 @@
 <template>
-  <div class="min-h-screen bg-slate-50 flex flex-col md:flex-row">
-    <StudentSidebar :state="studentDashboardState" />
+  <div class="dashboard-body min-h-screen">
+    <section class="border-b border-slate-800 bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950">
+      <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+        <div class="grid gap-5 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-cyan-200 ring-1 ring-cyan-400/30">
+                Student Workspace
+              </span>
+              <span class="text-xs font-semibold text-slate-400">Career dashboard</span>
+            </div>
+            <h1 class="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+              {{ studentHero.title }}
+            </h1>
+            <p class="mt-2 max-w-2xl text-sm font-semibold leading-6 text-slate-300">
+              {{ studentHero.description }}
+            </p>
+            <div class="mt-4 flex flex-wrap gap-3">
+              <button
+                @click="handleStudentHeroAction"
+                class="inline-flex items-center justify-center rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-bold text-slate-950 shadow-sm shadow-cyan-950/30 transition-colors hover:bg-cyan-300 focus-ring"
+              >
+                {{ studentHero.cta }}
+              </button>
+              <button
+                v-if="activeSection !== 'profile'"
+                @click="activeSection = 'profile'"
+                class="inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-white/15 focus-ring"
+              >
+                Improve profile
+              </button>
+            </div>
+          </div>
 
-    <main class="flex-grow p-6 sm:p-8 bg-slate-50 overflow-y-auto">
+          <div class="grid grid-cols-2 gap-3">
+            <div
+              v-for="stat in studentHeroStats"
+              :key="stat.label"
+              class="rounded-xl border border-white/10 bg-white/[0.07] px-4 py-3 shadow-sm shadow-slate-950/20 backdrop-blur ring-1 ring-white/10"
+            >
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-xs font-bold uppercase tracking-wide text-slate-400">{{ stat.label }}</p>
+                  <p class="mt-1 text-2xl font-extrabold text-white">{{ stat.value }}</p>
+                  <p class="mt-1 text-xs font-semibold text-slate-300">{{ stat.caption }}</p>
+                </div>
+                <span :class="[stat.iconClass, 'inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg']">
+                  <svg v-if="stat.icon === 'jobs'" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                  </svg>
+                  <svg v-else-if="stat.icon === 'apps'" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <svg v-else-if="stat.icon === 'accepted'" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <StudentJobsSection :state="studentDashboardState" />
       <StudentProfileSection :state="studentDashboardState" />
       <StudentApplicationsSection :state="studentDashboardState" />
@@ -13,8 +77,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, onUnmounted } from 'vue'
-import StudentSidebar from '~/components/student/StudentSidebar.vue'
+import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import StudentJobsSection from '~/components/student/StudentJobsSection.vue'
 import StudentProfileSection from '~/components/student/StudentProfileSection.vue'
 import StudentApplicationsSection from '~/components/student/StudentApplicationsSection.vue'
@@ -24,7 +87,7 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const activeSection = ref('jobs')
+const activeSection = useState<string>('studentDashboardActiveSection', () => 'jobs')
 
 const navItems = [
   { id: 'jobs', name: 'Dashboard' },
@@ -54,7 +117,7 @@ const resetFilters = () => {
 
 // Các lựa chọn địa điểm hiển thị lên giao diện
 const locationsList = [
-  { value: 'all', label: '📍 All Locations' },
+  { value: 'all', label: 'All locations' },
   { value: 'hanoi', label: 'Hanoi' },
   { value: 'hcm', label: 'Ho Chi Minh City' },
   { value: 'danang', label: 'Da Nang' }
@@ -83,6 +146,10 @@ const jobsSearchQuery = ref('')
 const jobsLocationQuery = ref('')
 const appSearchQuery = ref('')
 const appStatusFilter = ref('all')
+const jobsPage = ref(1)
+const jobsPageSize = 6
+const applicationsPage = ref(1)
+const applicationsPageSize = 8
 
 const appIdToCancel = ref<number | null>(null)
 const isCancellingApp = ref<number | null>(null)
@@ -125,6 +192,8 @@ const formatDate = (dateVal: any): string => {
 const statusBadgeClass = (status: string): string => {
   const norm = (status || '').toLowerCase()
   if (norm === 'approved' || norm === 'offer_accepted') return 'bg-emerald-50 border-emerald-200 text-emerald-700'
+  if (norm === 'student_completed') return 'bg-amber-50 border-amber-200 text-amber-700'
+  if (norm === 'paid') return 'bg-cyan-50 border-cyan-200 text-cyan-700'
   if (norm === 'rejected') return 'bg-rose-50 border-rose-200 text-rose-700'
   return 'bg-slate-50 border-slate-200 text-slate-700'
 }
@@ -167,6 +236,115 @@ const filteredApps = computed(() => {
     return matchesSearch && matchesStatus
   })
 })
+
+const paginatedJobs = computed(() => {
+  const start = (jobsPage.value - 1) * jobsPageSize
+  return filteredJobs.value.slice(start, start + jobsPageSize)
+})
+
+const paginatedApps = computed(() => {
+  const start = (applicationsPage.value - 1) * applicationsPageSize
+  return filteredApps.value.slice(start, start + applicationsPageSize)
+})
+
+watch(filteredJobs, () => {
+  jobsPage.value = 1
+})
+
+watch(filteredApps, () => {
+  applicationsPage.value = 1
+})
+
+const acceptedApplicationsCount = computed(() => {
+  return applications.value.filter(app => {
+    const status = app.status?.toLowerCase()
+    return status === 'approved' || status === 'offer_accepted'
+  }).length
+})
+
+const pendingApplicationsCount = computed(() => {
+  return applications.value.filter(app => {
+    const status = app.status?.toLowerCase()
+    return status === 'applied' || status === 'pending'
+  }).length
+})
+
+const profileReadiness = computed(() => {
+  const fields = [
+    profileForm.full_name,
+    profileForm.phone,
+    profileForm.gender,
+    profileForm.avatar_url || avatarPreview.value,
+    skillsArray.value.length > 0 || skillsText.value,
+    profileForm.cv_url || cvFileSelected.value
+  ]
+  const completed = fields.filter(Boolean).length
+  return Math.round((completed / fields.length) * 100)
+})
+
+const studentHero = computed(() => {
+  if (activeSection.value === 'profile') {
+    return {
+      title: profileForm.full_name ? `${profileForm.full_name}'s profile` : 'Build a stronger student profile',
+      description: 'Keep your contact details, skills, avatar, and CV ready before applying to new opportunities.',
+      cta: isEditing.value ? 'Editing profile' : 'Edit profile'
+    }
+  }
+
+  if (activeSection.value === 'applications') {
+    return {
+      title: 'Track your applications',
+      description: 'Follow every application, respond to offers, and manage active work sessions from one place.',
+      cta: 'Find more jobs'
+    }
+  }
+
+  return {
+    title: 'Find student-friendly jobs',
+    description: 'Browse verified roles, compare salary and location, then apply with your QuickWork profile.',
+    cta: 'Browse jobs'
+  }
+})
+
+const studentHeroStats = computed(() => [
+  {
+    label: 'Open jobs',
+    value: jobs.value.length,
+    caption: 'Available now',
+    icon: 'jobs',
+    iconClass: 'bg-brand-50 text-brand-700'
+  },
+  {
+    label: 'Applications',
+    value: applications.value.length,
+    caption: 'Submitted total',
+    icon: 'apps',
+    iconClass: 'bg-sky-50 text-sky-700'
+  },
+  {
+    label: 'Accepted',
+    value: acceptedApplicationsCount.value,
+    caption: `${pendingApplicationsCount.value} pending`,
+    icon: 'accepted',
+    iconClass: 'bg-emerald-50 text-emerald-700'
+  },
+  {
+    label: 'Profile',
+    value: `${profileReadiness.value}%`,
+    caption: 'Readiness score',
+    icon: 'profile',
+    iconClass: 'bg-amber-50 text-amber-700'
+  }
+])
+
+const handleStudentHeroAction = () => {
+  if (activeSection.value === 'profile') {
+    isEditing.value = true
+    return
+  }
+
+  activeSection.value = 'jobs'
+}
 
 // API Operations
 const fetchJobs = async () => {
@@ -485,6 +663,27 @@ const handleCheckOut = async (jobId: number) => {
     showToast(error.response?._data?.error || 'Không thể check-out', 'error')
   }
 }
+const handleStudentComplete = async (applicationId: number) => {
+  try {
+    const res = await api.post('/api/applications/student-complete', {
+      application_id: applicationId
+    })
+
+    showToast(res?.message || 'Bạn đã xác nhận hoàn thành công việc.')
+
+    await fetchApplications()
+  } catch (error: any) {
+    console.error('Student complete error:', error)
+
+    showToast(
+      error.data?.error ||
+      error.response?._data?.error ||
+      error.message ||
+      'Không thể xác nhận hoàn thành.',
+      'error'
+    )
+  }
+}
 // Vòng đời Hook duy nhất bọc toàn bộ logic
 const studentDashboardState = reactive({
   activeSection,
@@ -499,6 +698,9 @@ const studentDashboardState = reactive({
   fetchJobs,
   isLoadingJobs,
   filteredJobs,
+  paginatedJobs,
+  jobsPage,
+  jobsPageSize,
   companyNameLookup,
   checkIfApplied,
   handleApply,
@@ -514,6 +716,9 @@ const studentDashboardState = reactive({
   handleUpdateProfile,
   isLoadingApps,
   filteredApps,
+  paginatedApps,
+  applicationsPage,
+  applicationsPageSize,
   appSearchQuery,
   appStatusFilter,
   openChatModal,
@@ -537,6 +742,7 @@ const studentDashboardState = reactive({
   handleOfferResponse,
   isResponding,
   isChatModalOpen,
+  handleStudentComplete,
   selectedChatApp,
   toast
 })

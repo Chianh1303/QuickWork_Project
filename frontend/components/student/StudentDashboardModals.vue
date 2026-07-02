@@ -5,7 +5,7 @@
     <div class="p-6 pb-4 border-b border-slate-100">
       <h3 class="text-xl font-bold text-slate-900">Apply Opportunity</h3>
       <p class="text-sm font-medium text-slate-500 mt-1">
-        You are applying for: <span class="text-blue-600 font-semibold">{{ selectedJobForApply.title }}</span>
+        You are applying for: <span class="text-cyan-300 font-semibold">{{ selectedJobForApply.title }}</span>
       </p>
     </div>
 
@@ -18,7 +18,7 @@
           v-model="coverNoteText"
           rows="4"
           maxlength="500"
-          class="block w-full px-3 py-2 border border-slate-200 rounded-xl text-sm bg-slate-50 text-slate-900 focus:outline-none focus:ring-2 focus:ring-blue-500 focus:bg-white placeholder-slate-400 resize-none transition-all"
+          class="block w-full px-3 py-2 border border-white/10 rounded-xl text-sm bg-slate-950/70 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 placeholder-slate-500 resize-none transition-all"
           placeholder="Giới thiệu ngắn gọn về thế mạnh của bạn hoặc lý do bạn mong muốn ứng tuyển vị trí này..."
         ></textarea>
         <div class="text-right text-xs font-medium text-slate-400 mt-1">
@@ -37,7 +37,7 @@
         <button
           type="submit"
           :disabled="isSubmittingApply"
-          class="px-5 py-2 border border-transparent text-sm font-semibold rounded-lg text-white bg-blue-600 hover:bg-blue-500 shadow-sm transition-all flex items-center space-x-2"
+          class="px-5 py-2 border border-transparent text-sm font-semibold rounded-lg text-slate-950 bg-cyan-400 hover:bg-cyan-300 shadow-sm transition-all flex items-center space-x-2"
         >
           <span v-if="isSubmittingApply" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
           <span>Submit Application</span>
@@ -81,10 +81,10 @@
   <div v-if="selectedOffer" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
   <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full overflow-hidden text-left animate-in fade-in zoom-in-95 duration-150">
     
-    <div class="bg-gradient-to-br from-indigo-500 to-purple-600 p-6 text-white text-center relative">
+    <div class="bg-gradient-to-br from-slate-950 to-cyan-950 p-6 text-white text-center relative">
       <span class="text-4xl block mb-1">💼</span>
       <h3 class="text-lg font-bold">Lời Mời Nhận Việc (Job Offer)</h3>
-      <p class="text-xs text-indigo-100 mt-1">Hồ sơ ứng tuyển của bạn đã được doanh nghiệp phê duyệt</p>
+      <p class="text-xs text-cyan-100 mt-1">Hồ sơ ứng tuyển của bạn đã được doanh nghiệp phê duyệt</p>
     </div>
 <div class="p-6 space-y-5 bg-slate-900">
       <div>
@@ -192,8 +192,8 @@
   >
     <div 
       v-if="toast.show" 
-      class="fixed bottom-5 right-5 z-50 max-w-sm w-full bg-white shadow-xl rounded-xl pointer-events-auto ring-1 ring-black ring-opacity-5 overflow-hidden border"
-      :class="toast.type === 'success' ? 'border-emerald-500' : 'border-rose-500'"
+      class="fixed bottom-5 right-5 z-50 max-w-sm w-full bg-slate-900/95 shadow-2xl shadow-slate-950/40 rounded-xl pointer-events-auto ring-1 ring-white/10 overflow-hidden border backdrop-blur"
+      :class="toast.type === 'success' ? 'border-emerald-400/40' : 'border-rose-400/40'"
     >
       <div class="p-4">
         <div class="flex items-start">
@@ -206,15 +206,15 @@
             </svg>
           </div>
           <div class="ml-3 w-0 flex-1 pt-0.5">
-            <p class="text-sm font-bold text-slate-900">
+            <p class="text-sm font-bold text-white">
               {{ toast.type === 'success' ? 'Thông báo hệ thống' : 'Đã xảy ra lỗi' }}
             </p>
-            <p class="mt-1 text-xs font-medium text-slate-500 leading-relaxed">
+            <p class="mt-1 text-xs font-medium text-slate-300 leading-relaxed">
               {{ toast.message }}
             </p>
           </div>
           <div class="ml-4 flex-shrink-0 flex">
-            <button @click="toast.show = false" class="bg-white rounded-md inline-flex text-slate-400 hover:text-slate-500 focus:outline-none">
+            <button @click="toast.show = false" class="bg-white/10 rounded-md inline-flex text-slate-400 hover:text-white focus:outline-none">
               <span class="sr-only">Close</span>
               <svg class="h-4 w-4" viewBox="0 0 20 20" fill="currentColor">
                 <path fill-rule="evenodd" d="M4.293 4.293a1 1 0 011.414 0L10 8.586l4.293-4.293a1 1 0 111.414 1.414L11.414 10l4.293 4.293a1 1 0 01-1.414 1.414L10 11.414l-4.293 4.293a1 1 0 01-1.414-1.414L8.586 10 4.293 5.707a1 1 0 010-1.414z" clip-rule="evenodd" />

@@ -13,7 +13,7 @@
     <div class="p-6 space-y-4 overflow-y-auto flex-1">
       <div>
         <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Lời nhắn từ ứng viên (Cover Note)</label>
-        <div class="p-3 bg-blue-50/60 border border-blue-100 rounded-xl text-xs font-medium text-slate-700 whitespace-pre-line">
+        <div class="p-3 bg-cyan-400/10 border border-cyan-400/20 rounded-xl text-xs font-medium text-slate-200 whitespace-pre-line">
           {{ selectedApp.cover_note || 'Ứng viên không để lại lời nhắn.' }}
         </div>
       </div>
@@ -85,7 +85,7 @@
       <button 
         @click="submitReview"
         :disabled="!reviewStatus || isSubmitting"
-        class="px-4 py-2 text-xs font-bold text-white bg-indigo-600 hover:bg-indigo-700 disabled:opacity-50 rounded-lg shadow-sm transition-all"
+        class="px-4 py-2 text-xs font-bold text-slate-950 bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 rounded-lg shadow-sm transition-all"
       >
         {{ isSubmitting ? 'Đang gửi...' : 'Xác nhận phản hồi' }}
       </button>
@@ -93,6 +93,81 @@
 
   </div>
 </div>
+
+<div v-if="selectedCompletionApp" class="fixed inset-0 z-[9999] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+  <div class="w-full max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-slate-950 shadow-2xl shadow-slate-950/70">
+    <div class="border-b border-white/10 bg-slate-900/90 p-5">
+      <div class="flex items-start justify-between gap-4">
+        <div>
+          <p class="text-xs font-bold uppercase tracking-wider text-cyan-300">Hoàn tất công việc</p>
+          <h3 class="mt-1 text-xl font-extrabold text-white">Xác nhận hoàn thành & giải ngân</h3>
+          <p class="mt-1 text-sm font-medium text-slate-400">
+            Sinh viên đã báo hoàn thành. Vui lòng kiểm tra trước khi xác nhận cuối cùng.
+          </p>
+        </div>
+        <button
+          @click="closeCompletionModal"
+          class="rounded-lg bg-white/5 px-3 py-1.5 text-sm font-bold text-slate-300 hover:bg-white/10 hover:text-white"
+        >
+          Đóng
+        </button>
+      </div>
+    </div>
+
+    <div class="space-y-4 p-5">
+      <div class="grid gap-3 sm:grid-cols-2">
+        <div class="rounded-xl border border-white/10 bg-white/[0.04] p-4">
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Ứng viên</p>
+          <p class="mt-2 text-base font-extrabold text-white">{{ selectedCompletionApp.student?.full_name || 'N/A' }}</p>
+          <p class="mt-1 text-sm font-medium text-slate-400">{{ selectedCompletionApp.student?.phone || 'Chưa có số điện thoại' }}</p>
+        </div>
+        <div class="rounded-xl border border-white/10 bg-white/[0.04] p-4">
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Vị trí</p>
+          <p class="mt-2 text-base font-extrabold text-white">{{ selectedCompletionApp.job?.title || jobTitleLookup(selectedCompletionApp.job_id) }}</p>
+          <p class="mt-1 text-sm font-medium text-slate-400">Mã đơn #{{ selectedCompletionApp.id }}</p>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-cyan-400/20 bg-cyan-400/10 p-4">
+        <div class="grid gap-3 sm:grid-cols-3">
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wider text-cyan-200">Offer salary</p>
+            <p class="mt-1 text-sm font-extrabold text-white">{{ selectedCompletionApp.offer_salary || 'Thỏa thuận' }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wider text-cyan-200">Start date</p>
+            <p class="mt-1 text-sm font-extrabold text-white">{{ selectedCompletionApp.offer_start_date || 'N/A' }}</p>
+          </div>
+          <div>
+            <p class="text-xs font-bold uppercase tracking-wider text-cyan-200">Payment</p>
+            <p class="mt-1 text-sm font-extrabold text-white">Giả lập giải ngân</p>
+          </div>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-amber-400/20 bg-amber-400/10 p-4 text-sm font-medium text-amber-100">
+        Sau khi xác nhận, hệ thống sẽ chuyển trạng thái đơn sang <span class="font-extrabold">paid</span>, đánh dấu doanh nghiệp đã xác nhận và ghi nhận thời điểm giải ngân.
+      </div>
+    </div>
+
+    <div class="flex flex-col-reverse gap-2 border-t border-white/10 bg-slate-900/80 p-5 sm:flex-row sm:justify-end">
+      <button
+        @click="closeCompletionModal"
+        class="rounded-lg border border-white/10 px-4 py-2.5 text-sm font-bold text-slate-300 hover:bg-white/10 hover:text-white"
+      >
+        Kiểm tra lại
+      </button>
+      <button
+        @click="submitBusinessCompletion"
+        :disabled="isCompletingJob"
+        class="rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-extrabold text-slate-950 shadow-lg shadow-cyan-500/20 hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-60"
+      >
+        {{ isCompletingJob ? 'Đang xác nhận...' : 'Xác nhận & giải ngân' }}
+      </button>
+    </div>
+  </div>
+</div>
+
 <div 
     v-if="isChatModalOpen && selectedChatApp" 
     class="fixed inset-0 z-[9999] flex items-center justify-center p-4"
@@ -180,6 +255,10 @@ const {
   reviewStatus,
   offerForm,
   isSubmitting,
+  selectedCompletionApp,
+  isCompletingJob,
+  closeCompletionModal,
+  submitBusinessCompletion,
   closeModal,
   submitReview,
   isChatModalOpen,

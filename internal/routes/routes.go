@@ -99,4 +99,16 @@ func Register(app *fiber.App, db *gorm.DB) {
 
 	// WebSocket
 	app.Get("/api/chat/ws", websocket.New(handlers.HandleWS))
+
+	app.Post("/api/applications/student-complete",
+		middleware.Protected(),
+		middleware.RequireRole("student"),
+		handlers.StudentCompleteJob(db),
+	)
+
+	app.Post("/api/applications/business-complete",
+		middleware.Protected(),
+		middleware.RequireRole("business"),
+		handlers.BusinessCompleteJob(db),
+	)
 }

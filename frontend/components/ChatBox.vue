@@ -15,7 +15,7 @@
         <div 
           :class="[
             msg.sender_id === currentUserId 
-              ? 'bg-blue-600 text-white rounded-br-none' 
+              ? 'bg-cyan-400 text-slate-950 rounded-br-none'
               : 'bg-slate-900 text-slate-200 border border-slate-800 rounded-bl-none',
             'max-w-xs md:max-w-md px-4 py-2.5 rounded-2xl text-xs font-medium leading-relaxed shadow-sm'
           ]"
@@ -32,11 +32,11 @@
           v-model="newMessageText"
           type="text" 
           placeholder="Nhập nội dung tin nhắn trò chuyện..."
-          class="flex-1 px-4 py-3 border border-slate-800 rounded-xl text-xs bg-slate-900 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-blue-500 transition-all font-medium"
+          class="flex-1 px-4 py-3 border border-slate-800 rounded-xl text-xs bg-slate-900 text-slate-200 placeholder-slate-600 focus:outline-none focus:border-cyan-400 transition-all font-medium"
         />
         <button 
           type="submit" 
-          class="px-5 py-2.5 bg-blue-600 hover:bg-blue-500 text-white text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-blue-600/10"
+          class="px-5 py-2.5 bg-cyan-400 hover:bg-cyan-300 text-slate-950 text-xs font-bold uppercase tracking-wider rounded-xl transition-all shadow-lg shadow-cyan-500/10"
         >
           Gửi
         </button>

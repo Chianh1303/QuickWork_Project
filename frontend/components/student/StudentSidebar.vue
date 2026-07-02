@@ -1,25 +1,27 @@
 <template>
-    <!-- Sidebar Navigation -->
-    <aside class="w-full md:w-64 bg-white border-r border-slate-200 flex-shrink-0">
-      <div class="p-6 border-b border-slate-100 flex items-center space-x-3">
-        <span class="h-8 w-8 rounded-lg bg-gradient-to-tr from-blue-600 to-emerald-500 flex items-center justify-center text-white font-bold text-sm">
-          S
-        </span>
-        <div>
-          <h1 class="font-bold text-slate-900 text-sm">Student Portal</h1>
-          <p class="text-xs text-slate-500 font-medium">QuickWork Platform</p>
-        </div>
-      </div>
-      <nav class="p-4 space-y-1">
+    <section class="w-full bg-white border-b border-slate-200">
+      <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-4">
+        <div class="flex flex-col lg:flex-row lg:items-center lg:justify-between gap-4">
+          <div class="flex items-center space-x-3">
+            <span class="h-10 w-10 rounded-xl bg-gradient-to-tr from-brand-600 to-emerald-500 flex items-center justify-center text-white font-bold text-sm shadow-sm">
+              S
+            </span>
+            <div>
+              <h1 class="font-extrabold text-slate-900 text-base">Student Workspace</h1>
+              <p class="text-xs text-slate-500 font-medium">Find jobs, manage applications, and keep your profile ready.</p>
+            </div>
+          </div>
+
+          <nav class="grid grid-cols-2 sm:flex gap-2 rounded-xl bg-slate-100/80 p-1">
         <button
           v-for="item in navItems"
           :key="item.id"
           @click="activeSection = item.id"
           :class="[
             activeSection === item.id
-              ? 'bg-blue-50 text-blue-700 font-semibold'
-              : 'text-slate-600 hover:text-slate-900 hover:bg-slate-50',
-            'w-full flex items-center space-x-3 px-4 py-2.5 text-sm rounded-xl transition-all duration-150'
+              ? 'bg-white text-brand-700 font-semibold shadow-sm'
+              : 'text-slate-600 hover:text-slate-900 hover:bg-white/70',
+            'flex items-center justify-center space-x-2 px-4 py-2.5 text-sm rounded-lg transition-all duration-150 whitespace-nowrap focus:outline-none focus:ring-2 focus:ring-brand-500 focus:ring-offset-1'
           ]"
         >
           <!-- Render icons inline to avoid runtime compilation errors in Nuxt -->
@@ -35,7 +37,9 @@
           <span>{{ item.name }}</span>
         </button>
       </nav>
-    </aside>
+        </div>
+      </div>
+    </section>
 </template>
 
 <script setup lang="ts">

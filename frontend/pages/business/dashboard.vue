@@ -1,8 +1,73 @@
 <template>
-  <div class="min-h-screen bg-slate-50 flex flex-col md:flex-row">
-    <BusinessSidebar :state="businessDashboardState" />
+  <div class="dashboard-body min-h-screen">
+    <section class="border-b border-slate-800 bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950">
+      <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
+        <div class="grid gap-5 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+          <div>
+            <div class="flex flex-wrap items-center gap-2">
+              <span class="inline-flex items-center rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-cyan-200 ring-1 ring-cyan-400/30">
+                Employer Workspace
+              </span>
+              <span class="text-xs font-semibold text-slate-400">Hiring command center</span>
+            </div>
+            <h1 class="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+              {{ businessHero.title }}
+            </h1>
+            <p class="mt-2 max-w-2xl text-sm font-semibold leading-6 text-slate-300">
+              {{ businessHero.description }}
+            </p>
+            <div class="mt-4 flex flex-wrap gap-3">
+              <button
+                @click="handleBusinessHeroAction"
+                class="inline-flex items-center justify-center rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-bold text-slate-950 shadow-sm shadow-cyan-950/30 transition-colors hover:bg-cyan-300 focus-ring"
+              >
+                {{ businessHero.cta }}
+              </button>
+              <button
+                v-if="activeSection !== 'applicants'"
+                @click="activeSection = 'applicants'"
+                class="inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-white/15 focus-ring"
+              >
+                Review applicants
+              </button>
+            </div>
+          </div>
 
-    <main class="flex-grow p-6 sm:p-8 bg-slate-50 overflow-y-auto">
+          <div class="grid grid-cols-2 gap-3">
+            <div
+              v-for="stat in businessHeroStats"
+              :key="stat.label"
+              class="rounded-xl border border-white/10 bg-white/[0.07] px-4 py-3 shadow-sm shadow-slate-950/20 backdrop-blur ring-1 ring-white/10"
+            >
+              <div class="flex items-start justify-between gap-3">
+                <div>
+                  <p class="text-xs font-bold uppercase tracking-wide text-slate-400">{{ stat.label }}</p>
+                  <p class="mt-1 text-2xl font-extrabold text-white">{{ stat.value }}</p>
+                  <p class="mt-1 text-xs font-semibold text-slate-300">{{ stat.caption }}</p>
+                </div>
+                <span :class="[stat.iconClass, 'inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg']">
+                  <svg v-if="stat.icon === 'jobs'" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                  </svg>
+                  <svg v-else-if="stat.icon === 'apps'" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                  </svg>
+                  <svg v-else-if="stat.icon === 'pending'" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                  </svg>
+                  <svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                  </svg>
+                </span>
+              </div>
+            </div>
+          </div>
+        </div>
+      </div>
+    </section>
+
+    <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
       <BusinessOverviewSection :state="businessDashboardState" />
       <BusinessProfileSection :state="businessDashboardState" />
       <BusinessJobsSection :state="businessDashboardState" />
@@ -14,8 +79,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted } from 'vue'
-import BusinessSidebar from '~/components/business/BusinessSidebar.vue'
+import { ref, reactive, computed, onMounted, watch } from 'vue'
 import BusinessOverviewSection from '~/components/business/BusinessOverviewSection.vue'
 import BusinessProfileSection from '~/components/business/BusinessProfileSection.vue'
 import BusinessJobsSection from '~/components/business/BusinessJobsSection.vue'
@@ -28,7 +92,7 @@ definePageMeta({
 })
 
 // Navigation setups
-const activeSection = ref('dashboard')
+const activeSection = useState<string>('businessDashboardActiveSection', () => 'dashboard')
 
 const navItems = [
   { id: 'dashboard', name: 'Dashboard' },
@@ -57,6 +121,10 @@ const isReviewing = ref(false)
 // Query filters
 const applicantSearchQuery = ref('')
 const applicantStatusFilter = ref('all')
+const businessJobsPage = ref(1)
+const businessJobsPageSize = 10
+const applicantsPage = ref(1)
+const applicantsPageSize = 8
 
 
 // Trạng thái quản lý đóng mở form và file logo của Business
@@ -68,6 +136,8 @@ const logoPreview = ref<string | null>(null)
 const selectedApp = ref<any>(null)
 const reviewStatus = ref<'approved' | 'rejected' | null>(null)
 const isSubmitting = ref(false)
+const selectedCompletionApp = ref<any | null>(null)
+const isCompletingJob = ref(false)
 
 // Form thông tin Offer gửi đính kèm
 const offerForm = ref({
@@ -88,6 +158,44 @@ const openReviewModal = (app: any) => {
 const closeModal = () => {
   selectedApp.value = null
   reviewStatus.value = null
+}
+
+const openCompletionModal = (app: any) => {
+  selectedCompletionApp.value = app
+  feedback.value = null
+}
+
+const closeCompletionModal = () => {
+  selectedCompletionApp.value = null
+}
+
+const submitBusinessCompletion = async () => {
+  if (!selectedCompletionApp.value) return
+
+  isCompletingJob.value = true
+  feedback.value = null
+
+  try {
+    const res = await api.post('/api/applications/business-complete', {
+      application_id: selectedCompletionApp.value.id
+    })
+
+    feedback.value = {
+      type: 'success',
+      message: res.message || 'Đã xác nhận hoàn thành và giải ngân lương.'
+    }
+
+    closeCompletionModal()
+    await fetchApplications()
+  } catch (err: any) {
+    feedback.value = {
+      type: 'error',
+      message: err.response?._data?.error || err.response?._data?.message || 'Không thể xác nhận hoàn thành công việc.'
+    }
+  } finally {
+    isCompletingJob.value = false
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 }
 
 const submitReview = async () => {
@@ -194,8 +302,14 @@ const fillRatio = computed(() => {
 
 const metricsCards = computed(() => {
   const total = applications.value.length
-  const pending = applications.value.filter(app => app.status?.toLowerCase() === 'applied').length
-  const approved = applications.value.filter(app => app.status?.toLowerCase() === 'approved').length
+  const pending = applications.value.filter(app => {
+    const status = app.status?.toLowerCase()
+    return status === 'applied' || status === 'pending'
+  }).length
+  const approved = applications.value.filter(app => {
+    const status = app.status?.toLowerCase()
+    return status === 'approved' || status === 'offer_accepted' || status === 'student_completed' || status === 'paid'
+  }).length
   const rejected = applications.value.filter(app => app.status?.toLowerCase() === 'rejected').length
 
   return [
@@ -205,6 +319,98 @@ const metricsCards = computed(() => {
     { title: 'Rejected Applications', value: rejected, label: 'Declined', color: 'bg-rose-50 border-rose-200 text-rose-700' }
   ]
 })
+
+const pendingApplicationsCount = computed(() => {
+  return applications.value.filter(app => {
+    const status = app.status?.toLowerCase()
+    return status === 'applied' || status === 'pending'
+  }).length
+})
+
+const acceptedApplicationsCount = computed(() => {
+  return applications.value.filter(app => {
+    const status = app.status?.toLowerCase()
+    return status === 'approved' || status === 'offer_accepted' || status === 'student_completed' || status === 'paid'
+  }).length
+})
+
+const businessHero = computed(() => {
+  if (activeSection.value === 'profile') {
+    return {
+      title: profileForm.company_name ? `${profileForm.company_name} profile` : 'Complete your employer profile',
+      description: 'Keep company details polished so students can understand your brand before they apply.',
+      cta: 'Update profile'
+    }
+  }
+
+  if (activeSection.value === 'jobs') {
+    return {
+      title: 'Manage job openings',
+      description: 'Publish clear roles, monitor capacity, and keep student-friendly opportunities fresh.',
+      cta: 'Post a job'
+    }
+  }
+
+  if (activeSection.value === 'applicants') {
+    return {
+      title: 'Applicant pipeline',
+      description: 'Review candidates, move applications forward, and start conversations from one place.',
+      cta: 'View pending'
+    }
+  }
+
+  return {
+    title: 'Hiring performance overview',
+    description: 'Track job posts, candidate movement, and hiring coverage across your current openings.',
+    cta: 'Post a job'
+  }
+})
+
+const businessHeroStats = computed(() => [
+  {
+    label: 'Active jobs',
+    value: jobs.value.length,
+    caption: 'Open postings',
+    icon: 'jobs',
+    iconClass: 'bg-brand-50 text-brand-700'
+  },
+  {
+    label: 'Applicants',
+    value: applications.value.length,
+    caption: 'Total received',
+    icon: 'apps',
+    iconClass: 'bg-sky-50 text-sky-700'
+  },
+  {
+    label: 'Pending',
+    value: pendingApplicationsCount.value,
+    caption: 'Need review',
+    icon: 'pending',
+    iconClass: 'bg-amber-50 text-amber-700'
+  },
+  {
+    label: 'Fill rate',
+    value: `${fillRatio.value}%`,
+    caption: `${acceptedApplicationsCount.value} accepted`,
+    icon: 'fill',
+    iconClass: 'bg-emerald-50 text-emerald-700'
+  }
+])
+
+const handleBusinessHeroAction = () => {
+  if (activeSection.value === 'profile') {
+    isEditing.value = true
+    return
+  }
+
+  if (activeSection.value === 'applicants') {
+    applicantStatusFilter.value = 'pending'
+    return
+  }
+
+  activeSection.value = 'jobs'
+  showCreateForm.value = true
+}
 
 const filteredApps = computed(() => {
   return applications.value.filter(app => {
@@ -222,9 +428,29 @@ const filteredApps = computed(() => {
   })
 })
 
+const paginatedBusinessJobs = computed(() => {
+  const start = (businessJobsPage.value - 1) * businessJobsPageSize
+  return jobs.value.slice(start, start + businessJobsPageSize)
+})
+
+const paginatedApplicants = computed(() => {
+  const start = (applicantsPage.value - 1) * applicantsPageSize
+  return filteredApps.value.slice(start, start + applicantsPageSize)
+})
+
+watch(jobs, () => {
+  businessJobsPage.value = 1
+})
+
+watch(filteredApps, () => {
+  applicantsPage.value = 1
+})
+
 const statusBadgeClass = (status: string): string => {
   const norm = status?.toLowerCase() || ''
-  if (norm === 'approved') return 'bg-emerald-50 border-emerald-200 text-emerald-700'
+  if (norm === 'approved' || norm === 'offer_accepted') return 'bg-emerald-50 border-emerald-200 text-emerald-700'
+  if (norm === 'student_completed') return 'bg-amber-50 border-amber-200 text-amber-700'
+  if (norm === 'paid') return 'bg-cyan-50 border-cyan-200 text-cyan-700'
   if (norm === 'rejected') return 'bg-rose-50 border-rose-200 text-rose-700'
   return 'bg-slate-50 border-slate-200 text-slate-700'
 }
@@ -418,9 +644,15 @@ const businessDashboardState = reactive({
   isCreatingJob,
   isLoadingJobs,
   isLoadingApps,
+  paginatedBusinessJobs,
+  businessJobsPage,
+  businessJobsPageSize,
   applicantSearchQuery,
   applicantStatusFilter,
   filteredApps,
+  paginatedApplicants,
+  applicantsPage,
+  applicantsPageSize,
   jobTitleLookup,
   formatDate,
   statusBadgeClass,
@@ -437,6 +669,11 @@ const businessDashboardState = reactive({
   reviewStatus,
   offerForm,
   isSubmitting,
+  selectedCompletionApp,
+  isCompletingJob,
+  openCompletionModal,
+  closeCompletionModal,
+  submitBusinessCompletion,
   closeModal,
   submitReview,
   isChatModalOpen,

@@ -1,20 +1,21 @@
 <template>
-  <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-12">
+  <div class="dashboard-body px-4 sm:px-6 lg:px-8 py-10">
+    <div class="max-w-7xl mx-auto">
     <!-- Hero Header -->
-    <div class="text-center max-w-3xl mx-auto mb-16">
-      <h2 class="text-base font-semibold text-brand-600 tracking-wide uppercase">Open Positions</h2>
-      <p class="mt-2 text-3xl font-extrabold text-slate-900 sm:text-4xl tracking-tight">
-        Find the perfect role for your schedule
+    <div class="text-center max-w-3xl mx-auto mb-10 rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950 px-6 py-10 shadow-xl shadow-slate-950/10">
+      <h2 class="text-sm font-bold text-cyan-300 tracking-wide uppercase">Open Positions</h2>
+      <p class="mt-2 text-3xl font-extrabold text-white sm:text-4xl tracking-tight">
+        Student-friendly jobs, ready to apply
       </p>
-      <p class="mt-4 text-lg text-slate-500">
+      <p class="mt-4 text-base sm:text-lg text-slate-300">
         Browse active student job vacancies and application offers posted by verified local employers.
       </p>
     </div>
 
     <!-- Search & Filters -->
-    <div class="bg-white p-4 rounded-xl border border-slate-200 shadow-sm max-w-4xl mx-auto mb-10 grid grid-cols-1 sm:grid-cols-2 gap-4">
+    <div class="bg-slate-900/82 p-4 rounded-xl border border-cyan-400/15 shadow-lg shadow-slate-950/30 max-w-4xl mx-auto mb-10 grid grid-cols-1 sm:grid-cols-2 gap-4 backdrop-blur">
       <div class="relative">
-        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
@@ -22,12 +23,12 @@
         <input
           v-model="searchQuery"
           type="text"
-          class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all duration-200"
-          placeholder="Filter by title, keywords..."
+          class="block w-full pl-10 pr-3 py-2.5 border border-white/10 rounded-lg text-sm bg-slate-950/70 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-300 transition-all duration-200"
+          placeholder="Search title or keyword"
         />
       </div>
       <div class="relative">
-        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
+        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-500">
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
@@ -36,8 +37,8 @@
         <input
           v-model="locationQuery"
           type="text"
-          class="block w-full pl-10 pr-3 py-2 border border-slate-200 rounded-lg text-sm bg-slate-50 placeholder-slate-400 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:bg-white transition-all duration-200"
-          placeholder="Filter by location (e.g. Hanoi, Remote)..."
+          class="block w-full pl-10 pr-3 py-2.5 border border-white/10 rounded-lg text-sm bg-slate-950/70 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-300 transition-all duration-200"
+          placeholder="Location, city, or remote"
         />
       </div>
     </div>
@@ -78,45 +79,45 @@
       <p class="font-semibold text-slate-700">No active job listings found.</p>
     </div>
 
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 lg:grid-cols-3 gap-6 max-w-6xl mx-auto">
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5 max-w-6xl mx-auto">
       <div
-        v-for="job in filteredJobs"
+        v-for="job in paginatedJobs"
         :key="job.id"
-        class="bg-white rounded-xl border border-slate-200 shadow-sm p-6 flex flex-col justify-between hover:shadow-md transition-shadow duration-200"
+        class="bg-slate-900/82 rounded-lg border border-white/10 shadow-lg shadow-slate-950/25 p-5 flex flex-col min-h-[340px] hover:border-cyan-300/50 hover:shadow-cyan-950/30 transition-all duration-200 backdrop-blur"
       >
-        <div>
+        <div class="flex-1">
           <div class="flex justify-between items-start mb-3">
-            <span class="inline-flex items-center px-2.5 py-0.5 rounded-full text-xs font-semibold bg-brand-50 text-brand-700">
+            <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-400/10 text-cyan-200 ring-1 ring-cyan-400/20">
               Slots: {{ job.slots }}
             </span>
-            <span class="text-sm font-extrabold text-emerald-600 bg-emerald-50 px-2.5 py-1 rounded-lg">
-              ${{ job.salary.toLocaleString() }}
+            <span class="text-sm font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg whitespace-nowrap">
+              {{ formatCurrency(job.salary) }}
             </span>
           </div>
-          <h3 class="text-lg font-bold text-slate-900 line-clamp-1">{{ job.title }}</h3>
-          <p class="text-sm font-medium text-slate-500 mt-1 flex items-center gap-1">
+          <h3 class="text-lg font-bold text-white line-clamp-2 min-h-[3.5rem]">{{ displayJobTitle(job.title) }}</h3>
+          <p class="text-sm font-medium text-slate-400 mt-1 flex items-center gap-1">
             <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
             </svg>
             {{ job.location }}
           </p>
-          <p class="text-sm font-medium text-slate-500 mt-1 flex items-center gap-1" v-if="job.working_date">
+          <p class="text-sm font-medium text-slate-400 mt-1 flex items-center gap-1" v-if="job.working_date">
             <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
             </svg>
-            Date: {{ job.working_date }}
+            {{ job.working_date }}
           </p>
-          <p class="text-sm text-slate-600 mt-4 line-clamp-4 bg-slate-50 p-3 rounded-lg border border-slate-100">
+          <p class="text-sm text-slate-300 mt-4 line-clamp-4 leading-6">
             {{ job.description }}
           </p>
         </div>
 
-        <div class="mt-6 pt-4 border-t border-slate-100">
+        <div class="mt-6 pt-4 border-t border-white/10">
           <template v-if="isAuthenticated && userRole === 'student'">
             <button
               @click="handleApply(job.id)"
               :disabled="isApplying === job.id"
-              class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-semibold rounded-lg text-white bg-brand-600 hover:bg-brand-500 transition-colors focus-ring disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
+              class="w-full flex justify-center py-2 px-4 border border-transparent text-sm font-semibold rounded-lg text-slate-950 bg-cyan-400 hover:bg-cyan-300 transition-colors focus-ring disabled:opacity-50 disabled:cursor-not-allowed shadow-sm"
             >
               <span v-if="isApplying === job.id" class="flex items-center space-x-2">
                 <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
@@ -125,7 +126,7 @@
                 </svg>
                 <span>Applying...</span>
               </span>
-              <span v-else>Apply Instantly</span>
+              <span v-else>Apply Now</span>
             </button>
           </template>
           <template v-else-if="isAuthenticated && userRole === 'business'">
@@ -136,7 +137,7 @@
           <template v-else>
             <NuxtLink
               to="/login"
-              class="w-full flex justify-center py-2 px-4 border border-slate-200 text-sm font-semibold rounded-lg text-brand-600 hover:bg-brand-50 hover:text-brand-700 transition-all text-center"
+              class="w-full flex justify-center py-2 px-4 border border-white/10 text-sm font-semibold rounded-lg text-cyan-200 hover:bg-cyan-400/10 hover:text-cyan-100 transition-all text-center"
             >
               Sign In to Apply
             </NuxtLink>
@@ -144,13 +145,25 @@
         </div>
       </div>
     </div>
+
+    <div class="max-w-6xl mx-auto mt-6">
+      <PaginationControls
+        v-if="!isLoadingJobs && filteredJobs.length > 0"
+        :page="jobsPage"
+        :page-size="jobsPageSize"
+        :total-items="filteredJobs.length"
+        @update:page="jobsPage = $event"
+      />
+    </div>
+    </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, onMounted, watch } from 'vue'
 import { useApi } from '~/composables/useApi'
 import { useAuth } from '~/composables/useAuth'
+import PaginationControls from '~/components/common/PaginationControls.vue'
 
 const api = useApi()
 const { isAuthenticated, userRole } = useAuth()
@@ -162,6 +175,8 @@ const feedback = ref<{ type: 'success' | 'error'; message: string } | null>(null
 
 const searchQuery = ref('')
 const locationQuery = ref('')
+const jobsPage = ref(1)
+const jobsPageSize = 6
 
 const filteredJobs = computed(() => {
   return jobs.value.filter(job => {
@@ -174,6 +189,15 @@ const filteredJobs = computed(() => {
       
     return matchesSearch && matchesLocation
   })
+})
+
+const paginatedJobs = computed(() => {
+  const start = (jobsPage.value - 1) * jobsPageSize
+  return filteredJobs.value.slice(start, start + jobsPageSize)
+})
+
+watch(filteredJobs, () => {
+  jobsPage.value = 1
 })
 
 const fetchJobs = async () => {
@@ -207,6 +231,15 @@ const handleApply = async (jobId: number) => {
     isApplying.value = null
     window.scrollTo({ top: 0, behavior: 'smooth' })
   }
+}
+
+const formatCurrency = (value: number | string | null | undefined) => {
+  const amount = Number(value || 0)
+  return `${amount.toLocaleString('vi-VN')} VND`
+}
+
+const displayJobTitle = (title: string | null | undefined) => {
+  return (title || 'Untitled Job').replace(/\bMarketting\b/gi, 'Marketing')
 }
 
 onMounted(() => {
