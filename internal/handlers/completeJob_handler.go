@@ -2,9 +2,11 @@ package handlers
 
 import (
 	"QuickWork/internal/models"
+	"strconv"
+	"time"
+
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
-	"time"
 )
 
 func StudentCompleteJob(db *gorm.DB) fiber.Handler {
@@ -95,15 +97,68 @@ func BusinessCompleteJob(db *gorm.DB) fiber.Handler {
 
 		now := time.Now()
 
-		app.BusinessCompleted = true
-		app.CompletedAt = &now
-		app.PaidAt = &now
-		app.PaymentStatus = "paid"
-		app.Status = "paid"
+app.BusinessCompleted = true
+app.CompletedAt = &now
+app.PaidAt = &now
+app.PaymentStatus = "paid"
+app.Status = "paid"
 
-		if err := db.Save(&app).Error; err != nil {
-			return c.Status(500).JSON(fiber.Map{"error": "Không thể xác nhận hoàn thành"})
+var student models.Student
+if err := db.First(&student, app.StudentID).Error; err != nil {
+	return c.Status(404).JSON(fiber.Map{"error": "Không tìm thấy sinh viên để giải ngân"})
+}
+
+salaryAmount := app.Job.Salary
+if app.OfferSalary != "" {
+	parsedSalary, err := strconv.ParseFloat(app.OfferSalary, 64)
+	if err == nil && parsedSalary > 0 {
+		salaryAmount = parsedSalary
+	}
+}
+
+err := db.Transaction(func(tx *gorm.DB) error {
+	if err := tx.Save(&app).Error; err != nil {
+		return err
+	}
+
+	var studentWallet models.Wallet
+	if err := tx.Where("user_id = ?", student.UserID).First(&studentWallet).Error; err != nil {
+		studentWallet = models.Wallet{
+			UserID:  student.UserID,
+			Balance: 0,
 		}
+		if err := tx.Create(&studentWallet).Error; err != nil {
+			return err
+		}
+	}
+
+	studentWallet.Balance += salaryAmount
+
+	if err := tx.Save(&studentWallet).Error; err != nil {
+		return err
+	}
+
+	studentTransaction := models.WalletTransaction{
+		WalletID:      studentWallet.ID,
+		Type:          "salary",
+		Amount:        salaryAmount,
+		Description:   "Nhận lương từ công việc: " + app.Job.Title,
+		ReferenceID:   app.ID,
+		ReferenceType: "application",
+	}
+
+	if err := tx.Create(&studentTransaction).Error; err != nil {
+		return err
+	}
+
+	return nil
+})
+
+if err != nil {
+	return c.Status(500).JSON(fiber.Map{
+		"error": "Không thể giải ngân lương",
+	})
+}
 
 		return c.JSON(fiber.Map{
 			"message": "Doanh nghiệp đã xác nhận hoàn thành. Hệ thống đã giả lập giải ngân lương.",

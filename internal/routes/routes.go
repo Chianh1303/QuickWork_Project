@@ -83,6 +83,10 @@ func Register(app *fiber.App, db *gorm.DB) {
 		handlers.CheckOut(db),
 	)
 
+	app.Get("/api/wallet/me",
+		middleware.Protected(),
+		handlers.GetMyWallet(db),
+	)
 	// CHAT
 	handlers.StartChatHub(db)
 

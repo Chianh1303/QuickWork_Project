@@ -70,6 +70,7 @@
       <StudentJobsSection :state="studentDashboardState" />
       <StudentProfileSection :state="studentDashboardState" />
       <StudentApplicationsSection :state="studentDashboardState" />
+      <StudentWalletSection :state="studentDashboardState" />
     </main>
   </div>
 
@@ -82,6 +83,7 @@ import StudentJobsSection from '~/components/student/StudentJobsSection.vue'
 import StudentProfileSection from '~/components/student/StudentProfileSection.vue'
 import StudentApplicationsSection from '~/components/student/StudentApplicationsSection.vue'
 import StudentDashboardModals from '~/components/student/StudentDashboardModals.vue'
+import StudentWalletSection from '~/components/student/StudentWalletSection.vue'
 
 definePageMeta({
   middleware: 'auth'
@@ -92,7 +94,8 @@ const activeSection = useState<string>('studentDashboardActiveSection', () => 'j
 const navItems = [
   { id: 'jobs', name: 'Dashboard' },
   { id: 'profile', name: 'Profile' },
-  { id: 'applications', name: 'My Applications' }
+  { id: 'applications', name: 'My Applications' },
+  { id: 'wallet', name: 'Wallet' }
 ]
 
 const filterSearch = ref('')
@@ -129,6 +132,9 @@ const jobs = ref<any[]>([])
 const applications = ref<any[]>([])
 const isLoadingJobs = ref(false)
 const isLoadingApps = ref(false)
+const wallet = ref<any>(null)
+const walletTransactions = ref<any[]>([])
+const isLoadingWallet = ref(false)
 const isApplying = ref<number | null>(null)
 const isSavingProfile = ref(false)
 const feedback = ref<{ type: 'success' | 'error'; message: string } | null>(null)
@@ -387,6 +393,22 @@ const fetchApplications = async () => {
     console.error('Error fetching student applications:', err)
   } finally {
     isLoadingApps.value = false
+  }
+}
+const fetchWallet = async () => {
+  isLoadingWallet.value = true
+
+  try {
+    const res = await api.get('/api/wallet/me')
+
+    wallet.value = res.wallet || null
+    walletTransactions.value = Array.isArray(res.transactions)
+      ? res.transactions
+      : []
+  } catch (err) {
+    console.error('Error fetching wallet:', err)
+  } finally {
+    isLoadingWallet.value = false
   }
 }
 
@@ -672,6 +694,7 @@ const handleStudentComplete = async (applicationId: number) => {
     showToast(res?.message || 'Bạn đã xác nhận hoàn thành công việc.')
 
     await fetchApplications()
+    await fetchWallet()
   } catch (error: any) {
     console.error('Student complete error:', error)
 
@@ -744,25 +767,23 @@ const studentDashboardState = reactive({
   isChatModalOpen,
   handleStudentComplete,
   selectedChatApp,
-  toast
+  toast,
+  wallet,
+  walletTransactions,
+  isLoadingWallet,
+  fetchWallet
 })
 
-onMounted(() => {
-  fetchJobs()
-  fetchApplications()
-  fetchProfile()
-  timerInterval = setInterval(updateTimers, 1000)
-})
 
 onUnmounted(() => {
   if (timerInterval) clearInterval(timerInterval)
 })
-onMounted(() => {
-  fetchJobs()
-  fetchApplications()
-  fetchProfile()
+onMounted(async () => {
+  await fetchJobs()
+  await fetchApplications()
+  await fetchProfile()
+  await fetchWallet()
 
-  // 🌟 Khôi phục các ca làm việc đang mở từ localStorage
   if (import.meta.client) {
     applications.value.forEach(app => {
       if (app.job_id) {

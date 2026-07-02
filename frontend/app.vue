@@ -214,7 +214,8 @@ const businessDashboardActiveSection = useState<string>('businessDashboardActive
 const studentDashboardNavItems = [
   { id: 'jobs', name: 'Find Jobs' },
   { id: 'profile', name: 'Profile' },
-  { id: 'applications', name: 'Applications' }
+  { id: 'applications', name: 'Applications' },
+  { id: 'wallet', name: 'Wallet' }
 ]
 
 const businessDashboardNavItems = [
