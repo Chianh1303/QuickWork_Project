@@ -6,71 +6,35 @@ import (
 	"gorm.io/gorm"
 )
 
-func GetAvailableJobs(db *gorm.DB) fiber.Handler {
-	return func(c *fiber.Ctx) error {
-		// 1. Đón đầu toàn bộ 5 tham số từ URL Query String
-		search := c.Query("search")
-		location := c.Query("location")
-		category := c.Query("category")
-		jobType := c.Query("job_type")
-		maxSalary := c.Query("max_salary")
-
-		var jobs []models.Job
-		query := db.Model(&models.Job{})
-
-		// 2. Lọc theo Từ khóa (Title)
-		if search != "" {
-			query = query.Where("LOWER(title) LIKE LOWER(?)", "%"+search+"%")
-		}
-
-		// 3. Lọc theo Địa điểm
-		if location != "" && location != "all" {
-			query = query.Where("LOWER(location) LIKE LOWER(?)", "%"+location+"%")
-		}
-
-		// 4. Lọc theo Ngành nghề (Category)
-		if category != "" && category != "all" {
-			query = query.Where("LOWER(category) = LOWER(?)", category)
-		}
-
-		// 5. Lọc theo Hình thức (Job Type)
-		if jobType != "" && jobType != "all" {
-			query = query.Where("LOWER(job_type) = LOWER(?)", jobType)
-		}
-
-		// 6. Lọc theo Mức lương tối thiểu
-		if maxSalary != "" {
-			query = query.Where("salary >= ?", maxSalary)
-		}
-
-		// Thực thi truy vấn đưa ra danh sách
-		// 🌟 Chèn thêm .Where vào giữa để lọc đúng các Job đã được Admin duyệt
-		if err := query.
-			Preload("Business").
-			Where("status = ?", "approved").
-			Order("id DESC").
-			Find(&jobs).Error; err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-				"message": "Không thể lấy danh sách công việc toàn diện",
-			})
-		}
-
-		return c.JSON(fiber.Map{
-			"message": "🎨 Lấy danh sách công việc thành công!",
-			"data":    jobs,
-		})
-	}
-}
-
 // 🌟 ĐÃ FIX: Struct nhận dữ liệu ứng tuyển từ Sinh viên nội bộ (Thêm CoverNote)
 type ApplyJobInput struct {
 	JobID     uint   `json:"job_id"`
 	CoverNote string `json:"cover_note"` // Nhận lời nhắn từ Nuxt 4 gửi sang
 }
 
-type RespondOfferInput struct {
-	ApplicationID uint   `json:"application_id"`
-	Response      string `json:"response"` // "accept" hoặc "decline"
+func GetStudentApplications(db *gorm.DB) fiber.Handler {
+	return func(c *fiber.Ctx) error {
+
+		userID := c.Locals("user_id").(float64)
+		var student models.Student
+		if err := db.Where("user_id = ?", userID).First(&student).Error; err != nil {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "❌ Không tìm thấy hồ sơ sinh viên của tài khoản này"})
+		}
+		var apps []models.Application
+		if err := db.
+			Preload("Job").
+			Preload("Job.Business").
+			Preload("Job.Business.User").
+			Where("student_id = ?", student.ID).
+			Find(&apps).Error; err != nil {
+			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "❌ Lỗi hệ thống khi lấy lịch sử ứng tuyển"})
+		}
+		return c.JSON(fiber.Map{
+			"success": true,
+			"data":    apps,
+		})
+
+	}
 }
 
 func ApplyJob(db *gorm.DB) fiber.Handler {
@@ -153,52 +117,45 @@ func CancelApplication(db *gorm.DB) fiber.Handler {
 		})
 	}
 }
-func RespondToOffer(db *gorm.DB) fiber.Handler {
+
+func StudentCompleteJob(db *gorm.DB) fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		// 1. Xác thực sinh viên đang đăng nhập
 		userID := c.Locals("user_id").(float64)
+
+		var input struct {
+			ApplicationID uint `json:"application_id"`
+		}
+
+		if err := c.BodyParser(&input); err != nil || input.ApplicationID == 0 {
+			return c.Status(400).JSON(fiber.Map{"error": "Thiếu application_id"})
+		}
+
 		var student models.Student
 		if err := db.Where("user_id = ?", uint(userID)).First(&student).Error; err != nil {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "❌ Không tìm thấy hồ sơ sinh viên"})
+			return c.Status(404).JSON(fiber.Map{"error": "Không tìm thấy hồ sơ sinh viên"})
 		}
 
-		var input RespondOfferInput
-		if err := c.BodyParser(&input); err != nil {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "❌ Dữ liệu phản hồi không hợp lệ"})
-		}
-
-		// 2. Tìm đơn ứng tuyển đảm bảo đúng của sinh viên này
 		var app models.Application
-		if err := db.Where("id = ? AND student_id = ?", input.ApplicationID, student.ID).First(&app).Error; err != nil {
-			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": "❌ Không tìm thấy đơn ứng tuyển tương ứng"})
+		if err := db.
+			Preload("Job").
+			Where("id = ? AND student_id = ?", input.ApplicationID, student.ID).
+			First(&app).Error; err != nil {
+			return c.Status(404).JSON(fiber.Map{"error": "Không tìm thấy đơn ứng tuyển"})
 		}
 
-		// Đảm bảo đơn này đang ở trạng thái đã được approved (đang có offer chờ)
-		if app.Status != "approved" {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "❌ Đơn ứng tuyển này hiện không có Offer nào cần xử lý"})
+		if app.Status != "offer_accepted" {
+			return c.Status(400).JSON(fiber.Map{"error": "Chỉ có thể hoàn thành khi đã nhận việc"})
 		}
 
-		// 3. Cập nhật trạng thái theo quyết định của sinh viên
-		if input.Response == "accept" {
-			app.Status = "offer_accepted"
-		} else if input.Response == "decline" {
-			app.Status = "offer_declined"
-		} else {
-			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "❌ Hành động không hợp lệ"})
-		}
+		app.Status = "student_completed"
 
 		if err := db.Save(&app).Error; err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "❌ Lỗi hệ thống khi lưu phản hồi"})
-		}
-
-		msg := "🎉 Bạn đã đồng ý nhận offer công việc thành công!"
-		if input.Response == "decline" {
-			msg = "❌ Bạn đã từ chối offer công việc thành công."
+			return c.Status(500).JSON(fiber.Map{"error": "Không thể cập nhật trạng thái"})
 		}
 
 		return c.JSON(fiber.Map{
 			"success": true,
-			"message": msg,
+			"message": "Sinh viên đã xác nhận hoàn thành công việc. Đang chờ doanh nghiệp xác nhận.",
 			"data":    app,
 		})
 	}
