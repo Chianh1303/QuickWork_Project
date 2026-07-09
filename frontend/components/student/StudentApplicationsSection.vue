@@ -58,45 +58,44 @@
      <!-- Desktop Applications Table -->
 <div
   v-if="filteredApps.length > 0"
-  class="hidden md:block bg-slate-900/82 rounded-xl border border-white/10 shadow-lg shadow-slate-950/25 overflow-hidden backdrop-blur"
+  class="hidden md:block overflow-hidden rounded-xl border border-white/10 bg-slate-900/82 shadow-lg shadow-slate-950/25 backdrop-blur"
 >
-  <table class="min-w-full divide-y divide-white/10">
+  <table class="min-w-full table-fixed divide-y divide-white/10">
     <thead class="bg-slate-950">
       <tr>
-        <th class="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Position & Company</th>
-        <th class="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Location</th>
-        <th class="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Compensation</th>
-        <th class="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Applied Date</th>
-        <th class="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Status</th>
-        <th class="px-6 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">Actions</th>
+        <th class="w-[27%] px-5 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Position & Company</th>
+        <th class="w-[18%] px-5 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Location</th>
+        <th class="w-[16%] px-5 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Compensation</th>
+        <th class="w-[14%] px-5 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Applied Date</th>
+        <th class="w-[13%] px-5 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Status</th>
+        <th class="w-[12%] px-5 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">Actions</th>
       </tr>
     </thead>
 
     <tbody class="bg-slate-900/82 divide-y divide-white/10">
-      <template v-for="app in paginatedApps" :key="app.id">
-        <tr class="hover:bg-cyan-400/10 transition-colors">
-          <td class="px-6 py-4 whitespace-nowrap">
-            <div class="text-sm font-semibold text-white">
+        <tr v-for="app in paginatedApps" :key="app.id" class="hover:bg-cyan-400/10 transition-colors">
+          <td class="px-5 py-4">
+            <div class="truncate text-sm font-semibold text-white">
               {{ app.job?.title || 'Unknown Position' }}
             </div>
-            <div class="text-xs text-slate-500 font-medium">
-              {{ companyNameLookup(app.job?.business_id) }}
+            <div class="truncate text-xs text-slate-500 font-medium">
+              {{ companyNameLookup(app.job) }}
             </div>
           </td>
 
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-400 font-medium">
-            {{ app.job?.location || 'Location N/A' }}
+          <td class="px-5 py-4 text-sm text-slate-400 font-medium">
+            <div class="truncate">{{ app.job?.location || 'Location N/A' }}</div>
           </td>
 
-          <td class="px-6 py-4 whitespace-nowrap text-sm font-extrabold text-emerald-500">
+          <td class="px-5 py-4 whitespace-nowrap text-sm font-extrabold text-emerald-500">
             ${{ Number(app.job?.salary || 0).toLocaleString() }}
           </td>
 
-          <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-400 font-medium">
+          <td class="px-5 py-4 whitespace-nowrap text-sm text-slate-400 font-medium">
             {{ formatDate(app.applied_at || app.id) }}
           </td>
 
-          <td class="px-6 py-4 whitespace-nowrap">
+          <td class="px-5 py-4 whitespace-nowrap">
             <span
               :class="[
                 statusBadgeClass(app.status),
@@ -107,120 +106,24 @@
             </span>
           </td>
 
-          <td class="px-6 py-4 whitespace-nowrap text-right text-sm font-medium">
+          <td class="px-5 py-4 text-right text-sm font-medium">
             <div class="flex items-center justify-end gap-2">
               <button
                 @click="openChatModal(app)"
-                class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold uppercase tracking-wider rounded-lg border border-slate-700/60 transition-all flex items-center space-x-1.5"
+                class="inline-flex h-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-200 transition-all hover:bg-white/10 hover:text-white"
               >
-                <span>💬 Chat với HR</span>
+                <span>Chat</span>
               </button>
 
               <button
-                v-if="(app.status || '').toLowerCase() === 'pending'"
-                :disabled="isCancellingApp === app.id"
-                @click="triggerCancelConfirm(app.id)"
-                class="inline-flex items-center space-x-1 px-3 py-1.5 text-xs font-bold text-red-400 hover:text-red-300 hover:bg-red-500/10 rounded-lg border border-transparent hover:border-red-400/20 disabled:opacity-50 disabled:cursor-not-allowed transition-all duration-150"
+                @click="openManagedApplicationModal(app)"
+                class="inline-flex h-9 items-center justify-center rounded-lg bg-cyan-400 px-3 text-[11px] font-extrabold uppercase tracking-wider text-slate-950 shadow-sm shadow-cyan-500/20 transition-all hover:bg-cyan-300"
               >
-                <svg
-                  v-if="isCancellingApp === app.id"
-                  class="animate-spin h-3 w-3 text-red-400"
-                  fill="none"
-                  viewBox="0 0 24 24"
-                >
-                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-                </svg>
-                <span>Hủy ứng tuyển</span>
+                Manage
               </button>
-
-              <button
-                v-else-if="(app.status || '').toLowerCase() === 'approved'"
-                @click="openOfferModal(app)"
-                class="inline-flex items-center px-3 py-1.5 text-xs font-bold text-white bg-gradient-to-r from-emerald-500 to-teal-600 hover:from-emerald-600 hover:to-teal-700 rounded-lg shadow-sm transition-all duration-150 animate-pulse"
-              >
-                <span>✨ Xem Offer</span>
-              </button>
-
-              <button
-                v-else-if="(app.status || '').toLowerCase() === 'offer_accepted'"
-                @click="handleStudentComplete(app.id)"
-                class="inline-flex items-center px-3 py-1.5 text-xs font-bold text-white bg-cyan-600 hover:bg-cyan-500 rounded-lg shadow-sm transition-all duration-150"
-              >
-                ✅ Xác nhận hoàn thành
-              </button>
-
-              <span
-                v-else-if="(app.status || '').toLowerCase() === 'student_completed'"
-                class="inline-flex items-center px-3 py-1.5 text-xs font-bold text-amber-400 bg-amber-500/10 border border-amber-400/20 rounded-lg select-none"
-              >
-                ⏳ Chờ doanh nghiệp xác nhận
-              </span>
-
-              <span
-                v-else-if="(app.status || '').toLowerCase() === 'paid'"
-                class="inline-flex items-center px-3 py-1.5 text-xs font-bold text-emerald-400 bg-emerald-500/10 border border-emerald-400/20 rounded-lg select-none"
-              >
-                💰 Đã giải ngân
-              </span>
-
-              <span v-else class="text-xs font-medium text-slate-400 select-none">-</span>
             </div>
           </td>
         </tr>
-
-        <tr
-          v-if="(app.status || '').toLowerCase() === 'offer_accepted'"
-          class="bg-slate-950/80"
-        >
-          <td colspan="6" class="px-6 py-3 border-t border-slate-800 bg-slate-950/80">
-            <div class="flex items-center justify-between rounded-xl bg-slate-900/70 border border-slate-800 px-4 py-3">
-              <div class="flex items-center space-x-3">
-                <span class="flex h-2 w-2 relative">
-                  <span
-                    v-if="isWorking(app.job_id)"
-                    class="animate-ping absolute inline-flex h-full w-full rounded-full bg-amber-400 opacity-75"
-                  ></span>
-
-                  <span
-                    :class="isWorking(app.job_id) ? 'bg-amber-500' : 'bg-slate-500'"
-                    class="relative inline-flex rounded-full h-2 w-2"
-                  ></span>
-                </span>
-
-                <span class="text-xs font-bold text-slate-300 uppercase tracking-wider">
-                  Ca làm việc hôm nay:
-                </span>
-
-                <span
-                  class="text-xs font-semibold"
-                  :class="isWorking(app.job_id) ? 'text-amber-400 font-bold animate-pulse' : 'text-slate-400'"
-                >
-                  {{ isWorking(app.job_id) ? `⏱️ Đang làm việc (${getTimer(app.job_id)})` : 'Chưa vào ca' }}
-                </span>
-              </div>
-
-              <div class="flex items-center gap-2">
-                <button
-                  v-if="!isWorking(app.job_id)"
-                  @click="handleCheckIn(app.job_id)"
-                  class="inline-flex items-center space-x-1 px-4 py-2 bg-emerald-600 hover:bg-emerald-500 text-white text-[11px] font-bold rounded-lg shadow-sm transition-all duration-150"
-                >
-                  <span>⚡ Check-in đi làm</span>
-                </button>
-
-                <button
-                  v-else
-                  @click="handleCheckOut(app.job_id)"
-                  class="inline-flex items-center space-x-1 px-4 py-2 bg-rose-600 hover:bg-rose-500 text-white text-[11px] font-bold rounded-lg shadow-sm transition-all duration-150"
-                >
-                  <span>🛑 Check-out ra ca</span>
-                </button>
-              </div>
-            </div>
-          </td>
-        </tr>
-      </template>
     </tbody>
   </table>
 </div>
@@ -234,7 +137,7 @@
             <div class="flex justify-between items-start">
               <div>
                 <h4 class="text-base font-bold text-white">{{ app.job?.title || 'Unknown Position' }}</h4>
-                <p class="text-sm text-slate-500 font-medium">{{ companyNameLookup(app.job?.business_id) }}</p>
+                <p class="text-sm text-slate-500 font-medium">{{ companyNameLookup(app.job) }}</p>
               </div>
               <span :class="[
                 statusBadgeClass(app.status),
@@ -244,58 +147,26 @@
               </span>
             </div>
 
-            <div class="grid grid-cols-2 gap-2 pt-2 text-xs border-t border-slate-100 font-medium text-slate-500">
+            <div class="grid grid-cols-2 gap-2 pt-2 text-xs border-t border-white/10 font-medium text-slate-500">
               <div>Location: <span class="text-slate-200">{{ app.job?.location || 'Location N/A' }}</span></div>
               <div>Salary: <span class="text-emerald-600 font-bold">${{ Number(app.job?.salary || 0).toLocaleString() }}</span></div>
               <div class="col-span-2">Applied Date: <span class="text-slate-200">{{ formatDate(app.applied_at || app.id) }}</span></div>
             </div>
 
-            <div class="grid grid-cols-1 gap-2 pt-2">
+            <div class="grid grid-cols-2 gap-2 pt-2">
               <button
                 @click="openChatModal(app)"
-                class="w-full rounded-lg bg-slate-800 px-3 py-2 text-xs font-bold text-slate-200 hover:bg-slate-700"
+                class="w-full rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-slate-200 hover:bg-white/10 hover:text-white"
               >
-                Chat với HR
+                Chat
               </button>
 
               <button
-                v-if="(app.status || '').toLowerCase() === 'pending'"
-                :disabled="isCancellingApp === app.id"
-                @click="triggerCancelConfirm(app.id)"
-                class="w-full rounded-lg border border-rose-400/20 bg-rose-500/10 px-3 py-2 text-xs font-bold text-rose-300 disabled:cursor-not-allowed disabled:opacity-50"
+                @click="openManagedApplicationModal(app)"
+                class="w-full rounded-lg bg-cyan-400 px-3 py-2 text-xs font-extrabold text-slate-950 hover:bg-cyan-300"
               >
-                Hủy ứng tuyển
+                Manage
               </button>
-
-              <button
-                v-else-if="(app.status || '').toLowerCase() === 'approved'"
-                @click="openOfferModal(app)"
-                class="w-full rounded-lg bg-emerald-600 px-3 py-2 text-xs font-bold text-white hover:bg-emerald-500"
-              >
-                Xem Offer
-              </button>
-
-              <button
-                v-else-if="(app.status || '').toLowerCase() === 'offer_accepted'"
-                @click="handleStudentComplete(app.id)"
-                class="w-full rounded-lg bg-cyan-400 px-3 py-2 text-xs font-bold text-slate-950 hover:bg-cyan-300"
-              >
-                Xác nhận hoàn thành
-              </button>
-
-              <div
-                v-else-if="(app.status || '').toLowerCase() === 'student_completed'"
-                class="rounded-lg border border-amber-400/20 bg-amber-500/10 px-3 py-2 text-center text-xs font-bold text-amber-300"
-              >
-                Chờ doanh nghiệp xác nhận
-              </div>
-
-              <div
-                v-else-if="(app.status || '').toLowerCase() === 'paid'"
-                class="rounded-lg border border-emerald-400/20 bg-emerald-500/10 px-3 py-2 text-center text-xs font-bold text-emerald-300"
-              >
-                Đã giải ngân
-              </div>
             </div>
           </div>
         </div>
@@ -371,6 +242,8 @@ const {
   isChatModalOpen,
   selectedChatApp,
   handleStudentComplete,
+  openReviewModal,
+  openManagedApplicationModal,
   toast
 } = toRefs(props.state)
 </script>

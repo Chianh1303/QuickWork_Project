@@ -138,6 +138,19 @@ const reviewStatus = ref<'approved' | 'rejected' | null>(null)
 const isSubmitting = ref(false)
 const selectedCompletionApp = ref<any | null>(null)
 const isCompletingJob = ref(false)
+const selectedBusinessReviewApp = ref<any | null>(null)
+const businessReviewRating = ref(5)
+const businessReviewComment = ref('')
+const isSubmittingBusinessReview = ref(false)
+const selectedManagedApplicant = ref<any | null>(null)
+const selectedReviewsApp = ref<any | null>(null)
+const reviewsList = ref<any[]>([])
+const reviewSummary = ref<{ average_rating: number; total_reviews: number }>({
+  average_rating: 0,
+  total_reviews: 0
+})
+const isLoadingReviews = ref(false)
+const isReviewsModalOpen = ref(false)
 
 // Form thông tin Offer gửi đính kèm
 const offerForm = ref({
@@ -167,6 +180,109 @@ const openCompletionModal = (app: any) => {
 
 const closeCompletionModal = () => {
   selectedCompletionApp.value = null
+}
+
+const openBusinessReviewModal = (app: any) => {
+  selectedBusinessReviewApp.value = app
+  businessReviewRating.value = 5
+  businessReviewComment.value = ''
+  feedback.value = null
+}
+
+const closeBusinessReviewModal = () => {
+  selectedBusinessReviewApp.value = null
+}
+
+const openManagedApplicantModal = (app: any) => {
+  selectedManagedApplicant.value = app
+  feedback.value = null
+  fetchReviewsByApplication(app.id)
+}
+
+const closeManagedApplicantModal = () => {
+  selectedManagedApplicant.value = null
+}
+
+const fetchReviewsByApplication = async (applicationId: number) => {
+  isLoadingReviews.value = true
+  try {
+    const res = await api.get(`/api/reviews/application/${applicationId}`)
+    const list = Array.isArray(res?.reviews) ? res.reviews : []
+    reviewsList.value = list
+
+    const total = list.length
+    const sum = list.reduce((acc: number, review: any) => acc + Number(review.rating || review.Rating || 0), 0)
+    reviewSummary.value = {
+      average_rating: total > 0 ? sum / total : 0,
+      total_reviews: total
+    }
+  } catch (error) {
+    console.error('Error fetching application reviews:', error)
+    reviewsList.value = []
+    reviewSummary.value = { average_rating: 0, total_reviews: 0 }
+  } finally {
+    isLoadingReviews.value = false
+  }
+}
+
+const fetchReviewsByUser = async (userId: number) => {
+  isLoadingReviews.value = true
+  try {
+    const res = await api.get(`/api/reviews/user/${userId}`)
+    reviewsList.value = Array.isArray(res?.reviews) ? res.reviews : []
+    reviewSummary.value = {
+      average_rating: Number(res?.average_rating || 0),
+      total_reviews: Number(res?.total_reviews || 0)
+    }
+  } catch (error) {
+    console.error('Error fetching user reviews:', error)
+    reviewsList.value = []
+    reviewSummary.value = { average_rating: 0, total_reviews: 0 }
+  } finally {
+    isLoadingReviews.value = false
+  }
+}
+
+const openReviewsModal = async (app: any) => {
+  selectedReviewsApp.value = app
+  isReviewsModalOpen.value = true
+  await fetchReviewsByApplication(app.id)
+}
+
+const closeReviewsModal = () => {
+  isReviewsModalOpen.value = false
+  selectedReviewsApp.value = null
+}
+
+const submitBusinessReview = async () => {
+  if (!selectedBusinessReviewApp.value) return
+
+  isSubmittingBusinessReview.value = true
+  feedback.value = null
+
+  try {
+    const res = await api.post('/api/reviews', {
+      application_id: selectedBusinessReviewApp.value.id,
+      rating: businessReviewRating.value,
+      comment: businessReviewComment.value
+    })
+
+    feedback.value = {
+      type: 'success',
+      message: res.message || 'Đánh giá ứng viên thành công.'
+    }
+
+    closeBusinessReviewModal()
+    await fetchApplications()
+  } catch (err: any) {
+    feedback.value = {
+      type: 'error',
+      message: err.response?._data?.error || err.response?._data?.message || 'Không thể gửi đánh giá.'
+    }
+  } finally {
+    isSubmittingBusinessReview.value = false
+    window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
 }
 
 const submitBusinessCompletion = async () => {
@@ -674,6 +790,25 @@ const businessDashboardState = reactive({
   openCompletionModal,
   closeCompletionModal,
   submitBusinessCompletion,
+  selectedBusinessReviewApp,
+  businessReviewRating,
+  businessReviewComment,
+  isSubmittingBusinessReview,
+  openBusinessReviewModal,
+  closeBusinessReviewModal,
+  submitBusinessReview,
+  selectedManagedApplicant,
+  openManagedApplicantModal,
+  closeManagedApplicantModal,
+  selectedReviewsApp,
+  reviewsList,
+  reviewSummary,
+  isLoadingReviews,
+  isReviewsModalOpen,
+  openReviewsModal,
+  closeReviewsModal,
+  fetchReviewsByApplication,
+  fetchReviewsByUser,
   closeModal,
   submitReview,
   isChatModalOpen,

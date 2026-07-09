@@ -55,37 +55,37 @@
           </p>
         </div>
 
-      <div v-else class="hidden lg:block bg-white/95 rounded-xl border border-slate-200 shadow-sm shadow-slate-950/5 overflow-hidden backdrop-blur">
-  <table class="min-w-full divide-y divide-slate-200">
+      <div v-else class="hidden lg:block overflow-hidden rounded-xl border border-white/10 bg-slate-900/85 shadow-lg shadow-slate-950/25 backdrop-blur">
+  <table class="min-w-full table-fixed divide-y divide-white/10">
     <thead class="bg-slate-950">
       <tr>
-        <th class="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Candidate</th>
-        <th class="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Position Applied</th>
-        <th class="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Contact Phone</th>
-        <th class="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Applied Date</th>
-        <th class="px-6 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Status</th>
-        <th class="px-6 py-4 text-center text-xs font-bold text-slate-300 uppercase tracking-wider">Actions</th>
+        <th class="w-[27%] px-5 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Candidate</th>
+        <th class="w-[23%] px-5 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Position</th>
+        <th class="w-[14%] px-5 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Contact</th>
+        <th class="w-[13%] px-5 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Applied Date</th>
+        <th class="w-[12%] px-5 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Status</th>
+        <th class="w-[11%] px-5 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">Actions</th>
       </tr>
     </thead>
-    <tbody class="bg-white divide-y divide-slate-100">
-  <tr v-for="app in paginatedApplicants" :key="app.id" class="hover:bg-cyan-50/40 transition-colors">
+    <tbody class="divide-y divide-white/10 bg-slate-900/70">
+  <tr v-for="app in paginatedApplicants" :key="app.id" class="transition-colors hover:bg-cyan-400/10">
     
-    <td class="px-6 py-4">
+    <td class="px-5 py-4">
       <div class="flex items-start">
-        <img v-if="app.student?.avatar_url" :src="app.student.avatar_url" class="h-10 w-10 rounded-full object-cover border border-slate-200 mr-3 shadow-sm" />
-        <div v-else class="h-10 w-10 rounded-full bg-slate-100 border border-slate-200 flex items-center justify-center text-slate-500 font-bold mr-3 shadow-sm">
+        <img v-if="app.student?.avatar_url" :src="app.student.avatar_url" class="h-10 w-10 rounded-full object-cover border border-white/10 mr-3 shadow-sm" />
+        <div v-else class="h-10 w-10 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center text-cyan-200 font-bold mr-3 shadow-sm">
           {{ app.student?.full_name?.charAt(0) || 'S' }}
         </div>
         
-        <div class="flex flex-col space-y-1.5">
+        <div class="min-w-0 flex flex-col space-y-1.5">
           <div class="flex items-center gap-2">
-            <span class="text-sm font-bold text-slate-950 tracking-tight">{{ app.student?.full_name || 'N/A' }}</span>
+            <span class="truncate text-sm font-bold text-white tracking-tight">{{ app.student?.full_name || 'N/A' }}</span>
             
             <a 
               v-if="app.student?.cv_url" 
               :href="app.student.cv_url" 
               target="_blank" 
-              class="inline-flex items-center space-x-1 text-[10px] text-rose-600 hover:text-rose-800 font-bold bg-rose-50 hover:bg-rose-100 px-2 py-0.5 rounded border border-rose-200/60 transition-all duration-150 shadow-sm"
+              class="inline-flex flex-shrink-0 items-center space-x-1 text-[10px] text-rose-200 hover:text-white font-bold bg-rose-500/10 hover:bg-rose-500/20 px-2 py-0.5 rounded border border-rose-400/20 transition-all duration-150 shadow-sm"
             >
               <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
                 <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" />
@@ -98,7 +98,7 @@
             <span 
               v-for="(skill, sIdx) in parseSkills(app.student?.skills)" 
               :key="sIdx"
-              class="inline-block bg-slate-50 text-slate-600 border border-slate-200/80 text-[10px] font-bold px-1.5 py-0.5 rounded-md shadow-sm"
+              class="inline-block bg-slate-800 text-slate-300 border border-white/10 text-[10px] font-bold px-1.5 py-0.5 rounded-md shadow-sm"
             >
               {{ skill }}
             </span>
@@ -110,19 +110,19 @@
       </div>
     </td>
 
-    <td class="px-6 py-4 whitespace-nowrap text-sm font-semibold text-slate-800">
-      {{ app.job?.title || jobTitleLookup(app.job_id) }}
+    <td class="px-5 py-4 text-sm font-semibold text-slate-200">
+      <div class="truncate">{{ app.job?.title || jobTitleLookup(app.job_id) }}</div>
     </td>
 
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-600 font-medium">
+    <td class="px-5 py-4 whitespace-nowrap text-sm text-slate-400 font-medium">
       {{ app.student?.phone || 'N/A' }}
     </td>
 
-    <td class="px-6 py-4 whitespace-nowrap text-sm text-slate-500 font-medium">
+    <td class="px-5 py-4 whitespace-nowrap text-sm text-slate-400 font-medium">
       {{ formatDate(app.applied_at || app.id) }}
     </td>
 
-    <td class="px-6 py-4 whitespace-nowrap">
+    <td class="px-5 py-4 whitespace-nowrap">
       <span :class="[
         statusBadgeClass(app.status),
         'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border capitalize'
@@ -131,52 +131,21 @@
       </span>
     </td>
 
-    <td class="px-6 py-4 whitespace-nowrap text-center text-sm font-medium">
-      <div class="flex justify-end items-center gap-2">
+    <td class="px-5 py-4 text-right text-sm font-medium">
+      <div class="flex items-center justify-end gap-2">
         <button 
           @click="openChatModal(app)" 
-          class="px-3 py-1.5 bg-slate-800 hover:bg-slate-700 text-slate-200 text-[11px] font-bold uppercase tracking-wider rounded-lg border border-slate-700/60 transition-all flex items-center space-x-1.5"
+          class="inline-flex h-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-200 transition-all hover:bg-white/10 hover:text-white"
         >
-          <span>💬 Chat với Ứng viên</span>
+          <span>Chat</span>
         </button>
 
         <button
-          v-if="['pending', 'applied'].includes(app.status?.toLowerCase())"
-          @click="openReviewModal(app)"
-          class="px-3 py-1.5 text-xs font-bold text-cyan-200 bg-cyan-400/10 hover:bg-cyan-400/15 rounded-lg transition-all duration-150"
+          @click="openManagedApplicantModal(app)"
+          class="inline-flex h-9 items-center justify-center rounded-lg bg-cyan-400 px-3 text-[11px] font-extrabold uppercase tracking-wider text-slate-950 shadow-sm shadow-cyan-500/20 transition-all hover:bg-cyan-300"
         >
-          Review & Offer
+          Manage
         </button>
-
-        <button
-          v-else-if="app.status?.toLowerCase() === 'student_completed'"
-          @click="openCompletionModal(app)"
-          class="px-3 py-1.5 text-xs font-bold text-slate-950 bg-cyan-400 hover:bg-cyan-300 rounded-lg shadow-sm shadow-cyan-500/20 transition-all duration-150"
-        >
-          Xác nhận hoàn thành
-        </button>
-        
-        <button
-          v-if="['approved', 'rejected'].includes(app.status?.toLowerCase())"
-          @click="openReviewModal(app)"
-          class="px-3 py-1.5 text-xs font-medium text-slate-500 bg-slate-100 hover:bg-slate-200 rounded-lg transition-all duration-150"
-        >
-          View Details
-        </button>
-
-        <span
-          v-else-if="app.status?.toLowerCase() === 'offer_accepted'"
-          class="px-3 py-1.5 text-xs font-bold text-emerald-700 bg-emerald-50 border border-emerald-200 rounded-lg"
-        >
-          Đang làm việc
-        </span>
-
-        <span
-          v-else-if="app.status?.toLowerCase() === 'paid'"
-          class="px-3 py-1.5 text-xs font-bold text-cyan-700 bg-cyan-50 border border-cyan-200 rounded-lg"
-        >
-          Đã giải ngân
-        </span>
       </div>
     </td>
 
@@ -189,16 +158,16 @@
           <div
             v-for="app in paginatedApplicants"
             :key="app.id"
-            class="bg-white/95 border border-slate-200 rounded-xl p-5 shadow-sm shadow-slate-950/5 space-y-4 hover:border-cyan-200 hover:shadow-lg hover:shadow-cyan-950/5 transition-all backdrop-blur"
+            class="bg-slate-900/85 border border-white/10 rounded-xl p-5 shadow-lg shadow-slate-950/25 space-y-4 hover:border-cyan-300/40 hover:shadow-cyan-950/30 transition-all backdrop-blur"
           >
             <div class="flex items-center justify-between">
               <div class="flex items-center">
-                <img v-if="app.student?.avatar_url" :src="app.student.avatar_url" class="h-10 w-10 rounded-full border border-slate-200 mr-3" />
-                <div v-else class="h-10 w-10 bg-slate-100 rounded-full border border-slate-200 flex items-center justify-center font-bold text-slate-500 mr-3">
+                <img v-if="app.student?.avatar_url" :src="app.student.avatar_url" class="h-10 w-10 rounded-full border border-white/10 mr-3" />
+                <div v-else class="h-10 w-10 bg-slate-800 rounded-full border border-white/10 flex items-center justify-center font-bold text-cyan-200 mr-3">
                   {{ app.student?.full_name?.charAt(0) || 'S' }}
                 </div>
                 <div>
-                  <h4 class="text-sm font-bold text-slate-900">{{ app.student?.full_name || 'N/A' }}</h4>
+                  <h4 class="text-sm font-bold text-white">{{ app.student?.full_name || 'N/A' }}</h4>
                   <p class="text-xs text-slate-500">Skills: {{ app.student?.skills || 'N/A' }}</p>
                 </div>
               </div>
@@ -210,65 +179,27 @@
               </span>
             </div>
 
-            <div class="pt-2 border-t border-slate-100 text-xs font-medium text-slate-600 space-y-1">
-              <div>Position: <span class="text-slate-900 font-bold">{{ jobTitleLookup(app.job_id) }}</span></div>
-              <div>Contact: <span class="text-slate-900">{{ app.student?.phone }}</span></div>
-              <div>Applied: <span class="text-slate-900">{{ formatDate(app.applied_at || app.id) }}</span></div>
+            <div class="pt-2 border-t border-white/10 text-xs font-medium text-slate-500 space-y-1">
+              <div>Position: <span class="text-slate-200 font-bold">{{ jobTitleLookup(app.job_id) }}</span></div>
+              <div>Contact: <span class="text-slate-200">{{ app.student?.phone }}</span></div>
+              <div>Applied: <span class="text-slate-200">{{ formatDate(app.applied_at || app.id) }}</span></div>
             </div>
 
             <!-- Mobile actions -->
-            <div class="grid grid-cols-1 gap-2 pt-2">
+            <div class="grid grid-cols-2 gap-2 pt-2">
               <button
                 @click="openChatModal(app)"
-                class="w-full text-center py-2 text-xs font-bold text-slate-200 bg-slate-800 hover:bg-slate-700 rounded-lg shadow-sm"
+                class="w-full rounded-lg border border-white/10 bg-white/5 py-2 text-center text-xs font-bold text-slate-200 shadow-sm hover:bg-white/10 hover:text-white"
               >
-                Chat với Ứng viên
+                Chat
               </button>
 
               <button
-                v-if="['pending', 'applied'].includes(app.status?.toLowerCase())"
-                @click="triggerConfirmModal(app, 'approved')"
-                class="w-full text-center py-2 text-xs font-bold text-white bg-emerald-600 hover:bg-emerald-500 rounded-lg shadow-sm"
+                @click="openManagedApplicantModal(app)"
+                class="w-full rounded-lg bg-cyan-400 py-2 text-center text-xs font-extrabold text-slate-950 shadow-sm shadow-cyan-500/20 hover:bg-cyan-300"
               >
-                Approve
+                Manage
               </button>
-              <button
-                v-if="['pending', 'applied'].includes(app.status?.toLowerCase())"
-                @click="triggerConfirmModal(app, 'rejected')"
-                class="w-full text-center py-2 text-xs font-bold text-white bg-rose-600 hover:bg-rose-500 rounded-lg shadow-sm"
-              >
-                Reject
-              </button>
-
-              <button
-                v-if="app.status?.toLowerCase() === 'student_completed'"
-                @click="openCompletionModal(app)"
-                class="w-full text-center py-2 text-xs font-bold text-slate-950 bg-cyan-400 hover:bg-cyan-300 rounded-lg shadow-sm shadow-cyan-500/20"
-              >
-                Xác nhận hoàn thành & giải ngân
-              </button>
-
-              <button
-                v-if="['approved', 'rejected'].includes(app.status?.toLowerCase())"
-                @click="openReviewModal(app)"
-                class="w-full text-center py-2 text-xs font-bold text-slate-600 bg-slate-100 hover:bg-slate-200 rounded-lg shadow-sm"
-              >
-                View Details
-              </button>
-
-              <div
-                v-else-if="app.status?.toLowerCase() === 'offer_accepted'"
-                class="w-full rounded-lg border border-emerald-200 bg-emerald-50 py-2 text-center text-xs font-bold text-emerald-700"
-              >
-                Đang làm việc
-              </div>
-
-              <div
-                v-else-if="app.status?.toLowerCase() === 'paid'"
-                class="w-full rounded-lg border border-cyan-200 bg-cyan-50 py-2 text-center text-xs font-bold text-cyan-700"
-              >
-                Đã giải ngân
-              </div>
             </div>
           </div>
         </div>
@@ -320,6 +251,8 @@ const {
   openChatModal,
   openReviewModal,
   openCompletionModal,
+  openBusinessReviewModal,
+  openManagedApplicantModal,
   triggerConfirmModal,
   showConfirmModal,
   confirmTarget,

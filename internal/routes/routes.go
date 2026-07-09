@@ -115,4 +115,19 @@ func Register(app *fiber.App, db *gorm.DB) {
 		middleware.RequireRole("business"),
 		handlers.BusinessCompleteJob(db),
 	)
+	app.Get(
+		"/api/reviews/user/:userId",
+		middleware.Protected(),
+		handlers.GetReviewsByUser(db),
+	)
+	app.Get(
+		"/api/reviews/application/:applicationId",
+		middleware.Protected(),
+		handlers.GetReviewsByApplication(db),
+	)
+	app.Post(
+		"/api/reviews",
+		middleware.Protected(),
+		handlers.CreateReview(db),
+	)
 }

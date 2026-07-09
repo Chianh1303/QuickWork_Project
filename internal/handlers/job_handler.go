@@ -43,7 +43,7 @@ func CreateJob(db *gorm.DB) fiber.Handler {
 			})
 		}
 
-		if user.Status != "approved" {
+		if user.Status != "approved" && user.Status != "active" {
 			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
 				"message": "Tài khoản doanh nghiệp của bạn đang chờ duyệt hoặc đã bị từ chối.",
 			})

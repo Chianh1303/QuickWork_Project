@@ -120,7 +120,7 @@
             <div class="flex-1">
               <div class="flex justify-between items-start mb-3">
                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-400/10 text-cyan-200 ring-1 ring-cyan-400/20 max-w-[58%] truncate">
-                  {{ companyNameLookup(job.business_id) }}
+                  {{ companyNameLookup(job) }}
                 </span>
                 <span class="text-sm font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg whitespace-nowrap">
                   {{ formatCurrency(job.salary) }}

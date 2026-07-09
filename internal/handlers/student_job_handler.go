@@ -45,7 +45,11 @@ func GetAvailableJobs(db *gorm.DB) fiber.Handler {
 
 		// Thực thi truy vấn đưa ra danh sách
 		// 🌟 Chèn thêm .Where vào giữa để lọc đúng các Job đã được Admin duyệt
-		if err := query.Where("status = ?", "approved").Order("id DESC").Find(&jobs).Error; err != nil {
+		if err := query.
+			Preload("Business").
+			Where("status = ?", "approved").
+			Order("id DESC").
+			Find(&jobs).Error; err != nil {
 			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
 				"message": "Không thể lấy danh sách công việc toàn diện",
 			})

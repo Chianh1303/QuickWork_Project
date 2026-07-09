@@ -79,14 +79,14 @@
     </div>
   </div>
   <div v-if="selectedOffer" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-  <div class="bg-white rounded-2xl border border-slate-200 shadow-2xl max-w-md w-full overflow-hidden text-left animate-in fade-in zoom-in-95 duration-150">
+  <div class="flex max-h-[90vh] w-full max-w-md flex-col overflow-hidden rounded-2xl border border-slate-800 bg-slate-950 text-left shadow-2xl animate-in fade-in zoom-in-95 duration-150">
     
     <div class="bg-gradient-to-br from-slate-950 to-cyan-950 p-6 text-white text-center relative">
       <span class="text-4xl block mb-1">💼</span>
       <h3 class="text-lg font-bold">Lời Mời Nhận Việc (Job Offer)</h3>
       <p class="text-xs text-cyan-100 mt-1">Hồ sơ ứng tuyển của bạn đã được doanh nghiệp phê duyệt</p>
     </div>
-<div class="p-6 space-y-5 bg-slate-900">
+<div class="flex-1 overflow-y-auto p-6 space-y-5 bg-slate-900">
       <div>
         <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-1">Vị trí & Công ty</label>
         <div class="text-sm font-black text-white uppercase tracking-wide">{{ selectedOffer.job?.title || 'Unknown Position' }}</div>
@@ -109,19 +109,9 @@
           {{ selectedOffer.offer_message || 'Chào mừng bạn đến với công ty!' }}
         </div>
       </div>
-
-      <div class="pt-4 border-t border-slate-800/60">
-        <label class="text-[10px] font-bold text-slate-500 uppercase tracking-widest block mb-3">💬 Thảo luận trực tuyến với HR</label>
-        <ChatBox 
-          v-if="currentUserId !== null"
-          :applicationId="selectedOffer.id"
-          :targetId="selectedOffer.job?.business_id"
-          :currentUserId="currentUserId"
-        />
-      </div>
     </div>
 
-    <div class="p-4 bg-slate-950/60 border-t border-slate-800/80 flex items-center justify-between space-x-3">
+    <div class="flex flex-shrink-0 items-center justify-between space-x-3 border-t border-slate-800/80 bg-slate-950 p-4">
       <button 
         @click="handleOfferResponse('decline')"
         :disabled="isResponding"
@@ -182,6 +172,213 @@
 
     </div>
   </div>
+  <div v-if="selectedManagedApplication" class="fixed inset-0 z-[49] flex justify-end bg-slate-950/80 backdrop-blur-md">
+    <button
+      type="button"
+      class="absolute inset-0 cursor-default"
+      aria-label="Close application details"
+      @click="closeManagedApplicationModal"
+    ></button>
+
+    <aside class="relative flex h-full w-full max-w-2xl flex-col overflow-hidden border-l border-white/10 bg-slate-950 shadow-2xl shadow-slate-950/70">
+      <div class="border-b border-white/10 bg-slate-900/90 p-5">
+        <div class="flex items-start justify-between gap-4">
+          <div class="min-w-0">
+            <p class="text-xs font-bold uppercase tracking-wider text-cyan-300">Application Management</p>
+            <h3 class="mt-1 truncate text-2xl font-extrabold text-white">
+              {{ selectedManagedApplication.job?.title || 'Application details' }}
+            </h3>
+            <p class="mt-1 text-sm font-medium text-slate-400">
+              {{ companyNameLookup(selectedManagedApplication.job) }} · Application #{{ selectedManagedApplication.id }}
+            </p>
+          </div>
+          <button
+            type="button"
+            @click="closeManagedApplicationModal"
+            class="rounded-lg bg-white/5 px-3 py-1.5 text-sm font-bold text-slate-300 hover:bg-white/10 hover:text-white"
+          >
+            Đóng
+          </button>
+        </div>
+      </div>
+
+      <div class="flex-1 space-y-5 overflow-y-auto p-5">
+        <section class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+          <div class="flex flex-wrap items-start justify-between gap-3">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Application Summary</p>
+              <h4 class="mt-2 text-lg font-extrabold text-white">{{ selectedManagedApplication.job?.title || 'Unknown Position' }}</h4>
+              <p class="mt-1 text-sm font-bold text-cyan-200">{{ companyNameLookup(selectedManagedApplication.job) }}</p>
+            </div>
+            <span :class="[
+              statusBadgeClass(selectedManagedApplication.status),
+              'inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold capitalize'
+            ]">
+              {{ selectedManagedApplication.status ? selectedManagedApplication.status.replace('_', ' ') : 'Pending' }}
+            </span>
+          </div>
+
+          <div class="mt-4 grid gap-3 sm:grid-cols-3">
+            <div class="rounded-xl border border-white/10 bg-slate-900 p-3">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Location</p>
+              <p class="mt-1 text-sm font-extrabold text-slate-200">{{ selectedManagedApplication.job?.location || 'N/A' }}</p>
+            </div>
+            <div class="rounded-xl border border-emerald-400/20 bg-emerald-400/10 p-3">
+              <p class="text-xs font-bold uppercase tracking-wider text-emerald-200">Salary</p>
+              <p class="mt-1 text-sm font-extrabold text-white">${{ Number(selectedManagedApplication.job?.salary || 0).toLocaleString() }}</p>
+            </div>
+            <div class="rounded-xl border border-white/10 bg-slate-900 p-3">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Applied</p>
+              <p class="mt-1 text-sm font-extrabold text-slate-200">{{ formatDate(selectedManagedApplication.applied_at || selectedManagedApplication.id) }}</p>
+            </div>
+          </div>
+        </section>
+
+        <section class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+          <div class="flex items-center justify-between gap-3">
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Offer</p>
+            <button
+              v-if="(selectedManagedApplication.status || '').toLowerCase() === 'approved'"
+              @click="openOfferModal(selectedManagedApplication); closeManagedApplicationModal()"
+              class="rounded-lg bg-emerald-500 px-3 py-1.5 text-xs font-extrabold text-white hover:bg-emerald-400"
+            >
+              View Offer
+            </button>
+          </div>
+          <div
+            v-if="selectedManagedApplication.offer_salary || selectedManagedApplication.offer_start_date || selectedManagedApplication.offer_message"
+            class="mt-3 grid gap-3 sm:grid-cols-2"
+          >
+            <div class="rounded-xl border border-emerald-400/20 bg-emerald-400/10 p-3">
+              <p class="text-xs font-bold uppercase tracking-wider text-emerald-200">Offer Salary</p>
+              <p class="mt-1 text-sm font-extrabold text-white">{{ selectedManagedApplication.offer_salary || 'Thỏa thuận' }}</p>
+            </div>
+            <div class="rounded-xl border border-cyan-400/20 bg-cyan-400/10 p-3">
+              <p class="text-xs font-bold uppercase tracking-wider text-cyan-200">Start Date</p>
+              <p class="mt-1 text-sm font-extrabold text-white">{{ selectedManagedApplication.offer_start_date || 'Trao đổi sau' }}</p>
+            </div>
+            <div class="rounded-xl border border-white/10 bg-slate-900 p-3 sm:col-span-2">
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Message</p>
+              <p class="mt-1 whitespace-pre-line text-sm font-medium text-slate-300">{{ selectedManagedApplication.offer_message || 'Không có lời nhắn offer.' }}</p>
+            </div>
+          </div>
+          <p v-else class="mt-3 text-sm font-medium text-slate-500">Offer information appears when the employer approves your application.</p>
+        </section>
+
+        <section
+          v-if="(selectedManagedApplication.status || '').toLowerCase() === 'offer_accepted'"
+          class="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-4"
+        >
+          <p class="text-xs font-bold uppercase tracking-wider text-amber-200">Work / Attendance</p>
+          <div class="mt-3 flex flex-col gap-3 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <p class="text-sm font-extrabold text-white">
+                {{ isWorking(selectedManagedApplication.job_id) ? `Đang làm việc (${getTimer(selectedManagedApplication.job_id)})` : 'Chưa vào ca' }}
+              </p>
+              <p class="mt-1 text-xs font-medium text-slate-400">Theo dõi ca làm việc hiện tại của bạn.</p>
+            </div>
+            <button
+              v-if="!isWorking(selectedManagedApplication.job_id)"
+              @click="handleCheckIn(selectedManagedApplication.job_id)"
+              class="rounded-lg bg-emerald-500 px-4 py-2 text-sm font-extrabold text-white hover:bg-emerald-400"
+            >
+              Check-in
+            </button>
+            <button
+              v-else
+              @click="handleCheckOut(selectedManagedApplication.job_id)"
+              class="rounded-lg bg-rose-500 px-4 py-2 text-sm font-extrabold text-white hover:bg-rose-400"
+            >
+              Check-out
+            </button>
+          </div>
+        </section>
+
+        <section class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Completion</p>
+          <div class="mt-3">
+            <button
+              v-if="(selectedManagedApplication.status || '').toLowerCase() === 'offer_accepted'"
+              @click="handleStudentComplete(selectedManagedApplication.id); closeManagedApplicationModal()"
+              class="w-full rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-extrabold text-slate-950 hover:bg-cyan-300"
+            >
+              Xác nhận hoàn thành
+            </button>
+            <div
+              v-else-if="(selectedManagedApplication.status || '').toLowerCase() === 'student_completed'"
+              class="rounded-lg border border-amber-400/20 bg-amber-400/10 px-4 py-2.5 text-sm font-extrabold text-amber-200"
+            >
+              Đang chờ doanh nghiệp xác nhận
+            </div>
+            <div
+              v-else-if="(selectedManagedApplication.status || '').toLowerCase() === 'paid'"
+              class="rounded-lg border border-cyan-400/20 bg-cyan-400/10 px-4 py-2.5 text-sm font-extrabold text-cyan-200"
+            >
+              Đã giải ngân
+            </div>
+            <p v-else class="text-sm font-medium text-slate-500">Completion actions appear after you accept an offer.</p>
+          </div>
+        </section>
+
+        <section class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
+          <div class="flex flex-wrap items-center justify-between gap-3">
+            <div>
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Reviews</p>
+              <p class="mt-1 text-sm font-extrabold text-white">
+                {{ reviewSummary.average_rating.toFixed(1) }} / 5 · {{ reviewSummary.total_reviews }} reviews
+              </p>
+            </div>
+            <div class="flex flex-wrap gap-2">
+              <button
+                v-if="(selectedManagedApplication.status || '').toLowerCase() === 'paid' && !reviewsList.some(review => Number(review.reviewer_id || review.ReviewerID) === Number(currentUserId))"
+                @click="openReviewModal(selectedManagedApplication); closeManagedApplicationModal()"
+                class="rounded-lg bg-amber-400 px-3 py-1.5 text-xs font-extrabold text-slate-950 hover:bg-amber-300"
+              >
+                Đánh giá doanh nghiệp
+              </button>
+              <button
+                @click="openReviewsModal(selectedManagedApplication)"
+                class="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-slate-200 hover:bg-white/10 hover:text-white"
+              >
+                Xem đánh giá
+              </button>
+            </div>
+          </div>
+          <div class="mt-3 space-y-2">
+            <div v-if="isLoadingReviews" class="text-sm font-medium text-slate-500">Đang tải đánh giá...</div>
+            <div
+              v-for="review in reviewsList.slice(0, 3)"
+              :key="review.id || review.ID"
+              class="rounded-xl border border-white/10 bg-slate-900 p-3"
+            >
+              <p class="text-sm font-extrabold text-amber-300">{{ review.rating || review.Rating }} / 5</p>
+              <p class="mt-1 text-sm font-medium text-slate-300">{{ review.comment || review.Comment || 'Không có nhận xét.' }}</p>
+            </div>
+            <p v-if="!isLoadingReviews && reviewsList.length === 0" class="text-sm font-medium text-slate-500">Chưa có đánh giá cho đơn này.</p>
+          </div>
+        </section>
+      </div>
+
+      <div class="border-t border-white/10 bg-slate-900/90 p-5">
+        <div class="grid gap-2 sm:grid-cols-2">
+          <button
+            @click="openChatModal(selectedManagedApplication); closeManagedApplicationModal()"
+            class="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-slate-200 hover:bg-white/10 hover:text-white"
+          >
+            Chat with employer
+          </button>
+          <button
+            v-if="(selectedManagedApplication.status || '').toLowerCase() === 'pending'"
+            :disabled="isCancellingApp === selectedManagedApplication.id"
+            @click="triggerCancelConfirm(selectedManagedApplication.id); closeManagedApplicationModal()"
+            class="rounded-lg border border-rose-400/20 bg-rose-500/10 px-4 py-2.5 text-sm font-bold text-rose-300 hover:bg-rose-500/20 disabled:opacity-50"
+          >
+            Hủy ứng tuyển
+          </button>
+        </div>
+      </div>
+    </aside>
+  </div>
   <Transition
     enter-active-class="transform ease-out duration-300 transition"
     enter-from-class="translate-y-2 opacity-0 sm:translate-y-0 sm:translate-x-2"
@@ -225,6 +422,111 @@
       </div>
     </div>
   </Transition>
+  <div
+  v-if="selectedReviewApp"
+  class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/70 backdrop-blur-sm"
+>
+  <div class="w-full max-w-md overflow-hidden rounded-2xl border border-white/10 bg-slate-950 shadow-2xl">
+    <div class="p-6 border-b border-white/10">
+      <h3 class="text-xl font-black text-white">Đánh giá doanh nghiệp</h3>
+      <p class="mt-1 text-sm text-slate-400">
+        {{ selectedReviewApp.job?.title || 'Công việc đã hoàn thành' }}
+      </p>
+    </div>
+
+    <form @submit.prevent="submitReview" class="p-6 space-y-5">
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-3">
+          Số sao
+        </label>
+
+        <div class="flex gap-2">
+          <button
+            v-for="star in 5"
+            :key="star"
+            type="button"
+            @click="reviewRating = star"
+            class="text-3xl transition"
+            :class="star <= reviewRating ? 'text-amber-400' : 'text-slate-700'"
+          >
+            ★
+          </button>
+        </div>
+      </div>
+
+      <div>
+        <label class="block text-xs font-bold uppercase tracking-widest text-slate-400 mb-2">
+          Nhận xét
+        </label>
+
+        <textarea
+          v-model="reviewComment"
+          rows="4"
+          class="w-full rounded-xl border border-white/10 bg-slate-900 px-4 py-3 text-sm text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-amber-300 resize-none"
+          placeholder="Chia sẻ trải nghiệm làm việc với doanh nghiệp..."
+        ></textarea>
+      </div>
+
+      <div class="flex justify-end gap-3 pt-4 border-t border-white/10">
+        <button
+          type="button"
+          @click="selectedReviewApp = null"
+          class="px-4 py-2 rounded-lg bg-slate-800 text-slate-300 text-sm font-bold hover:bg-slate-700"
+        >
+          Hủy
+        </button>
+
+        <button
+          type="submit"
+          :disabled="isSubmittingReview"
+          class="px-5 py-2 rounded-lg bg-amber-400 text-slate-950 text-sm font-extrabold hover:bg-amber-300 disabled:opacity-50"
+        >
+          {{ isSubmittingReview ? 'Đang gửi...' : 'Gửi đánh giá' }}
+        </button>
+      </div>
+    </form>
+  </div>
+</div>
+<div v-if="isReviewsModalOpen" class="fixed inset-0 z-[60] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+  <div class="w-full max-w-xl overflow-hidden rounded-2xl border border-white/10 bg-slate-950 shadow-2xl shadow-slate-950/70">
+    <div class="flex items-start justify-between gap-4 border-b border-white/10 bg-slate-900/90 p-5">
+      <div>
+        <p class="text-xs font-bold uppercase tracking-wider text-cyan-300">Reviews</p>
+        <h3 class="mt-1 text-xl font-extrabold text-white">{{ selectedReviewsApp?.job?.title || 'Application reviews' }}</h3>
+        <p class="mt-1 text-sm font-medium text-slate-400">
+          {{ reviewSummary.average_rating.toFixed(1) }} / 5 · {{ reviewSummary.total_reviews }} reviews
+        </p>
+      </div>
+      <button
+        type="button"
+        @click="closeReviewsModal"
+        class="rounded-lg bg-white/5 px-3 py-1.5 text-sm font-bold text-slate-300 hover:bg-white/10 hover:text-white"
+      >
+        Đóng
+      </button>
+    </div>
+
+    <div class="max-h-[70vh] space-y-3 overflow-y-auto p-5">
+      <div v-if="isLoadingReviews" class="rounded-xl border border-white/10 bg-white/[0.04] p-4 text-sm font-medium text-slate-400">
+        Đang tải đánh giá...
+      </div>
+      <div
+        v-for="review in reviewsList"
+        :key="review.id || review.ID"
+        class="rounded-xl border border-white/10 bg-white/[0.04] p-4"
+      >
+        <div class="flex items-center justify-between gap-3">
+          <p class="text-sm font-extrabold text-amber-300">{{ review.rating || review.Rating }} / 5</p>
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ review.review_type || review.ReviewType || 'review' }}</p>
+        </div>
+        <p class="mt-2 text-sm font-medium text-slate-300">{{ review.comment || review.Comment || 'Không có nhận xét.' }}</p>
+      </div>
+      <p v-if="!isLoadingReviews && reviewsList.length === 0" class="rounded-xl border border-white/10 bg-white/[0.04] p-4 text-sm font-medium text-slate-500">
+        Chưa có đánh giá cho đơn này.
+      </p>
+    </div>
+  </div>
+</div>
 </template>
 
 <script setup lang="ts">
@@ -288,6 +590,23 @@ const {
   isResponding,
   isChatModalOpen,
   selectedChatApp,
+  selectedManagedApplication,
+  closeManagedApplicationModal,
+  selectedReviewApp,
+  reviewRating,
+  reviewComment,
+  isSubmittingReview,
+  submitReview,
+  reviewSummary,
+  reviewsList,
+  isLoadingReviews,
+  selectedReviewsApp,
+  isReviewsModalOpen,
+  openReviewsModal,
+  closeReviewsModal,
+  openManagedApplicationModal,
+  handleStudentComplete,
+  openReviewModal,
   toast
 } = toRefs(props.state)
 </script>

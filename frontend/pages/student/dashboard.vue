@@ -160,6 +160,20 @@ const applicationsPageSize = 8
 const appIdToCancel = ref<number | null>(null)
 const isCancellingApp = ref<number | null>(null)
 
+
+const selectedReviewApp = ref<any>(null)
+const reviewRating = ref(5)
+const reviewComment = ref('')
+const isSubmittingReview = ref(false)
+const selectedManagedApplication = ref<any | null>(null)
+const selectedReviewsApp = ref<any | null>(null)
+const reviewsList = ref<any[]>([])
+const reviewSummary = ref<{ average_rating: number; total_reviews: number }>({
+  average_rating: 0,
+  total_reviews: 0
+})
+const isLoadingReviews = ref(false)
+const isReviewsModalOpen = ref(false)
 // Hàm kích hoạt mở Modal Hủy ứng tuyển
 const triggerCancelConfirm = (id: number) => {
   appIdToCancel.value = id
@@ -176,17 +190,124 @@ const profileForm = reactive({
   cv_url: ''
 })
 
-// Company Seed Lookup
-const companyLookup: Record<number, string> = {
-  1: "FPT Software",
-  2: "VNG Corporation",
-  3: "Viettel Digital",
-  4: "MISA Joint Stock Company",
-  5: "NashTech Vietnam"
+
+const openReviewModal = (app: any) => {
+  selectedReviewApp.value = app
+  reviewRating.value = 5
+  reviewComment.value = ''
 }
 
-const companyNameLookup = (id: number): string => {
-  return companyLookup[id] || `Verified Employer #${id || ''}`
+const submitReview = async () => {
+  if (!selectedReviewApp.value) return
+
+  isSubmittingReview.value = true
+
+  try {
+    const res = await api.post('/api/reviews', {
+      application_id: selectedReviewApp.value.id,
+      rating: reviewRating.value,
+      comment: reviewComment.value
+    })
+
+    showToast(res?.message || 'Đánh giá thành công.')
+
+    selectedReviewApp.value = null
+    await fetchApplications()
+  } catch (error: any) {
+    console.error('Review error:', error)
+    showToast(
+      error.data?.error ||
+      error.response?._data?.error ||
+      error.message ||
+      'Không thể gửi đánh giá.',
+      'error'
+    )
+  } finally {
+    isSubmittingReview.value = false
+  }
+}
+
+const openManagedApplicationModal = async (app: any) => {
+  selectedManagedApplication.value = app
+  feedback.value = null
+  await fetchReviewsByApplication(app.id)
+}
+
+const closeManagedApplicationModal = () => {
+  selectedManagedApplication.value = null
+}
+
+const fetchReviewsByApplication = async (applicationId: number) => {
+  isLoadingReviews.value = true
+  try {
+    const res = await api.get(`/api/reviews/application/${applicationId}`)
+    const list = Array.isArray(res?.reviews) ? res.reviews : []
+    reviewsList.value = list
+
+    const total = list.length
+    const sum = list.reduce((acc: number, review: any) => acc + Number(review.rating || review.Rating || 0), 0)
+    reviewSummary.value = {
+      average_rating: total > 0 ? sum / total : 0,
+      total_reviews: total
+    }
+  } catch (error) {
+    console.error('Error fetching application reviews:', error)
+    reviewsList.value = []
+    reviewSummary.value = { average_rating: 0, total_reviews: 0 }
+  } finally {
+    isLoadingReviews.value = false
+  }
+}
+
+const fetchReviewsByUser = async (userId: number) => {
+  isLoadingReviews.value = true
+  try {
+    const res = await api.get(`/api/reviews/user/${userId}`)
+    reviewsList.value = Array.isArray(res?.reviews) ? res.reviews : []
+    reviewSummary.value = {
+      average_rating: Number(res?.average_rating || 0),
+      total_reviews: Number(res?.total_reviews || 0)
+    }
+  } catch (error) {
+    console.error('Error fetching user reviews:', error)
+    reviewsList.value = []
+    reviewSummary.value = { average_rating: 0, total_reviews: 0 }
+  } finally {
+    isLoadingReviews.value = false
+  }
+}
+
+const openReviewsModal = async (app: any) => {
+  selectedReviewsApp.value = app
+  isReviewsModalOpen.value = true
+  await fetchReviewsByApplication(app.id)
+}
+
+const closeReviewsModal = () => {
+  isReviewsModalOpen.value = false
+  selectedReviewsApp.value = null
+}
+const companyNameLookup = (source: any): string => {
+  if (source?.business?.company_name) {
+    return source.business.company_name
+  }
+
+  if (source?.company_name) {
+    return source.company_name
+  }
+
+  const id = Number(source?.business_id ?? source)
+
+  const fallback: Record<number, string> = {
+    1: "Công ty TNHH Phần mềm iNET",
+    2: "FPT Software",
+    3: "VNG Corporation",
+    4: "Viettel Digital",
+    5: "MISA Joint Stock Company",
+    6: "NashTech Vietnam"
+  }
+
+  return fallback[id] || `Verified Employer #${id || ''}`
 }
 
 // Format Application Date
@@ -229,8 +350,7 @@ const filteredApps = computed(() => {
   return list.filter(app => {
     if (!app) return false
     const jobTitle = (app.job?.title || '').toLowerCase()
-    const businessId = app.job?.business_id || 0
-    const compName = companyNameLookup(businessId).toLowerCase()
+    const compName = companyNameLookup(app.job).toLowerCase()
 
     const matchesSearch = !appSearchQuery.value ||
       jobTitle.includes(appSearchQuery.value.toLowerCase()) ||
@@ -771,6 +891,24 @@ const studentDashboardState = reactive({
   wallet,
   walletTransactions,
   isLoadingWallet,
+  selectedReviewApp,
+  reviewRating,
+  reviewComment,
+  isSubmittingReview,
+  openReviewModal,
+  submitReview,
+  selectedManagedApplication,
+  openManagedApplicationModal,
+  closeManagedApplicationModal,
+  selectedReviewsApp,
+  reviewsList,
+  reviewSummary,
+  isLoadingReviews,
+  isReviewsModalOpen,
+  openReviewsModal,
+  closeReviewsModal,
+  fetchReviewsByApplication,
+  fetchReviewsByUser,
   fetchWallet
 })
 
