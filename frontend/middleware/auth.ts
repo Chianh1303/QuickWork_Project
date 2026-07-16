@@ -5,6 +5,12 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
   const { fetchUser } = useAuth()
   const token = useCookie('auth_token')
 
+  const dashboardForRole = (role: string) => {
+    if (role === 'business') return '/business/dashboard'
+    if (role === 'admin') return '/admin/dashboard'
+    return '/student/dashboard'
+  }
+
   // Attempt to fetch current user profile if the cookie exists but store state is empty (e.g., page reload)
   if (token.value && !authStore.user) {
     await fetchUser()
@@ -28,6 +34,8 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
         return navigateTo('/student/dashboard')
       } else if (role === 'business') {
         return navigateTo('/business/dashboard')
+      } else if (role === 'admin') {
+        return navigateTo('/admin/dashboard')
       }
       return navigateTo('/')
     }
@@ -38,12 +46,17 @@ export default defineNuxtRouteMiddleware(async (to, from) => {
       
       // Guard student routes
       if (to.path.startsWith('/student') && role !== 'student') {
-        return navigateTo('/business/dashboard')
+        return navigateTo(dashboardForRole(role))
       }
       
       // Guard business routes
       if (to.path.startsWith('/business') && role !== 'business') {
-        return navigateTo('/student/dashboard')
+        return navigateTo(dashboardForRole(role))
+      }
+
+      // Guard admin routes
+      if (to.path.startsWith('/admin') && role !== 'admin') {
+        return navigateTo(dashboardForRole(role))
       }
     }
   }

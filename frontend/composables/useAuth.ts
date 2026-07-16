@@ -93,6 +93,8 @@ export const useAuth = () => {
       await navigateTo('/student/dashboard')
     } else if (role === 'business') {
       await navigateTo('/business/dashboard')
+    } else if (role === 'admin') {
+      await navigateTo('/admin/dashboard')
     } else {
       await navigateTo('/')
     }

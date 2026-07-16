@@ -29,7 +29,21 @@
 
             <!-- Navigation Links -->
             <nav class="hidden md:flex items-center space-x-1">
-              <template v-if="isDashboardRoute">
+              <template v-if="isAdminRoute">
+                <NuxtLink
+                  v-for="item in adminNavItems"
+                  :key="item.to"
+                  :to="item.to"
+                  class="relative rounded-lg px-3 py-2 text-sm font-bold transition-colors"
+                  :class="route.path === item.to
+                    ? 'bg-cyan-400 text-slate-950 shadow-sm shadow-cyan-950/30'
+                    : 'text-slate-300 hover:bg-white/10 hover:text-white'"
+                >
+                  {{ item.name }}
+                </NuxtLink>
+              </template>
+
+              <template v-else-if="isDashboardRoute">
                 <button
                   v-for="item in dashboardNavItems"
                   :key="item.id"
@@ -95,6 +109,17 @@
                     Employer Console
                   </NuxtLink>
                 </template>
+
+                <!-- Admin specific navigation links -->
+                <template v-if="isAuthenticated && userRole === 'admin' && !isAdminRoute">
+                  <NuxtLink
+                    to="/admin/dashboard"
+                    class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
+                    active-class="bg-cyan-400 text-slate-950 font-semibold"
+                  >
+                    Admin Console
+                  </NuxtLink>
+                </template>
               </template>
             </nav>
           </div>
@@ -103,7 +128,7 @@
           <div class="flex items-center space-x-4">
             <template v-if="isAuthenticated">
               <NuxtLink
-                v-if="!isDashboardRoute"
+                v-if="!isDashboardRoute && !isAdminRoute"
                 :to="dashboardPath"
                 class="hidden sm:inline-flex items-center justify-center rounded-lg bg-cyan-400 px-4 py-2 text-sm font-extrabold text-slate-950 hover:bg-cyan-300"
               >
@@ -112,7 +137,7 @@
               <!-- Logged In Status -->
               <div class="hidden sm:flex flex-col text-right">
                 <span class="text-xs font-semibold uppercase tracking-wider text-cyan-300">
-                  {{ userRole === 'student' ? 'Student' : 'Employer' }}
+                  {{ roleLabel }}
                 </span>
                 <span class="text-sm font-medium text-slate-200">{{ userEmail || 'Active User' }}</span>
               </div>
@@ -163,7 +188,25 @@
 
       <!-- Mobile Menu -->
       <div v-if="mobileMenuOpen" class="md:hidden border-t border-white/10 bg-slate-950 px-2 pt-2 pb-3 space-y-1 shadow-lg">
-        <template v-if="isDashboardRoute">
+        <template v-if="isAdminRoute">
+          <div class="px-3 py-2">
+            <p class="text-xs font-semibold uppercase tracking-wider text-cyan-300">Admin Console</p>
+          </div>
+          <NuxtLink
+            v-for="item in adminNavItems"
+            :key="item.to"
+            :to="item.to"
+            @click="mobileMenuOpen = false"
+            class="block px-3 py-2 rounded-lg text-base font-medium"
+            :class="route.path === item.to
+              ? 'bg-cyan-400 text-slate-950 font-semibold'
+              : 'text-slate-300 hover:bg-white/10 hover:text-white'"
+          >
+            {{ item.name }}
+          </NuxtLink>
+        </template>
+
+        <template v-else-if="isDashboardRoute">
           <div class="px-3 py-2">
             <p class="text-xs font-semibold uppercase tracking-wider text-cyan-300">{{ dashboardWorkspaceLabel }}</p>
           </div>
@@ -233,6 +276,16 @@
               Employer Console
             </NuxtLink>
           </template>
+          <template v-if="isAuthenticated && userRole === 'admin' && !isAdminRoute">
+            <NuxtLink
+              to="/admin/dashboard"
+              @click="mobileMenuOpen = false"
+              class="block px-3 py-2 rounded-lg text-base font-medium hover:bg-white/10 text-slate-300"
+              active-class="bg-cyan-400 text-slate-950 font-semibold"
+            >
+              Admin Console
+            </NuxtLink>
+          </template>
         </template>
       </div>
     </header>
@@ -285,6 +338,11 @@ const businessDashboardNavItems = [
   { id: 'applicants', name: 'Applicants' }
 ]
 
+const adminNavItems = [
+  { name: 'Dashboard', to: '/admin/dashboard' },
+  { name: 'Pending Business', to: '/admin/businesses/pending' }
+]
+
 const landingNavItems = [
   { id: 'home', name: 'Home', href: '#home' },
   { id: 'explore-jobs', name: 'Explore Jobs', href: '#explore-jobs' },
@@ -305,9 +363,18 @@ const userEmail = computed(() => user.value?.email)
 const isLandingRoute = computed(() => route.path === '/')
 const isStudentDashboard = computed(() => route.path === '/student/dashboard')
 const isBusinessDashboard = computed(() => route.path === '/business/dashboard')
+const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 const isDashboardRoute = computed(() => isStudentDashboard.value || isBusinessDashboard.value)
+const roleLabel = computed(() => {
+  if (userRole.value === 'student') return 'Student'
+  if (userRole.value === 'business') return 'Employer'
+  if (userRole.value === 'admin') return 'Admin'
+  return 'User'
+})
 const dashboardPath = computed(() => {
-  return userRole.value === 'business' ? '/business/dashboard' : '/student/dashboard'
+  if (userRole.value === 'business') return '/business/dashboard'
+  if (userRole.value === 'admin') return '/admin/dashboard'
+  return '/student/dashboard'
 })
 const dashboardNavItems = computed(() => {
   return isBusinessDashboard.value ? businessDashboardNavItems : studentDashboardNavItems
