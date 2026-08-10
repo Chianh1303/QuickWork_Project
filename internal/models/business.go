@@ -1,5 +1,7 @@
 package models
 
+import "time"
+
 type Business struct {
 	ID uint `gorm:"primaryKey" json:"id"`
 
@@ -18,4 +20,14 @@ type Business struct {
 	LogoUrl string `gorm:"type:varchar(255)" json:"logo_url"`
 
 	IsVerified bool `gorm:"default:false" json:"is_verified"`
+
+	RejectReason string `gorm:"type:text" json:"reject_reason"`
+
+	ReviewedAt *time.Time `json:"reviewed_at"`
+
+	ReviewedBy *uint `gorm:"index" json:"reviewed_by"`
+
+	CreatedAt time.Time `json:"created_at"`
+
+	UpdatedAt time.Time `json:"updated_at"`
 }

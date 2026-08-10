@@ -24,3 +24,33 @@ type PaginationMeta struct {
 	Total      int64 `json:"total"`
 	TotalPages int64 `json:"total_pages"`
 }
+
+type AdminDashboardStats struct {
+	TotalStudents     int64   `json:"total_students"`
+	TotalBusinesses   int64   `json:"total_businesses"`
+	PendingBusinesses int64   `json:"pending_businesses"`
+	TotalJobs         int64   `json:"total_jobs"`
+	PendingJobs       int64   `json:"pending_jobs"`
+	TotalDisbursed    float64 `json:"total_disbursed"`
+}
+
+type BusinessKYBDetail struct {
+	BusinessID   uint       `json:"business_id"`
+	UserID       uint       `json:"user_id"`
+	CompanyName  string     `json:"company_name"`
+	TaxCode      string     `json:"tax_code"`
+	Email        string     `json:"email"`
+	Phone        string     `json:"phone"`
+	Address      string     `json:"address"`
+	LogoURL      string     `json:"logo_url"`
+	Status       string     `json:"status"`
+	IsVerified   bool       `json:"is_verified"`
+	RejectReason string     `json:"reject_reason"`
+	CreatedAt    time.Time  `json:"created_at"`
+	ReviewedAt   *time.Time `json:"reviewed_at"`
+}
+
+type ReviewBusinessRequest struct {
+	Decision     string `json:"decision"`
+	RejectReason string `json:"reject_reason"`
+}

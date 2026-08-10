@@ -12,7 +12,7 @@
                 QuickWork operations command center
               </h1>
               <p class="mt-3 max-w-2xl text-sm font-semibold leading-6 text-slate-300 sm:text-base">
-                Monitor business onboarding, keep marketplace access controlled, and prepare pending registrations for review.
+                Theo dõi số liệu marketplace thật từ database và xử lý queue KYB doanh nghiệp đang chờ duyệt.
               </p>
             </div>
 
@@ -23,42 +23,58 @@
               >
                 Review Pending Business
               </NuxtLink>
-              <div class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] px-5 py-3 text-sm font-bold text-slate-200">
-                Admin-only workspace
-              </div>
+              <button
+                type="button"
+                class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] px-5 py-3 text-sm font-bold text-slate-200 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"
+                :disabled="isLoading"
+                @click="fetchStats"
+              >
+                Reload Stats
+              </button>
             </div>
           </div>
 
-          <div class="grid gap-3 sm:grid-cols-2">
-            <div
-              v-for="metric in metrics"
-              :key="metric.label"
-              class="rounded-2xl border border-white/10 bg-white/[0.06] p-5"
-            >
-              <p class="text-xs font-extrabold uppercase tracking-wide text-slate-400">{{ metric.label }}</p>
-              <p class="mt-3 text-3xl font-extrabold text-white">{{ metric.value }}</p>
-              <p class="mt-2 text-sm font-semibold text-slate-300">{{ metric.caption }}</p>
-            </div>
+          <div class="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-5">
+            <p class="text-xs font-extrabold uppercase tracking-wide text-cyan-200">KYB Queue</p>
+            <p class="mt-3 text-5xl font-extrabold text-white">
+              {{ isLoading ? '...' : formatNumber(stats?.pending_businesses || 0) }}
+            </p>
+            <p class="mt-3 text-sm font-semibold leading-6 text-cyan-100">
+              Doanh nghiệp đang chờ Admin duyệt trước khi được truy cập Business Dashboard.
+            </p>
           </div>
         </div>
       </section>
 
-      <section class="grid gap-4 lg:grid-cols-3">
+      <section v-if="errorMessage" class="rounded-2xl border border-rose-400/20 bg-rose-400/10 p-5">
+        <h2 class="text-base font-extrabold text-rose-100">Không tải được số liệu Dashboard</h2>
+        <p class="mt-2 text-sm font-semibold text-rose-200">{{ errorMessage }}</p>
+        <button
+          type="button"
+          class="mt-4 rounded-xl bg-rose-300 px-4 py-2 text-sm font-extrabold text-slate-950 transition-colors hover:bg-rose-200"
+          @click="fetchStats"
+        >
+          Thử lại
+        </button>
+      </section>
+
+      <section class="grid gap-4 md:grid-cols-2 xl:grid-cols-3">
         <article
-          v-for="card in cards"
-          :key="card.title"
+          v-for="card in statCards"
+          :key="card.label"
           class="rounded-2xl border border-white/10 bg-slate-950/70 p-5 shadow-xl shadow-slate-950/25 ring-1 ring-cyan-400/10"
         >
           <div class="flex items-start justify-between gap-4">
             <div>
               <p class="text-xs font-extrabold uppercase tracking-wide text-slate-400">{{ card.label }}</p>
-              <h2 class="mt-2 text-xl font-extrabold text-white">{{ card.title }}</h2>
+              <div v-if="isLoading" class="mt-3 h-9 w-28 animate-pulse rounded-lg bg-white/[0.08]" />
+              <p v-else class="mt-3 text-3xl font-extrabold text-white">{{ card.value }}</p>
             </div>
-            <span class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400/10 text-sm font-extrabold text-cyan-200 ring-1 ring-cyan-400/20">
-              {{ card.index }}
+            <span class="flex h-11 w-11 items-center justify-center rounded-xl bg-cyan-400/10 text-sm font-extrabold text-cyan-200 ring-1 ring-cyan-400/20">
+              {{ card.short }}
             </span>
           </div>
-          <p class="mt-4 text-sm font-semibold leading-6 text-slate-300">{{ card.description }}</p>
+          <p class="mt-4 text-sm font-semibold leading-6 text-slate-300">{{ card.caption }}</p>
         </article>
       </section>
 
@@ -66,9 +82,9 @@
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
             <p class="text-xs font-extrabold uppercase tracking-wide text-cyan-200">Primary workflow</p>
-            <h2 class="mt-2 text-xl font-extrabold text-white">Business onboarding queue</h2>
+            <h2 class="mt-2 text-xl font-extrabold text-white">Business KYB review</h2>
             <p class="mt-2 text-sm font-semibold leading-6 text-slate-300">
-              Use the Pending Business page to search, scan, and select business registrations. Detail review and approval actions remain reserved for the next phase.
+              Mở danh sách pending để xem hồ sơ doanh nghiệp, duyệt hoặc từ chối kèm lý do. Hồ sơ đã xử lý sẽ biến mất khỏi queue.
             </p>
           </div>
           <NuxtLink
@@ -84,37 +100,79 @@
 </template>
 
 <script setup lang="ts">
+import { computed, onMounted, ref } from 'vue'
 import AdminShell from '~/components/admin/AdminShell.vue'
+import { useAdminApi } from '~/composables/useAdminApi'
+import type { AdminDashboardStats } from '~/types/admin'
 
 definePageMeta({
   middleware: 'auth'
 })
 
-const metrics = [
-  { label: 'Access', value: 'Admin', caption: 'Role-protected controls' },
-  { label: 'Queue', value: 'Pending', caption: 'Businesses awaiting review' },
-  { label: 'Scope', value: 'List', caption: 'No approve or reject in this phase' },
-  { label: 'API', value: 'JWT', caption: 'Authenticated REST endpoint' }
-]
+const adminApi = useAdminApi()
+const stats = ref<AdminDashboardStats | null>(null)
+const isLoading = ref(false)
+const errorMessage = ref('')
 
-const cards = [
+const formatNumber = (value: number) => new Intl.NumberFormat('vi-VN').format(value)
+const formatCurrency = (value: number) =>
+  new Intl.NumberFormat('vi-VN', { style: 'currency', currency: 'VND', maximumFractionDigits: 0 }).format(value)
+const extractErrorMessage = (error: unknown, fallback: string) => {
+  const maybeError = error as { response?: { _data?: { message?: string } } }
+  return maybeError.response?._data?.message || fallback
+}
+
+const statCards = computed(() => [
   {
-    index: '01',
-    label: 'Queue',
-    title: 'Pending Business',
-    description: 'View businesses waiting for admin review and prepare records for later approval workflow.'
+    label: 'Tổng sinh viên',
+    short: 'SV',
+    value: formatNumber(stats.value?.total_students || 0),
+    caption: 'Số tài khoản có role student.'
   },
   {
-    index: '02',
-    label: 'Security',
-    title: 'Admin-only access',
-    description: 'All admin APIs are protected by JWT authentication and role-based authorization.'
+    label: 'Tổng doanh nghiệp',
+    short: 'DN',
+    value: formatNumber(stats.value?.total_businesses || 0),
+    caption: 'Số tài khoản có role business.'
   },
   {
-    index: '03',
-    label: 'Scope',
-    title: 'Review list only',
-    description: 'Approve, reject, and detailed profile review actions are intentionally left for a later task.'
+    label: 'Doanh nghiệp chờ duyệt',
+    short: 'KYB',
+    value: formatNumber(stats.value?.pending_businesses || 0),
+    caption: 'Business có trạng thái pending cần Admin xử lý.'
+  },
+  {
+    label: 'Tổng Job',
+    short: 'JOB',
+    value: formatNumber(stats.value?.total_jobs || 0),
+    caption: 'Tổng tin tuyển dụng trong hệ thống.'
+  },
+  {
+    label: 'Job pending',
+    short: 'PEN',
+    value: formatNumber(stats.value?.pending_jobs || 0),
+    caption: 'Tin tuyển dụng đang chờ duyệt.'
+  },
+  {
+    label: 'Tổng giải ngân',
+    short: 'VND',
+    value: formatCurrency(stats.value?.total_disbursed || 0),
+    caption: 'Tổng lương đã giải ngân qua hệ thống, không phải doanh thu ròng QuickWork.'
   }
-]
+])
+
+const fetchStats = async () => {
+  isLoading.value = true
+  errorMessage.value = ''
+
+  try {
+    stats.value = await adminApi.getDashboardStats()
+  } catch (error: unknown) {
+    errorMessage.value = extractErrorMessage(error, 'Không thể tải số liệu dashboard.')
+  } finally {
+    isLoading.value = false
+  }
+}
+
+onMounted(fetchStats)
 </script>

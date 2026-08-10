@@ -1,9 +1,11 @@
 package middleware
 
 import (
+	"fmt"
+	"strings"
+
 	"github.com/gofiber/fiber/v2"
 	"github.com/golang-jwt/jwt/v5"
-	"strings"
 )
 
 var jwtSecret = []byte("quickwork_secret_key_2026")
@@ -16,6 +18,9 @@ func Protected() fiber.Handler {
 		}
 		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
+			if token.Method != jwt.SigningMethodHS256 {
+				return nil, fmt.Errorf("unexpected signing method")
+			}
 			return jwtSecret, nil
 		})
 		if err != nil || !token.Valid {

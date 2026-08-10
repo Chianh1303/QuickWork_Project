@@ -53,12 +53,18 @@ func HandleRegister(db *gorm.DB) fiber.Handler {
 
 		// 4. Dùng Transaction để lưu đồng thời vào các bảng liên quan
 		err = db.Transaction(func(tx *gorm.DB) error {
+			status := "approved"
+			if req.Role == "business" {
+				// Doanh nghiệp đăng ký phải chờ Admin duyệt KYB, nên chưa được cấp quyền đăng nhập dashboard ngay.
+				status = "pending"
+			}
+
 			// Tạo User gốc trước
 			newUser := models.User{
 				Email:    req.Email,
 				Password: string(hashedPassword),
 				Role:     req.Role,
-				Status:   "active", // Tạm thời để active để test, sau này có thể đổi pending cho Business
+				Status:   status,
 				Balance:  0.0,
 			}
 			if err := tx.Create(&newUser).Error; err != nil {
@@ -134,6 +140,14 @@ func HandleLogin(db *gorm.DB) fiber.Handler {
 		err = bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password))
 		if err != nil {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "Email hoặc mật khẩu không chính xác"})
+		}
+
+		// Luôn kiểm tra password trước status để không làm lộ email nào đang tồn tại trong hệ thống.
+		if user.Status != "approved" && user.Status != "active" {
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
+				"message": "Tài khoản của bạn chưa được duyệt hoặc đang bị khóa",
+				"status":  user.Status,
+			})
 		}
 
 		// 3. Nếu mọi thứ đúng -> Tiến hành tạo Token JWT

@@ -2,9 +2,11 @@ package database
 
 import (
 	"QuickWork/internal/models" // Chanh nhớ chỉnh lại đường dẫn package models đúng với dự án của bạn nhé
+	"errors"
+	"log"
+
 	"golang.org/x/crypto/bcrypt"
 	"gorm.io/gorm"
-	"log"
 )
 
 func SeedDatabase(db *gorm.DB) {
@@ -13,11 +15,13 @@ func SeedDatabase(db *gorm.DB) {
 		log.Fatal("❌ Database connection is nil")
 	}
 
+	ensureDevelopmentAdmin(db)
+
 	// Nếu đã có user thì bỏ qua seed
 	var userCount int64
 	db.Model(&models.User{}).Count(&userCount)
 
-	if userCount > 0 {
+	if userCount > 1 {
 		log.Println("⚠️ Database đã có dữ liệu, bỏ qua seed.")
 		return
 	}
@@ -154,4 +158,39 @@ func SeedDatabase(db *gorm.DB) {
 	}
 
 	log.Println("🎉 Khởi tạo dữ liệu thực tế thành công mỹ mãn! Tất cả mật khẩu đều là: 12345678")
+}
+
+func ensureDevelopmentAdmin(db *gorm.DB) {
+	const adminEmail = "admin@quickwork.vn"
+
+	var admin models.User
+	err := db.Where("email = ?", adminEmail).First(&admin).Error
+	if err == nil {
+		return
+	}
+	if !errors.Is(err, gorm.ErrRecordNotFound) {
+		log.Printf("⚠️ Không thể kiểm tra admin mẫu: %v", err)
+		return
+	}
+
+	hashedPassword, hashErr := bcrypt.GenerateFromPassword([]byte("12345678"), bcrypt.DefaultCost)
+	if hashErr != nil {
+		log.Printf("⚠️ Không thể tạo mật khẩu admin mẫu: %v", hashErr)
+		return
+	}
+
+	// Tài khoản này chỉ phục vụ môi trường development; khi deploy production không dùng password mặc định.
+	admin = models.User{
+		Email:    adminEmail,
+		Password: string(hashedPassword),
+		Role:     "admin",
+		Status:   "approved",
+		Balance:  0,
+	}
+	if err := db.Create(&admin).Error; err != nil {
+		log.Printf("⚠️ Không thể tạo admin mẫu development: %v", err)
+		return
+	}
+
+	log.Println("✅ Đã tạo admin mẫu development: admin@quickwork.vn / 12345678")
 }
