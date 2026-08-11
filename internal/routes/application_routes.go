@@ -1,46 +1,52 @@
 package routes
 
 import (
-	"QuickWork/internal/handlers"
+	"QuickWork/internal/controllers"
 	"QuickWork/internal/middleware"
+	"QuickWork/internal/repositories"
+	"QuickWork/internal/services"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func RegisterApplicationRoutes(app *fiber.App, db *gorm.DB) {
-	app.Post("/api/jobs/apply", middleware.Protected(), middleware.RequireRole("student"), handlers.ApplyJob(db))
+	appRepo := repositories.NewApplicationRepository(db)
+	appService := services.NewApplicationService(appRepo)
+	appController := controllers.NewApplicationController(appService)
+
+	app.Post("/api/jobs/apply", middleware.Protected(), middleware.RequireRole("student"), appController.ApplyJob)
 
 	// Sinh viên xem lịch sử ứng tuyển của mình (C6)
 	app.Get("/api/applications/my-applications",
 		middleware.Protected(),
 		middleware.RequireRole("student"),
-		handlers.GetStudentApplications(db),
+		appController.GetStudentApplications,
 	)
 
 	// 🌟 THÊM ROUTE: Sinh viên thực hiện hủy ứng tuyển đơn còn chờ duyệt (C6)
 	app.Post("/api/applications/:id/cancel",
 		middleware.Protected(),
 		middleware.RequireRole("student"),
-		handlers.CancelApplication(db),
+		appController.CancelApplication,
 	)
 
 	// Doanh nghiệp xem danh sách ứng viên nộp đơn (B6)
 	app.Get("/api/applications/employer",
 		middleware.Protected(),
 		middleware.RequireRole("business"),
-		handlers.GetEmployerApplications(db),
+		appController.GetEmployerApplications,
 	)
 
 	app.Post("/api/applications/student-complete",
 		middleware.Protected(),
 		middleware.RequireRole("student"),
-		handlers.StudentCompleteJob(db),
+		appController.StudentCompleteJob,
 	)
 
 	app.Post("/api/applications/business-complete",
 		middleware.Protected(),
 		middleware.RequireRole("business"),
-		handlers.BusinessCompleteJob(db),
+		appController.BusinessCompleteJob,
 	)
 }

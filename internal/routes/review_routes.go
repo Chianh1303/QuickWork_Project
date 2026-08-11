@@ -1,27 +1,33 @@
 package routes
 
 import (
-	"QuickWork/internal/handlers"
+	"QuickWork/internal/controllers"
 	"QuickWork/internal/middleware"
+	"QuickWork/internal/repositories"
+	"QuickWork/internal/services"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func RegisterReviewRoutes(app *fiber.App, db *gorm.DB) {
+	reviewRepo := repositories.NewReviewRepository(db)
+	reviewService := services.NewReviewService(reviewRepo)
+	reviewController := controllers.NewReviewController(reviewService)
+
 	app.Get(
 		"/api/reviews/user/:userId",
 		middleware.Protected(),
-		handlers.GetReviewsByUser(db),
+		reviewController.GetReviewsByUser,
 	)
 	app.Get(
 		"/api/reviews/application/:applicationId",
 		middleware.Protected(),
-		handlers.GetReviewsByApplication(db),
+		reviewController.GetReviewsByApplication,
 	)
 	app.Post(
 		"/api/reviews",
 		middleware.Protected(),
-		handlers.CreateReview(db),
+		reviewController.CreateReview,
 	)
 }

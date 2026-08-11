@@ -1,28 +1,35 @@
 package routes
 
 import (
-	"QuickWork/internal/handlers"
+	"QuickWork/internal/controllers"
+	"QuickWork/internal/repositories"
+	"QuickWork/internal/services"
+	"QuickWork/internal/websocket"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/websocket/v2"
+	fiberWS "github.com/gofiber/websocket/v2"
 	"gorm.io/gorm"
 )
 
 func RegisterChatRoutes(app *fiber.App, db *gorm.DB) {
+	chatRepo := repositories.NewChatRepository(db)
+	chatService := services.NewChatService(chatRepo)
+	chatController := controllers.NewChatController(chatService)
+
 	// CHAT
-	handlers.StartChatHub(db)
+	websocket.StartChatHub(db)
 
 	// Middleware Upgrade WebSocket
 	app.Use("/api/chat/ws", func(c *fiber.Ctx) error {
-		if websocket.IsWebSocketUpgrade(c) {
+		if fiberWS.IsWebSocketUpgrade(c) {
 			return c.Next()
 		}
 		return fiber.ErrUpgradeRequired
 	})
 
-	// REST API
-	app.Get("/api/chat/history", handlers.GetChatHistory(db))
+	// WebSocket Handler
+	app.Get("/api/chat/ws", fiberWS.New(websocket.HandleWS))
 
-	// WebSocket
-	app.Get("/api/chat/ws", websocket.New(handlers.HandleWS))
+	// REST API
+	app.Get("/api/chat/history", chatController.GetChatHistory)
 }

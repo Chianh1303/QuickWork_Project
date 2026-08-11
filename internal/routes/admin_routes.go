@@ -1,18 +1,24 @@
 package routes
 
 import (
-	"QuickWork/internal/handlers"
+	"QuickWork/internal/controllers"
 	"QuickWork/internal/middleware"
+	"QuickWork/internal/repositories"
+	"QuickWork/internal/services"
 
 	"github.com/gofiber/fiber/v2"
 	"gorm.io/gorm"
 )
 
 func RegisterAdminRoutes(app *fiber.App, db *gorm.DB) {
+	adminRepo := repositories.NewAdminRepository(db)
+	adminService := services.NewAdminService(adminRepo)
+	adminController := controllers.NewAdminController(adminService)
+
 	admin := app.Group("/api/admin", middleware.Protected(), middleware.RequireRole("admin"))
 
-	admin.Get("/dashboard/stats", handlers.GetAdminDashboardStats(db))
-	admin.Get("/businesses/pending", handlers.GetPendingBusinesses(db))
-	admin.Get("/businesses/:id", handlers.GetBusinessKYBDetail(db))
-	admin.Put("/businesses/:id/review", handlers.ReviewBusinessKYB(db))
+	admin.Get("/dashboard/stats", adminController.GetAdminDashboardStats)
+	admin.Get("/businesses/pending", adminController.GetPendingBusinesses)
+	admin.Get("/businesses/:id", adminController.GetBusinessKYBDetail)
+	admin.Put("/businesses/:id/review", adminController.ReviewBusinessKYB)
 }
