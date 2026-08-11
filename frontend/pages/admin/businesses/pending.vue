@@ -5,10 +5,10 @@
         <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
           <div>
             <span class="inline-flex rounded-full bg-amber-400/10 px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-amber-200 ring-1 ring-amber-400/25">
-              Admin KYB Queue
+              Hàng chờ duyệt KYB Doanh nghiệp
             </span>
             <h1 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-              Pending Businesses
+              Doanh nghiệp Chờ Xét Duyệt
             </h1>
             <p class="mt-2 max-w-2xl text-sm font-semibold leading-6 text-slate-300 sm:text-base">
               Tìm kiếm, xem hồ sơ KYB, duyệt hoặc từ chối doanh nghiệp đang chờ xác minh.
@@ -17,11 +17,11 @@
 
           <div class="grid min-w-0 grid-cols-2 gap-3 sm:min-w-[360px]">
             <div class="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-5 py-4">
-              <p class="text-xs font-extrabold uppercase tracking-wide text-cyan-200">Total Results</p>
+              <p class="text-xs font-extrabold uppercase tracking-wide text-cyan-200">Tổng số kết quả</p>
               <p class="mt-1 text-2xl font-extrabold text-white">{{ pagination.total }}</p>
             </div>
             <div class="rounded-2xl border border-white/10 bg-white/[0.06] px-5 py-4">
-              <p class="text-xs font-extrabold uppercase tracking-wide text-slate-400">Current Page</p>
+              <p class="text-xs font-extrabold uppercase tracking-wide text-slate-400">Trang hiện tại</p>
               <p class="mt-1 text-2xl font-extrabold text-white">{{ pagination.page }}</p>
             </div>
           </div>
@@ -32,13 +32,13 @@
         <div class="grid gap-3 xl:grid-cols-[1fr_auto_auto] xl:items-end">
           <label class="block">
             <span class="mb-2 block text-xs font-extrabold uppercase tracking-wide text-slate-400">
-              Search by Company Name, Tax Code, or Email
+              Tìm kiếm theo Tên công ty, Mã số thuế hoặc Email
             </span>
             <input
               v-model="searchInput"
               type="search"
               class="w-full rounded-xl border border-white/10 bg-slate-950/80 px-4 py-3 text-sm font-semibold text-white outline-none transition focus:border-cyan-300 focus:ring-2 focus:ring-cyan-400/30"
-              placeholder="Nhập tên công ty, mã số thuế hoặc email"
+              placeholder="Nhập tên công ty, mã số thuế hoặc email..."
               @keydown.enter.prevent="applySearchNow"
             >
           </label>
@@ -49,7 +49,7 @@
             :disabled="isLoading"
             @click="applySearchNow"
           >
-            Search
+            Tìm kiếm
           </button>
 
           <button
@@ -115,12 +115,12 @@
             <table class="min-w-full divide-y divide-white/10">
               <thead class="bg-white/[0.04]">
                 <tr>
-                  <th class="px-5 py-3 text-left text-xs font-extrabold uppercase tracking-wide text-slate-400">Company Name</th>
-                  <th class="px-5 py-3 text-left text-xs font-extrabold uppercase tracking-wide text-slate-400">Tax Code</th>
-                  <th class="px-5 py-3 text-left text-xs font-extrabold uppercase tracking-wide text-slate-400">Email</th>
-                  <th class="px-5 py-3 text-left text-xs font-extrabold uppercase tracking-wide text-slate-400">Submitted At</th>
-                  <th class="px-5 py-3 text-left text-xs font-extrabold uppercase tracking-wide text-slate-400">Status</th>
-                  <th class="px-5 py-3 text-right text-xs font-extrabold uppercase tracking-wide text-slate-400">Action</th>
+                  <th class="px-5 py-3 text-left text-xs font-extrabold uppercase tracking-wide text-slate-400">Tên Công ty</th>
+                  <th class="px-5 py-3 text-left text-xs font-extrabold uppercase tracking-wide text-slate-400">Mã số thuế</th>
+                  <th class="px-5 py-3 text-left text-xs font-extrabold uppercase tracking-wide text-slate-400">Email liên hệ</th>
+                  <th class="px-5 py-3 text-left text-xs font-extrabold uppercase tracking-wide text-slate-400">Thời gian nộp</th>
+                  <th class="px-5 py-3 text-left text-xs font-extrabold uppercase tracking-wide text-slate-400">Trạng thái</th>
+                  <th class="px-5 py-3 text-right text-xs font-extrabold uppercase tracking-wide text-slate-400">Thao tác</th>
                 </tr>
               </thead>
               <tbody class="divide-y divide-white/10">
@@ -138,7 +138,7 @@
                   <td class="px-5 py-4 align-middle text-sm font-semibold text-slate-300">{{ formatDate(item.created_at) }}</td>
                   <td class="px-5 py-4 align-middle">
                     <span class="inline-flex rounded-full bg-amber-400/10 px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-amber-200 ring-1 ring-amber-400/25">
-                      Pending
+                      Chờ duyệt
                     </span>
                   </td>
                   <td class="px-5 py-4 text-right align-middle">
@@ -167,16 +167,16 @@
                   <p class="mt-1 text-sm font-semibold text-slate-400">{{ item.email }}</p>
                 </div>
                 <span class="rounded-full bg-amber-400/10 px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-amber-200 ring-1 ring-amber-400/25">
-                  Pending
+                  Chờ duyệt
                 </span>
               </div>
               <dl class="mt-4 grid gap-3 text-sm">
                 <div>
-                  <dt class="text-xs font-extrabold uppercase tracking-wide text-slate-500">Tax Code</dt>
+                  <dt class="text-xs font-extrabold uppercase tracking-wide text-slate-500">Mã số thuế</dt>
                   <dd class="mt-1 font-semibold text-slate-200">{{ item.tax_code }}</dd>
                 </div>
                 <div>
-                  <dt class="text-xs font-extrabold uppercase tracking-wide text-slate-500">Submitted At</dt>
+                  <dt class="text-xs font-extrabold uppercase tracking-wide text-slate-500">Thời gian nộp</dt>
                   <dd class="mt-1 font-semibold text-slate-200">{{ formatDate(item.created_at) }}</dd>
                 </div>
               </dl>

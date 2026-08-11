@@ -6,9 +6,9 @@
           <div>
             <div class="flex flex-wrap items-center gap-2">
               <span class="inline-flex items-center rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-cyan-200 ring-1 ring-cyan-400/30">
-                Employer Workspace
+                Không gian Doanh nghiệp
               </span>
-              <span class="text-xs font-semibold text-slate-400">Hiring command center</span>
+              <span class="text-xs font-semibold text-slate-400">Trung tâm quản lý tuyển dụng</span>
             </div>
             <h1 class="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
               {{ businessHero.title }}
@@ -28,7 +28,7 @@
                 @click="activeSection = 'applicants'"
                 class="inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-white/15 focus-ring"
               >
-                Review applicants
+                Xem danh sách ứng viên
               </button>
             </div>
           </div>
@@ -453,61 +453,61 @@ const acceptedApplicationsCount = computed(() => {
 const businessHero = computed(() => {
   if (activeSection.value === 'profile') {
     return {
-      title: profileForm.company_name ? `${profileForm.company_name} profile` : 'Complete your employer profile',
-      description: 'Keep company details polished so students can understand your brand before they apply.',
-      cta: 'Update profile'
+      title: profileForm.company_name ? `Hồ sơ công ty: ${profileForm.company_name}` : 'Hoàn thiện hồ sơ doanh nghiệp',
+      description: 'Cập nhật thông tin công ty rõ ràng giúp sinh viên hiểu rõ thương hiệu trước khi ứng tuyển.',
+      cta: 'Cập nhật hồ sơ'
     }
   }
 
   if (activeSection.value === 'jobs') {
     return {
-      title: 'Manage job openings',
-      description: 'Publish clear roles, monitor capacity, and keep student-friendly opportunities fresh.',
-      cta: 'Post a job'
+      title: 'Quản lý bài đăng tuyển dụng',
+      description: 'Đăng tin tuyển dụng rõ ràng, theo dõi nhu cầu nhân sự và duy trì các cơ hội phù hợp cho sinh viên.',
+      cta: 'Đăng tin mới'
     }
   }
 
   if (activeSection.value === 'applicants') {
     return {
-      title: 'Applicant pipeline',
-      description: 'Review candidates, move applications forward, and start conversations from one place.',
-      cta: 'View pending'
+      title: 'Quản lý ứng viên nộp đơn',
+      description: 'Xem xét hồ sơ ứng viên, chuyển đổi trạng thái nộp đơn và trao đổi trực tiếp từ một giao diện tập trung.',
+      cta: 'Xem đơn chờ duyệt'
     }
   }
 
   return {
-    title: 'Hiring performance overview',
-    description: 'Track job posts, candidate movement, and hiring coverage across your current openings.',
-    cta: 'Post a job'
+    title: 'Tổng quan hiệu quả tuyển dụng',
+    description: 'Theo dõi bài đăng tuyển dụng, ứng viên nộp đơn và tiến độ nhận việc thực tế.',
+    cta: 'Đăng tin tuyển dụng'
   }
 })
 
 const businessHeroStats = computed(() => [
   {
-    label: 'Active jobs',
+    label: 'Bài đăng hoạt động',
     value: jobs.value.length,
-    caption: 'Open postings',
+    caption: 'Đang mở tuyển',
     icon: 'jobs',
     iconClass: 'bg-brand-50 text-brand-700'
   },
   {
-    label: 'Applicants',
+    label: 'Ứng viên nộp đơn',
     value: applications.value.length,
-    caption: 'Total received',
+    caption: 'Tổng đơn nhận được',
     icon: 'apps',
     iconClass: 'bg-sky-50 text-sky-700'
   },
   {
-    label: 'Pending',
+    label: 'Đơn chờ duyệt',
     value: pendingApplicationsCount.value,
-    caption: 'Need review',
+    caption: 'Cần xem xét',
     icon: 'pending',
     iconClass: 'bg-amber-50 text-amber-700'
   },
   {
-    label: 'Fill rate',
+    label: 'Tỷ lệ nhận việc',
     value: `${fillRatio.value}%`,
-    caption: `${acceptedApplicationsCount.value} accepted`,
+    caption: `${acceptedApplicationsCount.value} ứng viên nhận việc`,
     icon: 'fill',
     iconClass: 'bg-emerald-50 text-emerald-700'
   }

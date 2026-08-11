@@ -14,28 +14,28 @@
 
           <div class="space-y-4">
             <p class="inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-cyan-200">
-              Employer console
+              Giao diện Nhà tuyển dụng
             </p>
             <h1 class="text-5xl font-extrabold leading-none tracking-tight text-white">
-              Publish roles and move candidates faster.
+              Đăng tin tuyển dụng & kết nối ứng viên tài năng.
             </h1>
             <p class="text-base font-medium leading-8 text-slate-300">
-              Create an employer workspace to post jobs, review student applicants, chat with candidates, and keep hiring status organized.
+              Tạo tài khoản Doanh nghiệp để đăng tin tuyển dụng, xem hồ sơ sinh viên, nhắn tin trực tiếp và quản lý tiến trình tuyển dụng tập trung.
             </p>
           </div>
 
           <div class="grid grid-cols-3 gap-3">
             <div class="rounded-xl border border-white/10 bg-white/[0.06] p-4">
-              <p class="text-2xl font-extrabold text-white">Jobs</p>
-              <p class="mt-1 text-xs font-semibold text-slate-400">Publish fast</p>
+              <p class="text-2xl font-extrabold text-white">Nhanh chóng</p>
+              <p class="mt-1 text-xs font-semibold text-slate-400">Đăng tin bài</p>
             </div>
             <div class="rounded-xl border border-white/10 bg-white/[0.06] p-4">
-              <p class="text-2xl font-extrabold text-white">HR</p>
-              <p class="mt-1 text-xs font-semibold text-slate-400">Live chat</p>
+              <p class="text-2xl font-extrabold text-white">Trực tiếp</p>
+              <p class="mt-1 text-xs font-semibold text-slate-400">Nhắn tin HR</p>
             </div>
             <div class="rounded-xl border border-white/10 bg-white/[0.06] p-4">
-              <p class="text-2xl font-extrabold text-white">Track</p>
-              <p class="mt-1 text-xs font-semibold text-slate-400">Applicants</p>
+              <p class="text-2xl font-extrabold text-white">Quản lý</p>
+              <p class="mt-1 text-xs font-semibold text-slate-400">Đơn ứng tuyển</p>
             </div>
           </div>
         </div>
@@ -50,10 +50,10 @@
               </div>
             </div>
             <h2 class="mt-2 text-center text-3xl font-extrabold text-white tracking-tight lg:mt-0">
-              Employer Registration
+              Đăng Ký Doanh Nghiệp
             </h2>
             <p class="mt-2 text-center text-sm text-slate-300">
-              Source student talent and manage job postings.
+              Tuyển dụng nhân sự sinh viên và quản lý các công việc đã đăng.
             </p>
           </div>
 
@@ -76,66 +76,66 @@
             <div class="space-y-4">
               <!-- Full Name / HR Name -->
               <div>
-                <label for="full_name" class="block text-sm font-semibold text-slate-200 mb-1">HR Manager / Recruiter Name</label>
+                <label for="full_name" class="block text-sm font-semibold text-slate-200 mb-1">Họ tên Người đại diện / HR</label>
                 <input
                   id="full_name"
                   type="text"
                   required
                   v-model="form.full_name"
                   class="appearance-none block w-full px-3 py-3 border border-white/10 placeholder-slate-500 text-white rounded-lg bg-slate-950/70 hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 sm:text-sm"
-                  placeholder="e.g. Ms. Jane Doe"
+                  placeholder="Ví dụ: Nguyễn Thị B"
                 />
               </div>
 
               <!-- Corporate Email -->
               <div>
-                <label for="email" class="block text-sm font-semibold text-slate-200 mb-1">Corporate Email Address</label>
+                <label for="email" class="block text-sm font-semibold text-slate-200 mb-1">Email Doanh nghiệp</label>
                 <input
                   id="email"
                   type="email"
                   required
                   v-model="form.email"
                   class="appearance-none block w-full px-3 py-3 border border-white/10 placeholder-slate-500 text-white rounded-lg bg-slate-950/70 hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 sm:text-sm"
-                  placeholder="e.g. hr@company.com"
+                  placeholder="Ví dụ: hr@fpt.com"
                 />
               </div>
 
               <!-- Password -->
               <div>
-                <label for="password" class="block text-sm font-semibold text-slate-200 mb-1">Password</label>
+                <label for="password" class="block text-sm font-semibold text-slate-200 mb-1">Mật khẩu</label>
                 <input
                   id="password"
                   type="password"
                   required
                   v-model="form.password"
                   class="appearance-none block w-full px-3 py-3 border border-white/10 placeholder-slate-500 text-white rounded-lg bg-slate-950/70 hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 sm:text-sm"
-                  placeholder="Minimum 6 characters"
+                  placeholder="Tối thiểu 6 ký tự"
                 />
               </div>
 
               <!-- Company Name -->
               <div>
-                <label for="company_name" class="block text-sm font-semibold text-slate-200 mb-1">Company Name</label>
+                <label for="company_name" class="block text-sm font-semibold text-slate-200 mb-1">Tên Công ty / Doanh nghiệp</label>
                 <input
                   id="company_name"
                   type="text"
                   required
                   v-model="form.company_name"
                   class="appearance-none block w-full px-3 py-3 border border-white/10 placeholder-slate-500 text-white rounded-lg bg-slate-950/70 hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 sm:text-sm"
-                  placeholder="e.g. QuickWork Tech Corp"
+                  placeholder="Ví dụ: Công ty TNHH QuickWork"
                 />
               </div>
 
               <!-- Tax Code -->
               <div>
-                <label for="tax_code" class="block text-sm font-semibold text-slate-200 mb-1">Corporate Tax Code</label>
+                <label for="tax_code" class="block text-sm font-semibold text-slate-200 mb-1">Mã số thuế</label>
                 <input
                   id="tax_code"
                   type="text"
                   required
                   v-model="form.tax_code"
                   class="appearance-none block w-full px-3 py-3 border border-white/10 placeholder-slate-500 text-white rounded-lg bg-slate-950/70 hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 sm:text-sm"
-                  placeholder="e.g. 0101234567"
+                  placeholder="Ví dụ: 0312345678"
                 />
               </div>
             </div>
@@ -151,9 +151,9 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  <span>Creating Employer Account...</span>
+                  <span>Đang tạo tài khoản...</span>
                 </span>
-                <span v-else>Register as Employer</span>
+                <span v-else>Đăng Ký Doanh Nghiệp</span>
               </button>
             </div>
           </form>
@@ -165,16 +165,16 @@
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
               </svg>
             </div>
-            <h3 class="text-xl font-bold text-white">Employer Account Created!</h3>
+            <h3 class="text-xl font-bold text-white">Đăng Ký Doanh Nghiệp Thành Công!</h3>
             <p class="text-slate-300 text-sm max-w-sm mx-auto font-medium">
-              Corporate registrations are active. You can now log in and publish listings.
+              Hồ sơ của bạn đã được lưu (chờ xét duyệt KYB từ Admin). Bạn có thể đăng nhập ngay bây giờ.
             </p>
             <div class="pt-4">
               <NuxtLink
                 to="/login"
                 class="inline-flex justify-center items-center py-2.5 px-6 font-bold text-sm text-slate-950 bg-cyan-400 rounded-lg hover:bg-cyan-300 shadow-md shadow-cyan-500/10 focus-ring"
               >
-                Go to Login
+                Đến Trang Đăng Nhập
               </NuxtLink>
             </div>
           </div>
@@ -182,15 +182,15 @@
           <!-- Navigation Links -->
           <div class="border-t border-white/10 pt-6 flex flex-col space-y-3 text-center text-sm">
             <div class="text-slate-300">
-              Already have an account?
+              Bạn đã có tài khoản?
               <NuxtLink to="/login" class="font-bold text-cyan-300 hover:text-cyan-200 transition-colors duration-150 ml-1">
-                Sign In here
+                Đăng nhập ngay
               </NuxtLink>
             </div>
             <div class="text-slate-400">
-              Looking for a job?
+              Bạn là sinh viên tìm việc?
               <NuxtLink to="/register" class="font-bold text-cyan-300 hover:text-cyan-200 transition-colors duration-150 ml-1">
-                Register as Student
+                Đăng ký Sinh viên
               </NuxtLink>
             </div>
           </div>
@@ -237,12 +237,13 @@ const handleRegister = async () => {
       company_name: form.company_name,
       tax_code: form.tax_code
     })
-    successMessage.value = res.message || '🎉 Employer registration successful!'
+    successMessage.value = res.message || '🎉 Đăng ký doanh nghiệp thành công!'
     registrationSuccess.value = true
   } catch (err: any) {
-    errorMessage.value = err.response?._data?.message || 'Registration failed. Please check the corporate data fields.'
+    errorMessage.value = err.response?._data?.message || 'Đăng ký thất bại. Vui lòng kiểm tra lại thông tin công ty.'
   } finally {
     isLoading.value = false
   }
 }
 </script>
+

@@ -7,8 +7,8 @@
               B
             </span>
             <div>
-              <h1 class="font-extrabold text-slate-900 text-base">Employer Workspace</h1>
-              <p class="text-xs text-slate-500 font-medium">Publish roles, review applicants, and manage hiring.</p>
+              <h1 class="font-extrabold text-slate-900 text-base">Không gian Doanh nghiệp</h1>
+              <p class="text-xs text-slate-500 font-medium">Đăng tin tuyển dụng, xem xét ứng viên và quản lý nhân sự.</p>
             </div>
           </div>
 

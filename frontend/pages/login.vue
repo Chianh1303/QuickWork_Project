@@ -14,28 +14,28 @@
 
           <div class="space-y-4">
             <p class="inline-flex rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-cyan-200">
-              Secure workspace access
+              Truy cập không gian làm việc an toàn
             </p>
             <h1 class="text-5xl font-extrabold leading-none tracking-tight text-white">
-              Continue where your work pipeline left off.
+              Tiếp tục công việc & kết nối tuyển dụng của bạn.
             </h1>
             <p class="text-base font-medium leading-8 text-slate-300">
-              Students can manage applications and accepted shifts. Employers can review applicants, publish listings, and keep conversations moving.
+              Sinh viên có thể quản lý danh sách ứng tuyển và ca làm việc. Nhà tuyển dụng quản lý hồ sơ ứng viên, đăng bài và trao đổi trực tiếp qua chat.
             </p>
           </div>
 
           <div class="grid grid-cols-3 gap-3">
             <div class="rounded-xl border border-white/10 bg-white/[0.06] p-4">
               <p class="text-2xl font-extrabold text-white">24/7</p>
-              <p class="mt-1 text-xs font-semibold text-slate-400">Access</p>
+              <p class="mt-1 text-xs font-semibold text-slate-400">Truy cập</p>
             </div>
             <div class="rounded-xl border border-white/10 bg-white/[0.06] p-4">
-              <p class="text-2xl font-extrabold text-white">Fast</p>
-              <p class="mt-1 text-xs font-semibold text-slate-400">Applications</p>
+              <p class="text-2xl font-extrabold text-white">Nhanh chóng</p>
+              <p class="mt-1 text-xs font-semibold text-slate-400">Nộp đơn</p>
             </div>
             <div class="rounded-xl border border-white/10 bg-white/[0.06] p-4">
-              <p class="text-2xl font-extrabold text-white">Live</p>
-              <p class="mt-1 text-xs font-semibold text-slate-400">Chat</p>
+              <p class="text-2xl font-extrabold text-white">Trực tiếp</p>
+              <p class="mt-1 text-xs font-semibold text-slate-400">Nhắn tin</p>
             </div>
           </div>
         </div>
@@ -50,10 +50,10 @@
               </div>
             </div>
             <h2 class="mt-2 text-center text-3xl font-extrabold text-white tracking-tight lg:mt-0">
-              Sign in to QuickWork
+              Đăng Nhập QuickWork
             </h2>
             <p class="mt-2 text-center text-sm text-slate-300">
-              Access your student or employer workspace.
+              Truy cập vào bảng điều khiển Sinh viên hoặc Doanh nghiệp.
             </p>
           </div>
 
@@ -69,7 +69,7 @@
             <div class="space-y-4">
               <!-- Email Address -->
               <div>
-                <label for="email-address" class="block text-sm font-semibold text-slate-200 mb-1">Email Address</label>
+                <label for="email-address" class="block text-sm font-semibold text-slate-200 mb-1">Địa chỉ Email</label>
                 <div class="relative">
                   <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -84,14 +84,14 @@
                     required
                     v-model="form.email"
                     class="appearance-none relative block w-full pl-10 pr-3 py-3 border border-white/10 placeholder-slate-500 text-white rounded-lg bg-slate-950/70 hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 sm:text-sm"
-                    placeholder="name@example.com"
+                    placeholder="ten@viethan.edu.vn"
                   />
                 </div>
               </div>
 
               <!-- Password -->
               <div>
-                <label for="password" class="block text-sm font-semibold text-slate-200 mb-1">Password</label>
+                <label for="password" class="block text-sm font-semibold text-slate-200 mb-1">Mật khẩu</label>
                 <div class="relative">
                   <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
                     <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -121,13 +121,13 @@
                   class="h-4 w-4 text-cyan-400 focus:ring-cyan-400 border-slate-700 rounded bg-slate-900 cursor-pointer"
                 />
                 <label for="remember-me" class="ml-2 block text-sm text-slate-300 font-medium cursor-pointer">
-                  Remember me
+                  Ghi nhớ đăng nhập
                 </label>
               </div>
 
               <div class="text-sm">
                 <a href="#" class="font-bold text-cyan-300 hover:text-cyan-200 transition-colors">
-                  Forgot password?
+                  Quên mật khẩu?
                 </a>
               </div>
             </div>
@@ -143,9 +143,9 @@
                     <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
-                  <span>Signing in...</span>
+                  <span>Đang đăng nhập...</span>
                 </span>
-                <span v-else>Sign In</span>
+                <span v-else>Đăng Nhập</span>
               </button>
             </div>
           </form>
@@ -153,15 +153,15 @@
           <!-- Navigation Links -->
           <div class="border-t border-white/10 pt-6 flex flex-col space-y-3 text-center text-sm">
             <div class="text-slate-300">
-              Need a student account?
+              Bạn chưa có tài khoản sinh viên?
               <NuxtLink to="/register" class="font-bold text-cyan-300 hover:text-cyan-200 transition-colors duration-150 ml-1">
-                Create Student Account
+                Đăng ký Sinh viên
               </NuxtLink>
             </div>
             <div class="text-slate-400">
-              Want to hire?
+              Dành cho nhà tuyển dụng?
               <NuxtLink to="/employer-register" class="font-bold text-cyan-300 hover:text-cyan-200 transition-colors duration-150 ml-1">
-                Register as Employer
+                Đăng ký Doanh nghiệp
               </NuxtLink>
             </div>
           </div>
@@ -199,9 +199,10 @@ const handleLogin = async () => {
       password: form.password
     })
   } catch (err: any) {
-    errorMessage.value = err.response?._data?.message || 'Failed to sign in. Please check your credentials.'
+    errorMessage.value = err.response?._data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.'
   } finally {
     isLoading.value = false
   }
 }
 </script>
+

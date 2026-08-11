@@ -7,8 +7,8 @@
               S
             </span>
             <div>
-              <h1 class="font-extrabold text-slate-900 text-base">Student Workspace</h1>
-              <p class="text-xs text-slate-500 font-medium">Find jobs, manage applications, and keep your profile ready.</p>
+              <h1 class="font-extrabold text-slate-900 text-base">Không gian Sinh viên</h1>
+              <p class="text-xs text-slate-500 font-medium">Tìm việc làm, theo dõi đơn nộp và cập nhật hồ sơ cá nhân.</p>
             </div>
           </div>
 

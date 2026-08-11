@@ -25,9 +25,9 @@
        <!-- Filters -->
        <div class="bg-slate-900/82 p-3 rounded-xl border border-cyan-400/15 shadow-lg shadow-slate-950/30 backdrop-blur">
           <div class="mb-3 flex items-center justify-between gap-3">
-            <span class="text-xs font-bold uppercase tracking-wide text-cyan-200/80">Job filters</span>
+            <span class="text-xs font-bold uppercase tracking-wide text-cyan-200/80">Bộ lọc việc làm</span>
             <span class="inline-flex items-center rounded-full bg-white/10 px-3 py-1 text-xs font-bold text-cyan-100 ring-1 ring-white/10">
-              {{ filteredJobs.length }} results
+              {{ filteredJobs.length }} kết quả
             </span>
           </div>
           <form @submit.prevent="fetchJobs" class="space-y-3">
@@ -38,7 +38,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-5.2-5.2m0 0A7.2 7.2 0 105.6 5.6a7.2 7.2 0 0010.2 10.2z" />
                   </svg>
                 </span>
-                <input v-model="jobsSearchQuery" type="text" class="block w-full pl-9 pr-3 py-2.5 border border-white/10 rounded-lg text-sm bg-slate-950/70 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-300" placeholder="Search title, keyword, or skill" />
+                <input v-model="jobsSearchQuery" type="text" class="block w-full pl-9 pr-3 py-2.5 border border-white/10 rounded-lg text-sm bg-slate-950/70 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-300" placeholder="Tìm theo tiêu đề, từ khóa hoặc kỹ năng..." />
               </div>
 
               <div class="relative">
@@ -48,44 +48,44 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10.5h.01" />
                   </svg>
                 </span>
-                <input v-model="jobsLocationQuery" type="text" class="block w-full pl-9 pr-3 py-2.5 border border-white/10 rounded-lg text-sm bg-slate-950/70 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-300" placeholder="Location, city, or remote" />
+                <input v-model="jobsLocationQuery" type="text" class="block w-full pl-9 pr-3 py-2.5 border border-white/10 rounded-lg text-sm bg-slate-950/70 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-300" placeholder="Nhập địa điểm, thành phố..." />
               </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_auto] gap-3">
               <div>
                 <select v-model="filterCategory" class="block w-full px-3 py-2.5 border border-white/10 rounded-lg text-sm bg-slate-950/70 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-300">
-                  <option value="all">All categories</option>
-                  <option value="it">Information Technology</option>
-                  <option value="marketing">Marketing</option>
-                  <option value="design">Graphic Design</option>
+                  <option value="all">Tất cả ngành nghề</option>
+                  <option value="it">Công nghệ thông tin</option>
+                  <option value="marketing">Marketing / Truyền thông</option>
+                  <option value="design">Thiết kế đồ họa</option>
                 </select>
               </div>
 
               <div>
                 <select v-model="filterJobType" class="block w-full px-3 py-2.5 border border-white/10 rounded-lg text-sm bg-slate-950/70 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-300">
-                  <option value="all">All job types</option>
-                  <option value="full-time">Full-time</option>
-                  <option value="part-time">Part-time</option>
-                  <option value="intern">Internship</option>
+                  <option value="all">Tất cả hình thức</option>
+                  <option value="full-time">Toàn thời gian</option>
+                  <option value="part-time">Bán thời gian</option>
+                  <option value="intern">Thực tập</option>
                 </select>
               </div>
 
               <div>
                 <select v-model="filterMinSalary" class="block w-full px-3 py-2.5 border border-white/10 rounded-lg text-sm bg-slate-950/70 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-300">
-                  <option value="">Any salary</option>
-                  <option value="2000000">From 2,000,000 VND</option>
-                  <option value="5000000">From 5,000,000 VND</option>
-                  <option value="10000000">From 10,000,000 VND</option>
+                  <option value="">Mức lương bất kỳ</option>
+                  <option value="2000000">Từ 2.000.000 VNĐ</option>
+                  <option value="5000000">Từ 5.000.000 VNĐ</option>
+                  <option value="10000000">Từ 10.000.000 VNĐ</option>
                 </select>
               </div>
 
               <div class="grid grid-cols-2 gap-2 sm:col-span-2 xl:col-span-1">
                 <button type="button" @click="resetFilters" class="px-4 py-2.5 border border-white/10 text-sm font-semibold rounded-lg text-slate-200 bg-white/10 hover:bg-white/15 transition-all focus-ring">
-                  Clear
+                  Xóa lọc
                 </button>
                 <button type="submit" class="px-5 py-2.5 border border-transparent text-sm font-semibold rounded-lg text-slate-950 bg-cyan-400 hover:bg-cyan-300 shadow-sm transition-all focus-ring">
-                  Apply
+                  Lọc ngay
                 </button>
               </div>
             </div>
@@ -107,8 +107,8 @@
           <svg class="mx-auto h-12 w-12 text-slate-300 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
-          <p class="font-bold text-slate-100 text-lg">No work listings found</p>
-          <p class="text-sm text-slate-400 mt-1">Try modifying your search or filters.</p>
+          <p class="font-bold text-slate-100 text-lg">Không tìm thấy việc làm nào</p>
+          <p class="text-sm text-slate-400 mt-1">Hãy thử thay đổi từ khóa hoặc xóa bộ lọc tìm kiếm.</p>
         </div>
 
         <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
@@ -122,7 +122,7 @@
                 <span class="inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold bg-cyan-400/10 text-cyan-200 ring-1 ring-cyan-400/20 max-w-[58%] truncate">
                   {{ companyNameLookup(job) }}
                 </span>
-                <span class="text-sm font-extrabold text-emerald-700 bg-emerald-50 px-2.5 py-1 rounded-lg whitespace-nowrap">
+                <span class="text-sm font-extrabold text-emerald-300 bg-emerald-400/10 px-2.5 py-1 rounded-lg whitespace-nowrap">
                   {{ formatCurrency(job.salary) }}
                 </span>
               </div>
@@ -131,7 +131,7 @@
                 <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
                 </svg>
-                {{ job.location || 'Location N/A' }}
+                {{ job.location || 'Chưa cập nhật địa điểm' }}
               </p>
               <p class="text-sm font-medium text-slate-400 mt-1 flex items-center gap-1" v-if="job.working_date">
                 <svg class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -140,30 +140,29 @@
                 {{ job.working_date }}
               </p>
               <p class="text-sm text-slate-300 mt-4 line-clamp-4 leading-6 font-medium">
-                {{ job.description || 'No description provided.' }}
+                {{ job.description || 'Chưa có mô tả công việc.' }}
               </p>
             </div>
 
-       <div class="mt-5 pt-4 border-t border-white/10">
-  <button
-    :disabled="checkIfApplied(job.id)"
-    @click="handleApply(job)"
-    :class="checkIfApplied(job.id) ? 'bg-slate-800 text-slate-400 border-white/10' : 'bg-cyan-400 hover:bg-cyan-300 text-slate-950 border-transparent'"
-    class="w-full flex justify-center py-2.5 px-4 border text-sm font-semibold rounded-lg transition-colors focus-ring disabled:cursor-not-allowed shadow-sm"
-  >
-    <span v-if="isApplying === job.id" class="flex items-center space-x-2">
-      <svg class="animate-spin h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-        <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-        <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-      </svg>
-      <span>Applying...</span>
-    </span>
-    
-    <span v-else>
-      {{ checkIfApplied(job.id) ? 'Applied' : 'Apply Now' }}
-    </span>
-  </button>
-</div>
+            <div class="mt-5 pt-4 border-t border-white/10">
+              <button
+                :disabled="checkIfApplied(job.id)"
+                @click="handleApply(job)"
+                :class="checkIfApplied(job.id) ? 'bg-slate-800 text-slate-400 border-white/10' : 'bg-cyan-400 hover:bg-cyan-300 text-slate-950 border-transparent'"
+                class="w-full flex justify-center py-2.5 px-4 border text-sm font-semibold rounded-lg transition-colors focus-ring disabled:cursor-not-allowed shadow-sm"
+              >
+                <span v-if="isApplying === job.id" class="flex items-center space-x-2">
+                  <svg class="animate-spin h-4 w-4 text-slate-950" fill="none" viewBox="0 0 24 24">
+                    <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                    <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                  </svg>
+                  <span>Đang ứng tuyển...</span>
+                </span>
+                <span v-else>
+                  {{ checkIfApplied(job.id) ? 'Đã nộp đơn' : 'Ứng Tuyển Ngay' }}
+                </span>
+              </button>
+            </div>
           </div>
         </div>
 

@@ -6,13 +6,13 @@
           <div class="flex flex-col justify-between gap-8">
             <div>
               <span class="inline-flex rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-cyan-200 ring-1 ring-cyan-400/25">
-                Admin Dashboard
+                Bảng Quản trị Admin
               </span>
               <h1 class="mt-4 max-w-3xl text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-                QuickWork operations command center
+                Trung tâm điều hành Quản trị QuickWork
               </h1>
               <p class="mt-3 max-w-2xl text-sm font-semibold leading-6 text-slate-300 sm:text-base">
-                Theo dõi số liệu marketplace thật từ database và xử lý queue KYB doanh nghiệp đang chờ duyệt.
+                Theo dõi số liệu marketplace thực tế từ database và xử lý danh sách Doanh nghiệp đang chờ duyệt KYB.
               </p>
             </div>
 
@@ -21,7 +21,7 @@
                 to="/admin/businesses/pending"
                 class="inline-flex items-center justify-center rounded-xl bg-cyan-400 px-5 py-3 text-sm font-extrabold text-slate-950 shadow-lg shadow-cyan-500/20 transition-colors hover:bg-cyan-300"
               >
-                Review Pending Business
+                Duyệt Doanh Nghiệp Pending
               </NuxtLink>
               <button
                 type="button"
@@ -29,13 +29,13 @@
                 :disabled="isLoading"
                 @click="fetchStats"
               >
-                Reload Stats
+                Cập nhật số liệu
               </button>
             </div>
           </div>
 
           <div class="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 p-5">
-            <p class="text-xs font-extrabold uppercase tracking-wide text-cyan-200">KYB Queue</p>
+            <p class="text-xs font-extrabold uppercase tracking-wide text-cyan-200">Hàng chờ duyệt KYB</p>
             <p class="mt-3 text-5xl font-extrabold text-white">
               {{ isLoading ? '...' : formatNumber(stats?.pending_businesses || 0) }}
             </p>
@@ -78,11 +78,18 @@
         </article>
       </section>
 
+      <!-- Data Visualization Section (Mục 3) -->
+      <AdminDisbursementChart
+        :total-disbursed="stats?.total_disbursed || 0"
+        :student-count="stats?.total_students || 0"
+        :business-count="stats?.total_businesses || 0"
+      />
+
       <section class="rounded-2xl border border-white/10 bg-slate-950/70 p-5 shadow-xl shadow-slate-950/25 ring-1 ring-cyan-400/10">
         <div class="flex flex-col gap-4 md:flex-row md:items-center md:justify-between">
           <div>
-            <p class="text-xs font-extrabold uppercase tracking-wide text-cyan-200">Primary workflow</p>
-            <h2 class="mt-2 text-xl font-extrabold text-white">Business KYB review</h2>
+            <p class="text-xs font-extrabold uppercase tracking-wide text-cyan-200">Quy trình chính</p>
+            <h2 class="mt-2 text-xl font-extrabold text-white">Duyệt hồ sơ KYB Doanh nghiệp</h2>
             <p class="mt-2 text-sm font-semibold leading-6 text-slate-300">
               Mở danh sách pending để xem hồ sơ doanh nghiệp, duyệt hoặc từ chối kèm lý do. Hồ sơ đã xử lý sẽ biến mất khỏi queue.
             </p>
@@ -91,7 +98,7 @@
             to="/admin/businesses/pending"
             class="inline-flex items-center justify-center rounded-xl border border-cyan-400/25 bg-cyan-400/10 px-5 py-3 text-sm font-extrabold text-cyan-100 transition-colors hover:bg-cyan-400 hover:text-slate-950"
           >
-            Go to Queue
+            Đến Queue Chờ Duyệt
           </NuxtLink>
         </div>
       </section>
@@ -102,6 +109,7 @@
 <script setup lang="ts">
 import { computed, onMounted, ref } from 'vue'
 import AdminShell from '~/components/admin/AdminShell.vue'
+import AdminDisbursementChart from '~/components/admin/AdminDisbursementChart.vue'
 import { useAdminApi } from '~/composables/useAdminApi'
 import type { AdminDashboardStats } from '~/types/admin'
 

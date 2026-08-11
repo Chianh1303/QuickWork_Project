@@ -8,22 +8,22 @@
         <div class="space-y-7 text-center lg:text-left">
           <div class="inline-flex items-center gap-2 rounded-full border border-cyan-400/20 bg-cyan-400/10 px-3 py-1 text-sm font-bold text-cyan-100">
             <span class="h-2 w-2 rounded-full bg-cyan-300"></span>
-            Student jobs and hiring, in one platform
+            Nền tảng việc làm & tuyển dụng sinh viên hàng đầu
           </div>
           <div class="space-y-5">
             <h1 class="text-4xl font-extrabold leading-[0.98] tracking-tight sm:text-6xl lg:text-7xl">
-              Find Part-time & Internship Jobs Faster
+              Tìm Việc Bán Thời Gian & Thực Tập Nhanh Chóng
             </h1>
             <p class="mx-auto max-w-2xl text-base font-medium leading-8 text-slate-300 sm:text-lg lg:mx-0">
-              QuickWork connects students with businesses quickly, safely and efficiently through job search, applications, chat, attendance, wallet and reviews.
+              QuickWork kết nối sinh viên với doanh nghiệp một cách nhanh chóng, an toàn và hiệu quả thông qua hệ thống tìm việc, ứng tuyển, nhắn tin, chấm công, ví tiền và đánh giá.
             </p>
           </div>
           <div class="flex flex-col justify-center gap-3 sm:flex-row lg:justify-start">
             <a href="#explore-jobs" class="focus-ring inline-flex items-center justify-center rounded-xl bg-cyan-400 px-7 py-3.5 text-base font-extrabold text-slate-950 shadow-lg shadow-cyan-500/20 hover:bg-cyan-300">
-              Explore Jobs
+              Khám Phá Việc Làm
             </a>
             <NuxtLink to="/employer-register" class="focus-ring inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/10 px-7 py-3.5 text-base font-bold text-white hover:bg-white/15">
-              Create Employer Account
+              Đăng Ký Doanh Nghiệp
             </NuxtLink>
           </div>
         </div>
@@ -33,10 +33,10 @@
           <div class="relative overflow-hidden rounded-3xl border border-white/10 bg-slate-900/80 p-5 shadow-2xl shadow-slate-950/60 backdrop-blur">
             <div class="flex items-center justify-between border-b border-white/10 pb-4">
               <div>
-                <p class="text-xs font-bold uppercase tracking-wider text-cyan-200">QuickWork matching</p>
-                <h2 class="mt-1 text-lg font-extrabold text-white">Live job search workspace</h2>
+                <p class="text-xs font-bold uppercase tracking-wider text-cyan-200">Kết nối QuickWork</p>
+                <h2 class="mt-1 text-lg font-extrabold text-white">Không gian tìm việc trực tuyến</h2>
               </div>
-              <span class="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-bold text-emerald-200">Verified</span>
+              <span class="rounded-full border border-emerald-400/20 bg-emerald-400/10 px-3 py-1 text-xs font-bold text-emerald-200">Đã xác thực KYB</span>
             </div>
 
             <div class="grid gap-3 py-4 sm:grid-cols-3">
@@ -51,25 +51,25 @@
                 <div class="flex items-start justify-between gap-4">
                   <div>
                     <span class="rounded-full bg-cyan-400/10 px-2.5 py-1 text-xs font-bold text-cyan-200">FPT Software</span>
-                    <h3 class="mt-3 text-lg font-extrabold text-white">Backend Intern</h3>
-                    <p class="mt-2 text-sm font-medium text-slate-400">Hybrid · Student-friendly · Start this month</p>
+                    <h3 class="mt-3 text-lg font-extrabold text-white">Thực tập sinh Backend</h3>
+                    <p class="mt-2 text-sm font-medium text-slate-400">Bán thời gian · Phù hợp sinh viên · Nhận việc ngay</p>
                   </div>
-                  <span class="rounded-lg bg-emerald-400/10 px-3 py-1 text-sm font-extrabold text-emerald-200">9.500.000 VND</span>
+                  <span class="rounded-lg bg-emerald-400/10 px-3 py-1 text-sm font-extrabold text-emerald-200">9.500.000 VNĐ</span>
                 </div>
                 <div class="mt-4 grid grid-cols-3 gap-2">
-                  <span class="rounded-lg bg-white/[0.06] px-3 py-2 text-center text-xs font-bold text-slate-300">Chat</span>
-                  <span class="rounded-lg bg-white/[0.06] px-3 py-2 text-center text-xs font-bold text-slate-300">Offer</span>
-                  <span class="rounded-lg bg-white/[0.06] px-3 py-2 text-center text-xs font-bold text-slate-300">Wallet</span>
+                  <span class="rounded-lg bg-white/[0.06] px-3 py-2 text-center text-xs font-bold text-slate-300">Nhắn tin</span>
+                  <span class="rounded-lg bg-white/[0.06] px-3 py-2 text-center text-xs font-bold text-slate-300">Nhận Offer</span>
+                  <span class="rounded-lg bg-white/[0.06] px-3 py-2 text-center text-xs font-bold text-slate-300">Ví lương</span>
                 </div>
               </div>
               <div class="grid grid-cols-2 gap-3">
                 <div class="rounded-xl border border-white/10 bg-white/[0.05] p-4">
-                  <p class="text-xs font-bold uppercase text-slate-500">Attendance</p>
-                  <p class="mt-1 text-sm font-bold text-slate-200">Check-in ready</p>
+                  <p class="text-xs font-bold uppercase text-slate-500">Chấm công</p>
+                  <p class="mt-1 text-sm font-bold text-slate-200">Điểm danh 1-Chạm</p>
                 </div>
                 <div class="rounded-xl border border-white/10 bg-white/[0.05] p-4">
-                  <p class="text-xs font-bold uppercase text-slate-500">Reviews</p>
-                  <p class="mt-1 text-sm font-bold text-slate-200">Trust after work</p>
+                  <p class="text-xs font-bold uppercase text-slate-500">Đánh giá</p>
+                  <p class="mt-1 text-sm font-bold text-slate-200">Xây dựng uy tín</p>
                 </div>
               </div>
             </div>
@@ -80,7 +80,7 @@
 
     <section id="about" class="px-4 py-16 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-7xl">
-        <SectionHeading eyebrow="Why QuickWork?" title="Built for students and employers who move fast" />
+        <SectionHeading eyebrow="Tại sao chọn QuickWork?" title="Giải pháp tối ưu cho sinh viên và nhà tuyển dụng" />
         <div class="mt-10 grid gap-5 md:grid-cols-2 xl:grid-cols-4">
           <InfoCard v-for="item in introCards" :key="item.title" v-bind="item" />
         </div>
@@ -89,7 +89,7 @@
 
     <section id="features" class="border-y border-white/10 bg-slate-900/45 px-4 py-16 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-7xl">
-        <SectionHeading eyebrow="Platform Features" title="Everything needed from discovery to payment" />
+        <SectionHeading eyebrow="Tính năng nổi bật" title="Trọn bộ công cụ từ tìm việc đến nhận lương" />
         <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <FeatureCard v-for="feature in features" :key="feature.title" v-bind="feature" />
         </div>
@@ -100,7 +100,7 @@
 
     <section class="border-y border-white/10 bg-slate-900/45 px-4 py-16 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-7xl">
-        <SectionHeading eyebrow="How It Works" title="A clear workflow for every application" />
+        <SectionHeading eyebrow="Quy trình hoạt động" title="Quy trình minh bạch và dễ dàng cho từng đơn ứng tuyển" />
         <div class="mt-10 grid gap-4 sm:grid-cols-2 lg:grid-cols-4">
           <div v-for="(step, index) in timeline" :key="step.title" class="rounded-2xl border border-white/10 bg-white/[0.04] p-5">
             <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-400 text-sm font-extrabold text-slate-950">{{ index + 1 }}</div>
@@ -124,7 +124,7 @@
 
     <section class="border-y border-white/10 bg-slate-900/45 px-4 py-16 sm:px-6 lg:px-8">
       <div class="mx-auto max-w-7xl">
-        <SectionHeading eyebrow="Testimonials" title="Trusted by students and local teams" />
+        <SectionHeading eyebrow="Đánh giá từ người dùng" title="Được tin dùng bởi hàng ngàn sinh viên & doanh nghiệp" />
         <div class="mt-10 grid gap-5 md:grid-cols-3">
           <div v-for="testimonial in testimonials" :key="testimonial.name" class="rounded-2xl border border-white/10 bg-white/[0.04] p-6">
             <p class="text-sm font-medium leading-7 text-slate-300">"{{ testimonial.quote }}"</p>
@@ -145,24 +145,24 @@
             <span class="text-xl font-extrabold">QuickWork</span>
           </div>
           <p class="mt-4 max-w-sm text-sm font-medium leading-7 text-slate-400">
-            A modern recruitment workspace for student jobs, internships, hiring conversations, attendance, wallet and reviews.
+            Nền tảng tuyển dụng hiện đại dành cho việc làm sinh viên, thực tập, trao đổi trực tiếp, chấm công ca làm và ví tiền tiện lợi.
           </p>
         </div>
-        <FooterGroup title="Quick Links" :items="['Home', 'Explore Jobs', 'Features', 'Contact']" />
-        <FooterGroup title="Users" :items="['Student', 'Business', 'Register', 'Login']" />
+        <FooterGroup title="Liên kết nhanh" :items="['Trang chủ', 'Khám phá việc làm', 'Tính năng', 'Liên hệ']" />
+        <FooterGroup title="Dành cho người dùng" :items="['Sinh viên', 'Doanh nghiệp', 'Đăng ký', 'Đăng nhập']" />
         <div>
-          <h3 class="font-extrabold text-white">Contact</h3>
+          <h3 class="font-extrabold text-white">Liên hệ</h3>
           <div class="mt-4 space-y-2 text-sm font-medium text-slate-400">
             <p>support@quickwork.vn</p>
             <p>0123 456 789</p>
-            <p>Ho Chi Minh City, Vietnam</p>
+            <p>TP. Hồ Chí Minh, Việt Nam</p>
           </div>
           <div class="mt-5 flex gap-3">
             <span v-for="social in ['Facebook', 'LinkedIn', 'GitHub']" :key="social" class="rounded-lg border border-white/10 bg-white/5 px-3 py-2 text-xs font-bold text-slate-300">{{ social }}</span>
           </div>
         </div>
       </div>
-      <p class="mx-auto mt-6 max-w-7xl text-center text-sm font-medium text-slate-500">© 2026 QuickWork. All rights reserved.</p>
+      <p class="mx-auto mt-6 max-w-7xl text-center text-sm font-medium text-slate-500">© 2026 QuickWork. Bản quyền thuộc về QuickWork.</p>
     </footer>
   </div>
 </template>
@@ -172,51 +172,51 @@ import { defineComponent, h } from 'vue'
 import ExploreJobsSection from '~/components/home/ExploreJobsSection.vue'
 
 const heroStats = [
-  { value: '300+', label: 'Jobs' },
-  { value: '500+', label: 'Students' },
-  { value: '150+', label: 'Businesses' }
+  { value: '300+', label: 'Việc làm' },
+  { value: '500+', label: 'Sinh viên' },
+  { value: '150+', label: 'Doanh nghiệp' }
 ]
 
 const introCards = [
-  { icon: 'S', title: 'Student', text: 'Find internships and part-time jobs that match your schedule.' },
-  { icon: 'B', title: 'Business', text: 'Recruit students quickly with applications and offers in one place.' },
-  { icon: 'C', title: 'Real-time Chat', text: 'Instant communication using WebSocket-powered conversations.' },
-  { icon: 'W', title: 'Wallet & Payment', text: 'Simulated payroll after job completion and confirmation.' }
+  { icon: 'S', title: 'Sinh viên', text: 'Tìm kiếm công việc thực tập và bán thời gian linh hoạt phù hợp với lịch học.' },
+  { icon: 'D', title: 'Doanh nghiệp', text: 'Tuyển dụng nhân sự sinh viên nhanh chóng với quy trình nộp đơn và offer tập trung.' },
+  { icon: 'C', title: 'Nhắn tin Real-time', text: 'Trao đổi công việc trực tiếp giữa ứng viên và nhà tuyển dụng qua WebSocket.' },
+  { icon: 'V', title: 'Ví & Thanh toán', text: 'Nhận lương và theo dõi lịch sử thu nhập minh bạch ngay sau khi hoàn thành công việc.' }
 ]
 
 const features = [
-  ['Job Search', 'Browse verified openings from local businesses.'],
-  ['Smart Filter', 'Find jobs by keyword, location, type and salary.'],
-  ['Application Tracking', 'Follow every application status clearly.'],
-  ['Offer Management', 'Review offers and respond from one workspace.'],
-  ['Attendance', 'Check in and check out during accepted work.'],
-  ['Wallet', 'Track simulated earnings and payment history.'],
-  ['Review System', 'Build trust after each completed job.'],
-  ['Real-time Chat', 'Talk with HR or candidates instantly.']
+  ['Tìm việc làm', 'Khám phá các vị trí tuyển dụng uy tín từ các doanh nghiệp.'],
+  ['Bộ lọc thông minh', 'Lọc công việc theo từ khóa, địa điểm, hình thức và mức lương.'],
+  ['Theo dõi đơn ứng tuyển', 'Theo dõi tiến trình xét duyệt đơn ứng tuyển minh bạch.'],
+  ['Quản lý Offer', 'Nhận và phản hồi Offer nhận việc ngay trên màn hình cá nhân.'],
+  ['Chấm công ca làm', 'Điểm danh Check-in và Check-out trong suốt thời gian làm việc.'],
+  ['Ví tiền cá nhân', 'Theo dõi số dư thu nhập và lịch sử giao dịch thanh toán lương.'],
+  ['Hệ thống Đánh giá', 'Tạo dựng uy tín cá nhân và thương hiệu sau mỗi công việc hoàn thành.'],
+  ['Chat trực tiếp', 'Trò chuyện nhanh chóng với nhà tuyển dụng hoặc ứng viên.']
 ].map(([title, text], index) => ({ icon: String(index + 1), title, text }))
 
 const timeline = [
-  { title: 'Register', text: 'Create a student or employer account.' },
-  { title: 'Apply Job', text: 'Students apply to verified openings.' },
-  { title: 'Business Reviews', text: 'Employers review applications and profiles.' },
-  { title: 'Receive Offer', text: 'Approved students receive offer details.' },
-  { title: 'Work', text: 'Accepted students begin the job.' },
-  { title: 'Attendance', text: 'Work sessions are tracked with check-in.' },
-  { title: 'Salary Payment', text: 'Payment is released after confirmation.' },
-  { title: 'Review', text: 'Both sides leave reviews after completion.' }
+  { title: 'Tạo tài khoản', text: 'Đăng ký tài khoản Sinh viên hoặc Doanh nghiệp.' },
+  { title: 'Ứng tuyển', text: 'Sinh viên nộp đơn vào công việc phù hợp.' },
+  { title: 'Duyệt hồ sơ', text: 'Doanh nghiệp xem xét hồ sơ và kỹ năng của ứng viên.' },
+  { title: 'Nhận Offer', text: 'Sinh viên đủ điều kiện nhận được thông báo Offer công việc.' },
+  { title: 'Bắt đầu làm việc', text: 'Sinh viên xác nhận chấp nhận và bắt đầu ca làm.' },
+  { title: 'Chấm công', text: 'Điểm danh ca làm việc hàng ngày bằng Check-in/Check-out.' },
+  { title: 'Thanh toán lương', text: 'Nhận lương trực tiếp vào ví sau khi công việc hoàn thành.' },
+  { title: 'Viết đánh giá', text: 'Hai bên để lại đánh giá để nâng cao uy tín trên hệ thống.' }
 ]
 
 const stats = [
-  { value: '150+', label: 'Businesses' },
-  { value: '500+', label: 'Students' },
-  { value: '1200+', label: 'Applications' },
-  { value: '300+', label: 'Jobs' }
+  { value: '150+', label: 'Doanh nghiệp' },
+  { value: '500+', label: 'Sinh viên' },
+  { value: '1200+', label: 'Lượt nộp đơn' },
+  { value: '300+', label: 'Công việc' }
 ]
 
 const testimonials = [
-  { name: 'Minh Anh', role: 'Student', quote: 'QuickWork helped me find a flexible internship and manage the offer without messy messages.' },
-  { name: 'Thanh Nguyen', role: 'HR Executive', quote: 'The applicant pipeline and chat flow make student hiring much easier for our team.' },
-  { name: 'Quoc Bao', role: 'Student Developer', quote: 'I liked having attendance, payment status and reviews inside the same dashboard.' }
+  { name: 'Minh Anh', role: 'Sinh viên CNTT', quote: 'QuickWork giúp mình dễ dàng tìm được công việc thực tập linh hoạt và quản lý nhận lương rất rõ ràng.' },
+  { name: 'Thanh Nguyễn', role: 'Trưởng phòng HR', quote: 'Quy trình tuyển dụng và trao đổi qua chat giúp công ty kết nối với sinh viên nhanh hơn bao giờ hết.' },
+  { name: 'Quốc Bảo', role: 'Sinh viên Lập trình', quote: 'Mình rất thích việc chấm công ca làm và ví tiền tích hợp ngay trên cùng một trang điều hướng.' }
 ]
 
 const SectionHeading = defineComponent({
@@ -261,3 +261,4 @@ const FooterGroup = defineComponent({
   }
 })
 </script>
+

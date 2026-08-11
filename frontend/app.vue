@@ -5,9 +5,9 @@
       <div v-if="isLandingRoute" class="hidden border-b border-white/10 bg-slate-900/80 text-xs font-semibold text-slate-300 lg:block">
         <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
           <div class="flex items-center gap-5">
-            <span>Phone: 0123 456 789</span>
+            <span>SĐT: 0123 456 789</span>
             <span>Email: support@quickwork.vn</span>
-            <span>Address: Ho Chi Minh City, Vietnam</span>
+            <span>Địa chỉ: TP. Hồ Chí Minh, Việt Nam</span>
           </div>
           <div class="flex items-center gap-4">
             <span>Facebook</span>
@@ -85,7 +85,7 @@
                   class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
                   active-class="bg-cyan-400 text-slate-950 font-semibold"
                 >
-                  Explore Jobs
+                  Tìm việc làm
                 </NuxtLink>
 
                 <!-- Student specific navigation links -->
@@ -95,7 +95,7 @@
                     class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
                     active-class="bg-cyan-400 text-slate-950 font-semibold"
                   >
-                    My Dashboard
+                    Trang cá nhân
                   </NuxtLink>
                 </template>
 
@@ -106,7 +106,7 @@
                     class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
                     active-class="bg-cyan-400 text-slate-950 font-semibold"
                   >
-                    Employer Console
+                    Nhà tuyển dụng
                   </NuxtLink>
                 </template>
 
@@ -117,7 +117,7 @@
                     class="px-3 py-2 rounded-lg text-sm font-medium text-slate-300 hover:bg-white/10 hover:text-white transition-colors"
                     active-class="bg-cyan-400 text-slate-950 font-semibold"
                   >
-                    Admin Console
+                    Quản trị viên
                   </NuxtLink>
                 </template>
               </template>
@@ -132,14 +132,14 @@
                 :to="dashboardPath"
                 class="hidden sm:inline-flex items-center justify-center rounded-lg bg-cyan-400 px-4 py-2 text-sm font-extrabold text-slate-950 hover:bg-cyan-300"
               >
-                Dashboard
+                Bảng điều khiển
               </NuxtLink>
               <!-- Logged In Status -->
               <div class="hidden sm:flex flex-col text-right">
                 <span class="text-xs font-semibold uppercase tracking-wider text-cyan-300">
                   {{ roleLabel }}
                 </span>
-                <span class="text-sm font-medium text-slate-200">{{ userEmail || 'Active User' }}</span>
+                <span class="text-sm font-medium text-slate-200">{{ userEmail || 'Người dùng' }}</span>
               </div>
 
               <!-- Profile Dropdown trigger / Logout button -->
@@ -150,7 +150,7 @@
                 <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
-                <span>Sign Out</span>
+                <span>Đăng xuất</span>
               </button>
             </template>
 
@@ -161,14 +161,14 @@
                 to="/login"
                 class="text-sm font-semibold text-slate-200 hover:text-white px-3 py-2"
               >
-                Sign In
+                Đăng nhập
               </NuxtLink>
               <NuxtLink
                 v-if="route.path !== '/register'"
                 to="/register"
                 class="inline-flex items-center justify-center py-2 px-4 border border-transparent text-sm font-semibold rounded-lg text-slate-950 bg-cyan-400 hover:bg-cyan-300 shadow-md shadow-cyan-500/10 focus-ring"
               >
-                Register
+                Đăng ký
               </NuxtLink>
             </template>
 
@@ -190,7 +190,7 @@
       <div v-if="mobileMenuOpen" class="md:hidden border-t border-white/10 bg-slate-950 px-2 pt-2 pb-3 space-y-1 shadow-lg">
         <template v-if="isAdminRoute">
           <div class="px-3 py-2">
-            <p class="text-xs font-semibold uppercase tracking-wider text-cyan-300">Admin Console</p>
+            <p class="text-xs font-semibold uppercase tracking-wider text-cyan-300">Quản trị hệ thống</p>
           </div>
           <NuxtLink
             v-for="item in adminNavItems"
@@ -253,7 +253,7 @@
             class="block px-3 py-2 rounded-lg text-base font-medium hover:bg-white/10 text-slate-300"
             active-class="bg-cyan-400 text-slate-950 font-semibold"
           >
-            Explore Jobs
+            Tìm việc làm
           </NuxtLink>
 
           <template v-if="isAuthenticated && userRole === 'student'">
@@ -263,7 +263,7 @@
               class="block px-3 py-2 rounded-lg text-base font-medium hover:bg-white/10 text-slate-300"
               active-class="bg-cyan-400 text-slate-950 font-semibold"
             >
-              My Dashboard
+              Trang cá nhân
             </NuxtLink>
           </template>
           <template v-if="isAuthenticated && userRole === 'business'">
@@ -273,7 +273,7 @@
               class="block px-3 py-2 rounded-lg text-base font-medium hover:bg-white/10 text-slate-300"
               active-class="bg-cyan-400 text-slate-950 font-semibold"
             >
-              Employer Console
+              Nhà tuyển dụng
             </NuxtLink>
           </template>
           <template v-if="isAuthenticated && userRole === 'admin' && !isAdminRoute">
@@ -283,7 +283,7 @@
               class="block px-3 py-2 rounded-lg text-base font-medium hover:bg-white/10 text-slate-300"
               active-class="bg-cyan-400 text-slate-950 font-semibold"
             >
-              Admin Console
+              Quản trị viên
             </NuxtLink>
           </template>
         </template>
@@ -291,21 +291,27 @@
     </header>
 
     <!-- Main Content App Router -->
-    <main class="flex-grow">
+    <main class="flex-grow pb-16 md:pb-0">
       <NuxtPage />
     </main>
+
+    <!-- Global Toast Container (Mục 4) -->
+    <ToastContainer />
+
+    <!-- Mobile Bottom Navigation (Hiện trên di động < 768px) -->
+    <MobileBottomNav />
 
     <!-- Simple Modern Footer -->
     <footer v-if="showFooter" class="bg-slate-900 text-slate-400 py-6 border-t border-slate-800">
       <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 flex flex-col sm:flex-row justify-between items-center space-y-4 sm:space-y-0 text-sm">
         <div class="flex items-center space-x-2">
           <span class="font-semibold text-white">QuickWork</span>
-          <span>&copy; 2026. All rights reserved.</span>
+          <span>&copy; 2026. Bản quyền thuộc về QuickWork.</span>
         </div>
         <div class="flex space-x-6">
-          <a href="#" class="hover:text-white transition-colors">Privacy Policy</a>
-          <a href="#" class="hover:text-white transition-colors">Terms of Service</a>
-          <a href="#" class="hover:text-white transition-colors">Contact Support</a>
+          <a href="#" class="hover:text-white transition-colors">Chính sách bảo mật</a>
+          <a href="#" class="hover:text-white transition-colors">Điều khoản dịch vụ</a>
+          <a href="#" class="hover:text-white transition-colors">Hỗ trợ khách hàng</a>
         </div>
       </div>
     </footer>
@@ -316,6 +322,8 @@
 import { ref, computed, onMounted, onBeforeUnmount, nextTick, watch } from 'vue'
 import { useRoute } from 'vue-router'
 import { useAuth } from '~/composables/useAuth'
+import MobileBottomNav from '~/components/common/MobileBottomNav.vue'
+import ToastContainer from '~/components/common/ToastContainer.vue'
 
 const route = useRoute()
 const { logout, user, isAuthenticated, userRole, fetchUser } = useAuth()
@@ -325,30 +333,30 @@ const studentDashboardActiveSection = useState<string>('studentDashboardActiveSe
 const businessDashboardActiveSection = useState<string>('businessDashboardActiveSection', () => 'dashboard')
 
 const studentDashboardNavItems = [
-  { id: 'jobs', name: 'Find Jobs' },
-  { id: 'profile', name: 'Profile' },
-  { id: 'applications', name: 'Applications' },
-  { id: 'wallet', name: 'Wallet' }
+  { id: 'jobs', name: 'Tìm việc làm' },
+  { id: 'profile', name: 'Hồ sơ cá nhân' },
+  { id: 'applications', name: 'Đơn ứng tuyển' },
+  { id: 'wallet', name: 'Ví tiền' }
 ]
 
 const businessDashboardNavItems = [
-  { id: 'dashboard', name: 'Dashboard' },
-  { id: 'profile', name: 'Company Profile' },
-  { id: 'jobs', name: 'Jobs' },
-  { id: 'applicants', name: 'Applicants' }
+  { id: 'dashboard', name: 'Tổng quan' },
+  { id: 'profile', name: 'Hồ sơ công ty' },
+  { id: 'jobs', name: 'Bài đăng việc làm' },
+  { id: 'applicants', name: 'Danh sách ứng viên' }
 ]
 
 const adminNavItems = [
-  { name: 'Dashboard', to: '/admin/dashboard' },
-  { name: 'Pending Business', to: '/admin/businesses/pending' }
+  { name: 'Tổng quan', to: '/admin/dashboard' },
+  { name: 'Duyệt Doanh nghiệp', to: '/admin/businesses/pending' }
 ]
 
 const landingNavItems = [
-  { id: 'home', name: 'Home', href: '#home' },
-  { id: 'explore-jobs', name: 'Explore Jobs', href: '#explore-jobs' },
-  { id: 'about', name: 'About', href: '#about' },
-  { id: 'features', name: 'Features', href: '#features' },
-  { id: 'contact', name: 'Contact', href: '#contact' }
+  { id: 'home', name: 'Trang chủ', href: '#home' },
+  { id: 'explore-jobs', name: 'Tìm việc làm', href: '#explore-jobs' },
+  { id: 'about', name: 'Giới thiệu', href: '#about' },
+  { id: 'features', name: 'Tính năng', href: '#features' },
+  { id: 'contact', name: 'Liên hệ', href: '#contact' }
 ]
 
 const activeLandingSection = ref('home')
@@ -366,10 +374,10 @@ const isBusinessDashboard = computed(() => route.path === '/business/dashboard')
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))
 const isDashboardRoute = computed(() => isStudentDashboard.value || isBusinessDashboard.value)
 const roleLabel = computed(() => {
-  if (userRole.value === 'student') return 'Student'
-  if (userRole.value === 'business') return 'Employer'
-  if (userRole.value === 'admin') return 'Admin'
-  return 'User'
+  if (userRole.value === 'student') return 'Sinh viên'
+  if (userRole.value === 'business') return 'Doanh nghiệp'
+  if (userRole.value === 'admin') return 'Quản trị viên'
+  return 'Người dùng'
 })
 const dashboardPath = computed(() => {
   if (userRole.value === 'business') return '/business/dashboard'
@@ -385,7 +393,7 @@ const dashboardActiveSection = computed(() => {
     : studentDashboardActiveSection.value
 })
 const dashboardWorkspaceLabel = computed(() => {
-  return isBusinessDashboard.value ? 'Employer Workspace' : 'Student Workspace'
+  return isBusinessDashboard.value ? 'Không gian Doanh nghiệp' : 'Không gian Sinh viên'
 })
 
 const setDashboardSection = (sectionId: string) => {
@@ -484,3 +492,4 @@ const handleLogout = async () => {
   await logout()
 }
 </script>
+

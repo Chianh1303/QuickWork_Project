@@ -3,27 +3,27 @@
     <div :class="standalone ? 'dashboard-body px-4 sm:px-6 lg:px-8 py-10' : 'px-4 sm:px-6 lg:px-8 py-16 lg:py-20'">
       <div class="mx-auto max-w-7xl">
         <div v-if="showHero" class="mx-auto mb-10 max-w-3xl rounded-2xl bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950 px-6 py-10 text-center shadow-xl shadow-slate-950/10">
-          <h2 class="text-sm font-bold uppercase tracking-wide text-cyan-300">Open Positions</h2>
+          <h2 class="text-sm font-bold uppercase tracking-wide text-cyan-300">Vị Trí Mở Tuyển</h2>
           <p class="mt-2 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-            Student-friendly jobs, ready to apply
+            Việc làm bán thời gian phù hợp với sinh viên
           </p>
           <p class="mt-4 text-base text-slate-300 sm:text-lg">
-            Browse active vacancies and application offers posted by verified local employers.
+            Khám phá danh sách việc làm uy tín được đăng tuyển bởi các doanh nghiệp đã xác thực.
           </p>
         </div>
 
         <div v-else class="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p class="text-sm font-bold uppercase tracking-[0.24em] text-cyan-300">Explore Jobs</p>
+            <p class="text-sm font-bold uppercase tracking-[0.24em] text-cyan-300">Khám Phá Việc Làm</p>
             <h2 class="mt-2 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-              Apply to verified student jobs
+              Ứng tuyển việc làm sinh viên đã xác thực
             </h2>
             <p class="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-400 sm:text-base">
-              Search current openings without leaving the homepage. Filters, pagination, and job cards use the same logic as the Explore Jobs page.
+              Tìm kiếm việc làm nhanh chóng với bộ lọc từ khóa, địa điểm và phân trang mượt mà.
             </p>
           </div>
           <span class="inline-flex w-fit items-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm font-bold text-cyan-100">
-            {{ filteredJobs.length }} active results
+            {{ filteredJobs.length }} kết quả khả dụng
           </span>
         </div>
 
@@ -38,7 +38,7 @@
               v-model="searchQuery"
               type="text"
               class="block w-full rounded-lg border border-white/10 bg-slate-950/70 py-2.5 pl-10 pr-3 text-sm text-slate-100 placeholder-slate-500 transition-all duration-200 focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400"
-              placeholder="Search title or keyword"
+              placeholder="Tìm theo tiêu đề hoặc từ khóa công việc..."
             />
           </div>
           <div class="relative">
@@ -52,28 +52,24 @@
               v-model="locationQuery"
               type="text"
               class="block w-full rounded-lg border border-white/10 bg-slate-950/70 py-2.5 pl-10 pr-3 text-sm text-slate-100 placeholder-slate-500 transition-all duration-200 focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400"
-              placeholder="Location, city, or remote"
+              placeholder="Nhập địa điểm, thành phố..."
             />
           </div>
         </div>
 
         <div v-if="feedback" :class="[
-          feedback.type === 'success' ? 'border-emerald-300 bg-emerald-50 text-emerald-800' : 'border-red-300 bg-red-50 text-red-800',
+          feedback.type === 'success' ? 'border-emerald-300 bg-emerald-500/10 text-emerald-300' : 'border-rose-300 bg-rose-500/10 text-rose-300',
           'mx-auto mb-8 flex max-w-4xl items-start justify-between rounded-r-lg border-l-4 p-4 transition-all duration-300'
         ]">
           <span class="text-sm font-medium">{{ feedback.message }}</span>
-          <button @click="feedback = null" class="text-slate-400 hover:text-slate-600">x</button>
+          <button @click="feedback = null" class="text-slate-400 hover:text-slate-200">✕</button>
         </div>
 
-        <div v-if="isLoadingJobs" class="flex justify-center py-12">
-          <svg class="h-8 w-8 animate-spin text-cyan-400" fill="none" viewBox="0 0 24 24">
-            <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-            <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A8 8 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-          </svg>
-        </div>
+        <!-- Skeleton Loading (Mục 4) -->
+        <JobSkeleton v-if="isLoadingJobs" :count="6" />
 
-        <div v-else-if="filteredJobs.length === 0" class="rounded-xl border border-white/10 bg-slate-900/82 px-4 py-12 text-center text-slate-500">
-          <p class="font-semibold text-slate-100">No active job listings found.</p>
+        <div v-else-if="filteredJobs.length === 0" class="rounded-xl border border-white/10 bg-slate-900/82 px-4 py-12 text-center text-slate-400">
+          <p class="font-semibold text-slate-200">Hiện chưa có bài đăng việc làm nào phù hợp.</p>
         </div>
 
         <div v-else class="mx-auto grid max-w-6xl grid-cols-1 gap-5 md:grid-cols-2 xl:grid-cols-3">
@@ -116,18 +112,18 @@
                   :disabled="isApplying === job.id"
                   class="focus-ring flex w-full justify-center rounded-lg border border-transparent bg-cyan-400 px-4 py-2 text-sm font-semibold text-slate-950 shadow-sm transition-colors hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-50"
                 >
-                  {{ isApplying === job.id ? 'Applying...' : 'Apply Now' }}
+                  {{ isApplying === job.id ? 'Đang ứng tuyển...' : 'Ứng Tuyển Ngay' }}
                 </button>
               </template>
               <template v-else-if="isAuthenticated && userRole === 'business'">
-                <div class="py-2 text-center text-xs font-medium italic text-slate-400">Viewing as Employer</div>
+                <div class="py-2 text-center text-xs font-medium italic text-slate-400">Đang xem dưới quyền Doanh nghiệp</div>
               </template>
               <template v-else>
                 <NuxtLink
                   to="/login"
                   class="flex w-full justify-center rounded-lg border border-white/10 px-4 py-2 text-center text-sm font-semibold text-cyan-200 transition-all hover:bg-cyan-400/10 hover:text-cyan-100"
                 >
-                  Sign In to Apply
+                  Đăng Nhập Để Ứng Tuyển
                 </NuxtLink>
               </template>
             </div>
@@ -153,6 +149,7 @@ import { ref, computed, onMounted, watch } from 'vue'
 import { useApi } from '~/composables/useApi'
 import { useAuth } from '~/composables/useAuth'
 import PaginationControls from '~/components/common/PaginationControls.vue'
+import JobSkeleton from '~/components/common/JobSkeleton.vue'
 
 defineProps({
   showHero: { type: Boolean, default: true },
@@ -212,26 +209,27 @@ const handleApply = async (jobId: number) => {
   feedback.value = null
   try {
     const res = await api.post('/api/jobs/apply', { job_id: jobId })
-    feedback.value = { type: 'success', message: res.message || 'Applied successfully!' }
+    feedback.value = { type: 'success', message: res.message || '🎉 Nộp đơn ứng tuyển thành công!' }
   } catch (err: any) {
-    feedback.value = { type: 'error', message: err.response?._data?.message || 'Failed to submit application.' }
+    feedback.value = { type: 'error', message: err.response?._data?.message || 'Nộp đơn thất bại. Vui lòng thử lại.' }
   } finally {
     isApplying.value = null
   }
 }
 
 const companyName = (job: any) => {
-  return job?.business?.company_name || `Verified Employer #${job?.business_id || ''}`
+  return job?.business?.company_name || `Doanh nghiệp #${job?.business_id || ''}`
 }
 
 const formatCurrency = (value: number | string | null | undefined) => {
   const amount = Number(value || 0)
-  return `${amount.toLocaleString('vi-VN')} VND`
+  return `${amount.toLocaleString('vi-VN')} VNĐ`
 }
 
 const displayJobTitle = (title: string | null | undefined) => {
-  return (title || 'Untitled Job').replace(/\bMarketting\b/gi, 'Marketing')
+  return (title || 'Công việc chưa đặt tên').replace(/\bMarketting\b/gi, 'Marketing')
 }
 
 onMounted(fetchJobs)
 </script>
+

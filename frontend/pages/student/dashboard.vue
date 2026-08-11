@@ -6,9 +6,9 @@
           <div>
             <div class="flex flex-wrap items-center gap-2">
               <span class="inline-flex items-center rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-cyan-200 ring-1 ring-cyan-400/30">
-                Student Workspace
+                Không gian Sinh viên
               </span>
-              <span class="text-xs font-semibold text-slate-400">Career dashboard</span>
+              <span class="text-xs font-semibold text-slate-400">Bảng điều khiển sự nghiệp</span>
             </div>
             <h1 class="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
               {{ studentHero.title }}
@@ -28,7 +28,7 @@
                 @click="activeSection = 'profile'"
                 class="inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-white/15 focus-ring"
               >
-                Improve profile
+                Cập nhật hồ sơ
               </button>
             </div>
           </div>
@@ -411,53 +411,53 @@ const profileReadiness = computed(() => {
 const studentHero = computed(() => {
   if (activeSection.value === 'profile') {
     return {
-      title: profileForm.full_name ? `${profileForm.full_name}'s profile` : 'Build a stronger student profile',
-      description: 'Keep your contact details, skills, avatar, and CV ready before applying to new opportunities.',
-      cta: isEditing.value ? 'Editing profile' : 'Edit profile'
+      title: profileForm.full_name ? `Hồ sơ cá nhân: ${profileForm.full_name}` : 'Tạo hồ sơ sinh viên ấn tượng',
+      description: 'Cập nhật thông tin liên hệ, kỹ năng, ảnh đại diện và CV của bạn trước khi ứng tuyển các cơ hội mới.',
+      cta: isEditing.value ? 'Đang chỉnh sửa' : 'Chỉnh sửa hồ sơ'
     }
   }
 
   if (activeSection.value === 'applications') {
     return {
-      title: 'Track your applications',
-      description: 'Follow every application, respond to offers, and manage active work sessions from one place.',
-      cta: 'Find more jobs'
+      title: 'Theo dõi đơn ứng tuyển',
+      description: 'Theo dõi tiến trình từng đơn ứng tuyển, phản hồi offer nhận việc và quản lý các ca làm việc tập trung.',
+      cta: 'Tìm thêm việc làm'
     }
   }
 
   return {
-    title: 'Find student-friendly jobs',
-    description: 'Browse verified roles, compare salary and location, then apply with your QuickWork profile.',
-    cta: 'Browse jobs'
+    title: 'Tìm việc làm bán thời gian cho sinh viên',
+    description: 'Duyệt các công việc đã xác thực, so sánh mức lương và địa điểm, sau đó nộp đơn ứng tuyển nhanh chóng.',
+    cta: 'Khám phá công việc'
   }
 })
 
 const studentHeroStats = computed(() => [
   {
-    label: 'Open jobs',
+    label: 'Việc làm mở tuyển',
     value: jobs.value.length,
-    caption: 'Available now',
+    caption: 'Đang tuyển dụng',
     icon: 'jobs',
     iconClass: 'bg-brand-50 text-brand-700'
   },
   {
-    label: 'Applications',
+    label: 'Đơn ứng tuyển',
     value: applications.value.length,
-    caption: 'Submitted total',
+    caption: 'Tổng số đã nộp',
     icon: 'apps',
     iconClass: 'bg-sky-50 text-sky-700'
   },
   {
-    label: 'Accepted',
+    label: 'Đã nhận việc',
     value: acceptedApplicationsCount.value,
-    caption: `${pendingApplicationsCount.value} pending`,
+    caption: `${pendingApplicationsCount.value} đơn chờ duyệt`,
     icon: 'accepted',
     iconClass: 'bg-emerald-50 text-emerald-700'
   },
   {
-    label: 'Profile',
+    label: 'Hồ sơ cá nhân',
     value: `${profileReadiness.value}%`,
-    caption: 'Readiness score',
+    caption: 'Mức độ hoàn thiện',
     icon: 'profile',
     iconClass: 'bg-amber-50 text-amber-700'
   }

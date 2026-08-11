@@ -47,25 +47,56 @@
 
           <!-- Khối File CV Đính Kèm -->
           <div class="rounded-2xl border border-white/10 bg-slate-900/82 shadow-lg shadow-slate-950/25 p-6 space-y-3 backdrop-blur">
-            <h4 class="text-sm font-bold text-cyan-200/80 uppercase tracking-wider">Attached Curriculum Vitae (CV)</h4>
+            <h4 class="text-sm font-bold text-cyan-200/80 uppercase tracking-wider">File Hồ sơ CV Cá nhân</h4>
             <div v-if="profileForm.cv_url" class="flex items-center justify-between bg-emerald-400/10 border border-emerald-400/20 p-4 rounded-xl">
               <div class="flex items-center space-x-3">
                 <span class="text-3xl">📄</span>
                 <div>
-                  <p class="text-sm font-bold text-emerald-100">Your CV is Active</p>
-                  <p class="text-xs text-emerald-700">Ready to apply for jobs on QuickWork</p>
+                  <p class="text-sm font-bold text-emerald-100">CV đang hoạt động</p>
+                  <p class="text-xs text-emerald-300">Đã sẵn sàng ứng tuyển các công việc trên QuickWork</p>
                 </div>
               </div>
               <a 
                 :href="profileForm.cv_url" 
                 target="_blank" 
-                class="px-4 py-2 bg-emerald-600 hover:bg-emerald-700 text-white text-xs font-bold rounded-lg shadow-sm transition-colors"
+                class="px-4 py-2 bg-emerald-400 text-slate-950 font-bold text-xs rounded-lg hover:bg-emerald-300 transition-colors shadow-sm"
               >
-                View CV ↗
+                Xem CV
               </a>
             </div>
-            <div v-else class="text-center p-6 border-2 border-dashed border-white/10 rounded-xl bg-slate-950/60">
-              <p class="text-sm text-slate-400 font-medium">You haven't uploaded any CV PDF file yet.</p>
+            <div v-else class="text-center py-6 border-2 border-dashed border-white/10 rounded-xl bg-slate-950/50">
+              <p class="text-sm text-slate-400 font-semibold">Chưa có CV nào được đính kèm</p>
+              <p class="text-xs text-slate-500 mt-1">Bấm "Chỉnh sửa hồ sơ" bên dưới để tải lên CV của bạn.</p>
+            </div>
+          </div>
+
+          <!-- Khối AI Đánh giá & Chấm điểm CV (Mục AI mới) -->
+          <div class="rounded-2xl border border-cyan-400/30 bg-gradient-to-br from-cyan-950/40 via-slate-900/80 to-slate-950/90 shadow-xl shadow-cyan-950/30 p-6 backdrop-blur ring-1 ring-cyan-400/20">
+            <div class="flex flex-col sm:flex-row items-center justify-between gap-4">
+              <div class="flex items-center space-x-4">
+                <div class="h-12 w-12 rounded-2xl bg-gradient-to-tr from-cyan-400 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-2xl shadow-lg shadow-cyan-500/30">
+                  🤖
+                </div>
+                <div>
+                  <h4 class="text-base font-extrabold text-white flex items-center gap-2">
+                    AI CV Evaluator
+                    <span class="inline-flex rounded-full bg-cyan-400/20 px-2.5 py-0.5 text-[10px] font-black uppercase text-cyan-300 ring-1 ring-cyan-400/30">Mới</span>
+                  </h4>
+                  <p class="text-xs text-slate-300 font-semibold mt-0.5">Phân tích CV, phát hiện điểm yếu & nhận tóm tắt AI ấn tượng</p>
+                </div>
+              </div>
+              <button
+                type="button"
+                @click="runAiCvEvaluation"
+                :disabled="isEvaluating"
+                class="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-cyan-400 px-5 py-3 text-xs font-black text-slate-950 shadow-lg shadow-cyan-500/25 transition-all hover:bg-cyan-300 active:scale-95 disabled:opacity-60"
+              >
+                <svg v-if="isEvaluating" class="animate-spin -ml-1 mr-2 h-4 w-4 text-slate-950" fill="none" viewBox="0 0 24 24">
+                  <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                  <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
+                </svg>
+                <span>{{ isEvaluating ? 'Đang phân tích AI...' : '✨ Phân Tích CV Bằng AI' }}</span>
+              </button>
             </div>
           </div>
         </div>
@@ -139,27 +170,37 @@
                 @click="isEditing = false"
                 class="px-5 py-2.5 border border-white/10 text-sm font-semibold rounded-lg text-slate-200 bg-white/10 hover:bg-white/15 transition-all"
               >
-                Cancel
+                Hủy bỏ
               </button>
               <button
                 type="submit"
                 :disabled="isSavingProfile"
                 class="px-6 py-2.5 border border-transparent text-sm font-semibold rounded-lg text-slate-950 bg-cyan-400 hover:bg-cyan-300 focus:ring-2 focus:ring-cyan-400 disabled:opacity-50 disabled:cursor-not-allowed shadow-sm transition-all duration-150"
               >
-                <span v-if="isSavingProfile">Saving Profile...</span>
-                <span v-else>Save Changes</span>
+                <span v-if="isSavingProfile">Đang lưu...</span>
+                <span v-else>Lưu thay đổi</span>
               </button>
             </div>
           </form>
         </div>
 
+        <!-- Modal AI CV Review (Đưa ra ngoài khối v-if/v-else để hiển thị ở cả 2 trạng thái) -->
+        <AiCvReviewModal
+          :is-open="isAiModalOpen"
+          :result="aiResult"
+          @close="isAiModalOpen = false"
+        />
       </div>
 </template>
 
 <script setup lang="ts">
-import { toRefs } from 'vue'
+import { ref, toRefs } from 'vue'
+import AiCvReviewModal from '~/components/student/AiCvReviewModal.vue'
+import { useAi, type EvaluateCvResult } from '~/composables/useAi'
+import { useToast } from '~/composables/useToast'
 
 const props = defineProps<{ state: Record<string, any> }>()
+
 const {
   activeSection,
   navItems,
@@ -214,4 +255,34 @@ const {
   selectedChatApp,
   toast
 } = toRefs(props.state)
+
+const { evaluateCv } = useAi()
+const { error } = useToast()
+
+const isEvaluating = ref(false)
+const isAiModalOpen = ref(false)
+const aiResult = ref<EvaluateCvResult | null>(null)
+
+const runAiCvEvaluation = async () => {
+  isEvaluating.value = true
+  try {
+    const rawSkills = skillsArray?.value || []
+    const formVal = profileForm?.value || {}
+    const res = await evaluateCv({
+      full_name: formVal.full_name,
+      phone: formVal.phone,
+      gender: formVal.gender,
+      skills: Array.isArray(rawSkills) ? rawSkills : [],
+      cv_url: formVal.cv_url
+    })
+    aiResult.value = res
+    isAiModalOpen.value = true
+  } catch (err: any) {
+    console.error('AI CV Evaluation Error:', err)
+    const msg = err?.data?.message || err?.message || 'Không thể kết nối đến hệ thống phân tích AI. Vui lòng thử lại sau.'
+    error(msg)
+  } finally {
+    isEvaluating.value = false
+  }
+}
 </script>

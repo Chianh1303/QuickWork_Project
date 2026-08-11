@@ -76,14 +76,24 @@
               </div>
 
               <div class="sm:col-span-2">
-                <label for="job_description" class="block text-sm font-semibold text-slate-700 mb-1">Detailed Description</label>
+                <div class="flex justify-between items-center mb-1">
+                  <label for="job_description" class="block text-sm font-semibold text-slate-700">Mô tả công việc chi tiết</label>
+                  <button
+                    type="button"
+                    @click="handleAiGenerateJob"
+                    :disabled="isGeneratingAi"
+                    class="inline-flex items-center gap-1.5 px-3 py-1 bg-cyan-400/10 text-cyan-700 hover:bg-cyan-400/20 text-xs font-bold rounded-lg border border-cyan-400/30 transition-all disabled:opacity-50"
+                  >
+                    <span>{{ isGeneratingAi ? 'Đang tạo...' : '✨ AI Soạn Mô Tả' }}</span>
+                  </button>
+                </div>
                 <textarea
                   id="job_description"
-                  rows="4"
+                  rows="5"
                   v-model="jobForm.description"
                   required
                   class="block w-full px-3 py-2 border border-slate-200 rounded-lg text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-300"
-                  placeholder="Responsibilities, requirements, skills..."
+                  placeholder="Mô tả công việc, yêu cầu kỹ năng, quyền lợi..."
                 ></textarea>
               </div>
             </div>
@@ -155,10 +165,34 @@
 </template>
 
 <script setup lang="ts">
-import { toRefs } from 'vue'
+import { ref, toRefs } from 'vue'
+import { useAi } from '~/composables/useAi'
+import { useToast } from '~/composables/useToast'
 import PaginationControls from '~/components/common/PaginationControls.vue'
 
 const props = defineProps<{ state: Record<string, any> }>()
+const { generateJobDescription } = useAi()
+const { success, warning, error } = useToast()
+const isGeneratingAi = ref(false)
+
+const handleAiGenerateJob = async () => {
+  if (!jobForm.value?.title || !jobForm.value?.title.trim()) {
+    warning('Vui lòng nhập Tiêu đề công việc trước (ví dụ: Pha chế ca tối).')
+    return
+  }
+
+  isGeneratingAi.value = true
+  try {
+    const res = await generateJobDescription(jobForm.value.title)
+    jobForm.value.description = `${res.description}\n\n📌 YÊU CẦU:\n${res.requirements}\n\n🎁 QUYỀN LỢI:\n${res.benefits}`
+    success('AI đã tạo tự động bản mô tả công việc thành công!')
+  } catch (err: any) {
+    error('Không thể tạo mô tả bằng AI. Vui lòng thử lại.')
+  } finally {
+    isGeneratingAi.value = false
+  }
+}
+
 const {
   activeSection,
   navItems,
