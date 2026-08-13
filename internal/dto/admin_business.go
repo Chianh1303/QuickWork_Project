@@ -54,3 +54,27 @@ type ReviewBusinessRequest struct {
 	Decision     string `json:"decision"`
 	RejectReason string `json:"reject_reason"`
 }
+
+type AdminBusinessItem struct {
+	BusinessID  uint      `json:"business_id"`
+	UserID      uint      `json:"user_id"`
+	CompanyName string    `json:"company_name"`
+	TaxCode     string    `json:"tax_code"`
+	Email       string    `json:"email"`
+	Phone       string    `json:"phone"`
+	Address     string    `json:"address"`
+	LogoURL     string    `json:"logo_url"`
+	Status      string    `json:"status"` // approved, pending, locked, rejected
+	IsVerified  bool      `json:"is_verified"`
+	JobCount    int64     `json:"job_count"`
+	CreatedAt   time.Time `json:"created_at"`
+}
+
+type AdminBusinessListResponse struct {
+	Items      []AdminBusinessItem `json:"items"`
+	Pagination PaginationMeta      `json:"pagination"`
+}
+
+type UpdateBusinessStatusRequest struct {
+	Status string `json:"status"` // approved, locked
+}

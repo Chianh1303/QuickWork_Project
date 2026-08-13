@@ -19,6 +19,8 @@ type AdminRepository interface {
 	GetStudents(page, limit int, search, status string) ([]dto.AdminStudentItem, int64, error)
 	GetStudentDetail(studentID int) (*dto.AdminStudentItem, error)
 	UpdateStudentStatus(studentID int, status string) error
+	GetBusinesses(page, limit int, search, status string) ([]dto.AdminBusinessItem, int64, error)
+	UpdateBusinessStatus(businessID int, status string) error
 }
 
 type adminRepository struct {
@@ -274,5 +276,70 @@ func (r *adminRepository) UpdateStudentStatus(studentID int, status string) erro
 		return err
 	}
 	return r.db.Model(&models.User{}).Where("id = ? AND role = ?", student.UserID, "student").Update("status", status).Error
+}
+
+func (r *adminRepository) GetBusinesses(page, limit int, search, status string) ([]dto.AdminBusinessItem, int64, error) {
+	offset := (page - 1) * limit
+	buildQuery := func() *gorm.DB {
+		query := r.db.
+			Table("businesses").
+			Joins("JOIN users ON users.id = businesses.user_id").
+			Where("users.role = ?", "business")
+
+		if status != "" {
+			query = query.Where("users.status = ?", status)
+		}
+
+		if search != "" {
+			keyword := "%" + search + "%"
+			query = query.Where(
+				"(businesses.company_name LIKE ? OR businesses.tax_code LIKE ? OR users.email LIKE ? OR businesses.phone LIKE ?)",
+				keyword,
+				keyword,
+				keyword,
+				keyword,
+			)
+		}
+
+		return query
+	}
+
+	var total int64
+	if err := buildQuery().Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	items := make([]dto.AdminBusinessItem, 0)
+	if err := buildQuery().
+		Select(`
+			businesses.id AS business_id,
+			businesses.user_id,
+			businesses.company_name,
+			businesses.tax_code,
+			users.email,
+			businesses.phone,
+			businesses.address,
+			businesses.logo_url,
+			users.status,
+			businesses.is_verified,
+			businesses.created_at,
+			(SELECT COUNT(*) FROM jobs WHERE jobs.business_id = businesses.id) AS job_count
+		`).
+		Order("businesses.id DESC").
+		Limit(limit).
+		Offset(offset).
+		Scan(&items).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return items, total, nil
+}
+
+func (r *adminRepository) UpdateBusinessStatus(businessID int, status string) error {
+	var business models.Business
+	if err := r.db.First(&business, businessID).Error; err != nil {
+		return err
+	}
+	return r.db.Model(&models.User{}).Where("id = ? AND role = ?", business.UserID, "business").Update("status", status).Error
 }
 

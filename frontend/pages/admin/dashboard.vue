@@ -24,6 +24,12 @@
                 Duyệt Doanh Nghiệp Pending
               </NuxtLink>
               <NuxtLink
+                to="/admin/businesses"
+                class="inline-flex items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-5 py-3 text-sm font-extrabold text-cyan-200 transition-colors hover:bg-cyan-400 hover:text-slate-950"
+              >
+                🏢 Quản lý Doanh nghiệp (A7)
+              </NuxtLink>
+              <NuxtLink
                 to="/admin/students"
                 class="inline-flex items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-5 py-3 text-sm font-extrabold text-cyan-200 transition-colors hover:bg-cyan-400 hover:text-slate-950"
               >

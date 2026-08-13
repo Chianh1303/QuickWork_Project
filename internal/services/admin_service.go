@@ -29,6 +29,8 @@ type AdminService interface {
 	GetStudents(page, limit int, search, status string) (*dto.AdminStudentListResponse, error)
 	GetStudentDetail(studentID int) (*dto.AdminStudentItem, error)
 	UpdateStudentStatus(studentID int, status string) error
+	GetBusinesses(page, limit int, search, status string) (*dto.AdminBusinessListResponse, error)
+	UpdateBusinessStatus(businessID int, status string) error
 }
 
 type adminService struct {
@@ -173,6 +175,55 @@ func (s *adminService) UpdateStudentStatus(studentID int, status string) error {
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return ErrStudentNotFound
+		}
+		return err
+	}
+	return nil
+}
+
+func (s *adminService) GetBusinesses(page, limit int, search, status string) (*dto.AdminBusinessListResponse, error) {
+	if page < 1 {
+		return nil, ErrPageInvalid
+	}
+	if limit < 1 || limit > 100 {
+		return nil, ErrLimitInvalid
+	}
+
+	searchClean := strings.TrimSpace(search)
+	statusClean := strings.TrimSpace(status)
+	items, total, err := s.adminRepo.GetBusinesses(page, limit, searchClean, statusClean)
+	if err != nil {
+		return nil, err
+	}
+
+	totalPages := int64(0)
+	if total > 0 {
+		totalPages = int64(math.Ceil(float64(total) / float64(limit)))
+	}
+
+	return &dto.AdminBusinessListResponse{
+		Items: items,
+		Pagination: dto.PaginationMeta{
+			Page:       page,
+			Limit:      limit,
+			Total:      total,
+			TotalPages: totalPages,
+		},
+	}, nil
+}
+
+func (s *adminService) UpdateBusinessStatus(businessID int, status string) error {
+	if businessID < 1 {
+		return ErrBusinessIDInvalid
+	}
+	statusClean := strings.TrimSpace(status)
+	if statusClean != "approved" && statusClean != "locked" {
+		return errors.New("status chỉ được là approved hoặc locked")
+	}
+	err := s.adminRepo.UpdateBusinessStatus(businessID, statusClean)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrAdminBusinessNotFound
 		}
 		return err
 	}
