@@ -3,6 +3,7 @@ package routes
 import (
 	"QuickWork/internal/clients"
 	"QuickWork/internal/controllers"
+	"QuickWork/internal/engine"
 	"QuickWork/internal/middleware"
 	"QuickWork/internal/parsers"
 	"QuickWork/internal/repositories"
@@ -14,15 +15,21 @@ import (
 
 func RegisterAIRoutes(app *fiber.App, db *gorm.DB) {
 	aiRepo := repositories.NewAIRepository(db)
+	jobRepo := repositories.NewJobRepository(db)
 	geminiClient := clients.NewGeminiClient()
 	pdfParser := parsers.NewPDFParser()
-	aiService := services.NewAIService(aiRepo, geminiClient, pdfParser)
+	matchingEngine := engine.NewMatchingEngine()
+
+	aiService := services.NewAIService(aiRepo, jobRepo, geminiClient, pdfParser, matchingEngine)
 	aiController := controllers.NewAIController(aiService)
 
 	api := app.Group("/api/ai")
 
 	// Đánh giá CV (Đã đăng nhập)
 	api.Post("/evaluate-cv", middleware.Protected(), aiController.EvaluateCV)
+
+	// AI Gợi ý công việc cho Sinh viên
+	api.Get("/recommended-jobs", middleware.Protected(), middleware.RequireRole("student"), aiController.GetRecommendedJobs)
 
 	// Đánh giá độ phù hợp với Job
 	api.Post("/match-job", middleware.Protected(), aiController.MatchJob)

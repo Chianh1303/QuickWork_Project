@@ -1,52 +1,118 @@
 <template>
-  <div v-if="selectedJobForApply" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-  <div class="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
-    
-    <div class="p-6 pb-4 border-b border-slate-100">
-      <h3 class="text-xl font-bold text-slate-900">Apply Opportunity</h3>
-      <p class="text-sm font-medium text-slate-500 mt-1">
-        You are applying for: <span class="text-cyan-300 font-semibold">{{ selectedJobForApply.title }}</span>
-      </p>
-    </div>
-
-    <form @submit.prevent="submitApplication" class="p-6 space-y-4">
-      <div>
-        <label class="block text-sm font-bold text-slate-700 mb-2">
-          Cover Note (Lời nhắn gửi nhà tuyển dụng)
-        </label>
-        <textarea
-          v-model="coverNoteText"
-          rows="4"
-          maxlength="500"
-          class="block w-full px-3 py-2 border border-white/10 rounded-xl text-sm bg-slate-950/70 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 placeholder-slate-500 resize-none transition-all"
-          placeholder="Giới thiệu ngắn gọn về thế mạnh của bạn hoặc lý do bạn mong muốn ứng tuyển vị trí này..."
-        ></textarea>
-        <div class="text-right text-xs font-medium text-slate-400 mt-1">
-          {{ coverNoteText.length }}/500 characters
+  <div v-if="selectedJobForApply" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/70 backdrop-blur-md">
+    <div class="bg-slate-900 rounded-2xl border border-cyan-400/20 shadow-2xl shadow-slate-950/80 max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200 flex flex-col max-h-[90vh]">
+      
+      <!-- Modal Header -->
+      <div class="p-5 pb-4 border-b border-white/10 flex items-start justify-between gap-3 bg-slate-950/40">
+        <div>
+          <div class="flex flex-wrap items-center gap-2 mb-1">
+            <span class="inline-flex items-center px-2 py-0.5 rounded text-[11px] font-bold bg-cyan-400/10 text-cyan-300 ring-1 ring-cyan-400/30">
+              {{ selectedJobForApply.company || companyNameLookup(selectedJobForApply) }}
+            </span>
+            <span v-if="selectedJobForApply.match_score !== undefined" class="inline-flex items-center px-2 py-0.5 rounded-full text-[11px] font-extrabold bg-emerald-400/10 text-emerald-300 ring-1 ring-emerald-400/30">
+              ✨ {{ selectedJobForApply.match_score }}% Phù hợp AI
+            </span>
+          </div>
+          <h3 class="text-lg font-extrabold text-white leading-snug">
+            {{ selectedJobForApply.title }}
+          </h3>
         </div>
+        <button @click="selectedJobForApply = null" class="text-slate-400 hover:text-white p-1 rounded-lg hover:bg-white/10 flex-shrink-0 transition-colors">
+          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
+          </svg>
+        </button>
       </div>
 
-      <div class="flex items-center gap-3 justify-end pt-2 border-t border-slate-100">
+      <!-- Modal Body (Scrollable Details & Description) -->
+      <div class="p-5 overflow-y-auto space-y-4 flex-1 custom-scrollbar">
+        <!-- Metadata (Salary & Location) -->
+        <div v-if="selectedJobForApply.salary || selectedJobForApply.location" class="flex flex-wrap items-center gap-3 text-xs font-semibold text-slate-300 bg-slate-950/60 border border-white/10 p-3 rounded-xl">
+          <div v-if="selectedJobForApply.salary" class="flex items-center gap-1 text-emerald-400 font-bold">
+            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8c-1.657 0-3 .895-3 2s1.343 2 3 2 3 .895 3 2-1.343 2-3 2m0-8c1.11 0 2.08.402 2.599 1M12 8V7m0 1v8m0 0v1m0-1c-1.11 0-2.08-.402-2.599-1M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
+            </svg>
+            <span>{{ Number(selectedJobForApply.salary || 0).toLocaleString('vi-VN') }} VNĐ</span>
+          </div>
+          <div v-if="selectedJobForApply.location" class="flex items-center gap-1">
+            <svg class="h-4 w-4 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.244-4.243a8 8 0 1111.314 0z" />
+            </svg>
+            <span>{{ selectedJobForApply.location }}</span>
+          </div>
+        </div>
+
+        <!-- AI Skills Breakdown (If opening AI Recommended Job) -->
+        <div v-if="(selectedJobForApply.matching_skills && selectedJobForApply.matching_skills.length) || (selectedJobForApply.missing_skills && selectedJobForApply.missing_skills.length)" class="rounded-xl border border-cyan-400/20 bg-cyan-400/5 p-3.5 space-y-2">
+          <div class="text-xs font-bold uppercase tracking-wider text-cyan-300 flex items-center gap-1.5">
+            <span>✨ Phân tích AI Matching</span>
+          </div>
+          <div v-if="selectedJobForApply.matching_skills && selectedJobForApply.matching_skills.length" class="space-y-1">
+            <span class="text-[11px] font-semibold text-emerald-400">Kỹ năng phù hợp:</span>
+            <div class="flex flex-wrap gap-1">
+              <span v-for="skill in selectedJobForApply.matching_skills" :key="skill" class="px-2 py-0.5 rounded text-[11px] font-medium bg-emerald-500/10 text-emerald-300 border border-emerald-500/20">
+                {{ skill }}
+              </span>
+            </div>
+          </div>
+          <div v-if="selectedJobForApply.missing_skills && selectedJobForApply.missing_skills.length" class="space-y-1 pt-1">
+            <span class="text-[11px] font-semibold text-slate-400">Kỹ năng cần bổ sung:</span>
+            <div class="flex flex-wrap gap-1">
+              <span v-for="skill in selectedJobForApply.missing_skills" :key="skill" class="px-2 py-0.5 rounded text-[11px] font-medium bg-slate-800 text-slate-400 border border-slate-700">
+                {{ skill }}
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Description Box -->
+        <div class="rounded-xl border border-white/10 bg-slate-950/70 p-4 space-y-2">
+          <h4 class="text-xs font-bold uppercase tracking-wider text-cyan-200/80">Mô tả công việc</h4>
+          <p class="text-sm font-medium text-slate-300 leading-relaxed whitespace-pre-line max-h-44 overflow-y-auto pr-1">
+            {{ selectedJobForApply.description || 'Chưa có thông tin mô tả chi tiết công việc.' }}
+          </p>
+        </div>
+
+        <!-- Cover Note Input -->
+        <form id="apply-opportunity-form" @submit.prevent="submitApplication" class="space-y-2 pt-1">
+          <label class="block text-xs font-bold uppercase tracking-wider text-slate-300">
+            Lời nhắn gửi nhà tuyển dụng (Cover Note)
+          </label>
+          <textarea
+            v-model="coverNoteText"
+            rows="3"
+            maxlength="500"
+            class="block w-full px-3.5 py-2.5 border border-white/10 rounded-xl text-sm bg-slate-950/90 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-300 resize-none transition-all"
+            placeholder="Giới thiệu ngắn gọn về thế mạnh của bạn hoặc lý do bạn mong muốn ứng tuyển vị trí này..."
+          ></textarea>
+          <div class="text-right text-xs font-medium text-slate-400">
+            {{ coverNoteText.length }}/500 ký tự
+          </div>
+        </form>
+      </div>
+
+      <!-- Modal Footer -->
+      <div class="flex items-center gap-3 justify-end p-4 border-t border-white/10 bg-slate-950/40">
         <button
           type="button"
           @click="selectedJobForApply = null"
-          class="px-4 py-2 border border-slate-200 text-sm font-semibold rounded-lg text-slate-700 bg-white hover:bg-slate-50 transition-all"
+          class="px-4 py-2 border border-white/10 text-xs font-bold rounded-lg text-slate-300 bg-white/5 hover:bg-white/10 hover:text-white transition-all"
         >
-          Cancel
+          Hủy bỏ
         </button>
         <button
           type="submit"
+          form="apply-opportunity-form"
           :disabled="isSubmittingApply"
-          class="px-5 py-2 border border-transparent text-sm font-semibold rounded-lg text-slate-950 bg-cyan-400 hover:bg-cyan-300 shadow-sm transition-all flex items-center space-x-2"
+          class="px-5 py-2 border border-transparent text-xs font-extrabold rounded-lg text-slate-950 bg-cyan-400 hover:bg-cyan-300 shadow-sm shadow-cyan-950/40 transition-all flex items-center space-x-2 disabled:opacity-50"
         >
-          <span v-if="isSubmittingApply" class="animate-spin h-4 w-4 border-2 border-white border-t-transparent rounded-full"></span>
-          <span>Submit Application</span>
+          <span v-if="isSubmittingApply" class="animate-spin h-3.5 w-3.5 border-2 border-slate-950 border-t-transparent rounded-full"></span>
+          <span>Nộp đơn ứng tuyển</span>
         </button>
       </div>
-    </form>
 
+    </div>
   </div>
-</div>
 <div v-if="appIdToCancel !== null" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
     <div class="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-sm w-full p-6 animate-in fade-in zoom-in-95 duration-150 text-center">
       <div class="mx-auto flex items-center justify-center h-12 w-12 rounded-full bg-red-50 text-red-600 mb-4">

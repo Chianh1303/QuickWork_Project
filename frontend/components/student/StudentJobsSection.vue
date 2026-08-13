@@ -1,6 +1,9 @@
 <template>
       <!-- Section 1: Dashboard (Explore Jobs) -->
       <div v-if="activeSection === 'jobs'" class="space-y-6">
+        <!-- AI Recommended Jobs Section -->
+        <StudentAiRecommendedJobs @apply="handleAiApply" />
+
         <!-- Feedback Banner -->
         <div v-if="feedback" :class="[
           feedback.type === 'success' ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-red-50 border-red-300 text-red-800',
@@ -179,6 +182,7 @@
 <script setup lang="ts">
 import { toRefs } from 'vue'
 import PaginationControls from '~/components/common/PaginationControls.vue'
+import StudentAiRecommendedJobs from '~/components/student/StudentAiRecommendedJobs.vue'
 
 const props = defineProps<{ state: Record<string, any> }>()
 const {
@@ -246,5 +250,21 @@ const formatCurrency = (value: number | string | null | undefined) => {
 
 const displayJobTitle = (title: string | null | undefined) => {
   return (title || 'Untitled Job').replace(/\bMarketting\b/gi, 'Marketing')
+}
+
+const handleAiApply = (aiJob: any) => {
+  if (!aiJob) return
+  const mappedJob = {
+    id: aiJob.job_id,
+    title: aiJob.job_title,
+    company: aiJob.company,
+    description: aiJob.description,
+    salary: aiJob.salary,
+    location: aiJob.location,
+    ...aiJob
+  }
+  if (typeof handleApply.value === 'function') {
+    handleApply.value(mappedJob)
+  }
 }
 </script>

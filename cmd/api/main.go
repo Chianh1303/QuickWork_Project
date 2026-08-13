@@ -1,22 +1,52 @@
 package main
 
 import (
+	_ "QuickWork/docs"
 	"QuickWork/internal/config"
 	"QuickWork/internal/database"
 	"QuickWork/internal/routes"
+	"bufio"
 	"fmt"
 	"log"
 	"os"
+	"strings"
 
 	"github.com/gofiber/fiber/v2"
 	"github.com/gofiber/fiber/v2/middleware/cors" // Bổ sung CORS để gọi mượt từ Nuxt 4 (Port 3001)
 	"github.com/gofiber/fiber/v2/middleware/logger"
+	swagger "github.com/gofiber/swagger"
 	"gorm.io/gorm"
 )
 
 var DB *gorm.DB
 
+func loadEnv() {
+	file, err := os.Open(".env")
+	if err != nil {
+		return
+	}
+	defer file.Close()
+
+	scanner := bufio.NewScanner(file)
+	for scanner.Scan() {
+		line := strings.TrimSpace(scanner.Text())
+		if line == "" || strings.HasPrefix(line, "#") {
+			continue
+		}
+		parts := strings.SplitN(line, "=", 2)
+		if len(parts) == 2 {
+			key := strings.TrimSpace(parts[0])
+			val := strings.TrimSpace(parts[1])
+			val = strings.Trim(val, `"'`)
+			if os.Getenv(key) == "" {
+				_ = os.Setenv(key, val)
+			}
+		}
+	}
+}
+
 func main() {
+	loadEnv()
 	_ = os.MkdirAll(config.AvatarDir, os.ModePerm)
 	_ = os.MkdirAll(config.CVDir, os.ModePerm)
 
@@ -52,6 +82,9 @@ func main() {
 		AllowCredentials: true,
 	}))
 	app.Static("/uploads", config.UploadDir)
+
+	// Swagger OpenAPI UI Route
+	app.Get("/swagger/*", swagger.HandlerDefault)
 
 	// ==========================================
 	// CÁC ROUTE API HỆ THỐNG

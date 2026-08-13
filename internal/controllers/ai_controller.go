@@ -105,6 +105,30 @@ func (ctrl *AIController) GenerateJobDescription(c *fiber.Ctx) error {
 	return c.JSON(res)
 }
 
+// GetRecommendedJobs GET /api/ai/recommended-jobs
+func (ctrl *AIController) GetRecommendedJobs(c *fiber.Ctx) error {
+	userID, ok := getUserIDFromContext(c)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "Chưa đăng nhập",
+		})
+	}
+
+	res, err := ctrl.aiService.GetRecommendedJobs(userID)
+	if err != nil {
+		if errors.Is(err, services.ErrStudentNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+				"message": err.Error(),
+			})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
+			"message": "Không thể lấy danh sách công việc gợi ý",
+		})
+	}
+
+	return c.JSON(res)
+}
+
 func getUserIDFromContext(c *fiber.Ctx) (uint, bool) {
 	val := c.Locals("user_id")
 	if val == nil {

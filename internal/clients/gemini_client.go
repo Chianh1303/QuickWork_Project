@@ -13,6 +13,7 @@ import (
 
 type GeminiClient interface {
 	EvaluateCV(apiKey string, prompt string, pdfBytes []byte) (string, error)
+	GenerateText(apiKey string, prompt string) (string, error)
 }
 
 type geminiClient struct {
@@ -22,13 +23,13 @@ type geminiClient struct {
 func NewGeminiClient() GeminiClient {
 	return &geminiClient{
 		httpClient: &http.Client{
-			Timeout: 30 * time.Second,
+			Timeout: 90 * time.Second,
 		},
 	}
 }
 
 func (c *geminiClient) EvaluateCV(apiKey string, prompt string, pdfBytes []byte) (string, error) {
-	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta/models/gemini-1.5-flash:generateContent?key=%s", apiKey)
+	url := fmt.Sprintf("https://generativelanguage.googleapis.com/v1beta/models/gemini-2.5-flash:generateContent?key=%s", apiKey)
 
 	partsList := []map[string]interface{}{}
 	if len(pdfBytes) > 0 {
@@ -85,4 +86,8 @@ func (c *geminiClient) EvaluateCV(apiKey string, prompt string, pdfBytes []byte)
 	rawText = strings.TrimSpace(rawText)
 
 	return rawText, nil
+}
+
+func (c *geminiClient) GenerateText(apiKey string, prompt string) (string, error) {
+	return c.EvaluateCV(apiKey, prompt, nil)
 }

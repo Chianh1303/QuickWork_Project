@@ -12,11 +12,14 @@ var jwtSecret = []byte("quickwork_secret_key_2026")
 
 func Protected() fiber.Handler {
 	return func(c *fiber.Ctx) error {
-		authHeader := c.Get("Authorization")
-		if authHeader == "" || !strings.HasPrefix(authHeader, "Bearer ") {
+		authHeader := strings.TrimSpace(c.Get("Authorization"))
+		if authHeader == "" {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "Header không hợp lệ"})
 		}
-		tokenString := strings.TrimPrefix(authHeader, "Bearer ")
+		tokenString := authHeader
+		if strings.HasPrefix(authHeader, "Bearer ") || strings.HasPrefix(authHeader, "bearer ") {
+			tokenString = strings.TrimSpace(authHeader[7:])
+		}
 		token, err := jwt.Parse(tokenString, func(token *jwt.Token) (interface{}, error) {
 			if token.Method != jwt.SigningMethodHS256 {
 				return nil, fmt.Errorf("unexpected signing method")

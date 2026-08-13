@@ -79,6 +79,22 @@ export interface GenerateJobResult {
   suggested_salary: string
 }
 
+export interface RecommendedJobItem {
+  job_id: number
+  job_title: string
+  company: string
+  description?: string
+  salary?: number
+  location?: string
+  match_score: number
+  matching_skills: string[]
+  missing_skills: string[]
+}
+
+export interface RecommendedJobsResponse {
+  jobs: RecommendedJobItem[]
+}
+
 export const useAi = () => {
   const api = useApi()
   const isLoading = ref(false)
@@ -126,11 +142,26 @@ export const useAi = () => {
     }
   }
 
+  const getRecommendedJobs = async (): Promise<RecommendedJobsResponse> => {
+    isLoading.value = true
+    errorMessage.value = ''
+    try {
+      const data = await api.get<RecommendedJobsResponse>('/api/ai/recommended-jobs')
+      return data
+    } catch (err: any) {
+      errorMessage.value = err?.data?.message || 'Không thể lấy danh sách công việc gợi ý từ AI.'
+      throw err
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     isLoading,
     errorMessage,
     evaluateCv,
     matchJob,
-    generateJobDescription
+    generateJobDescription,
+    getRecommendedJobs
   }
 }
