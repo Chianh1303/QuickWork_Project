@@ -21,6 +21,9 @@ type AdminRepository interface {
 	UpdateStudentStatus(studentID int, status string) error
 	GetBusinesses(page, limit int, search, status string) ([]dto.AdminBusinessItem, int64, error)
 	UpdateBusinessStatus(businessID int, status string) error
+	GetTickets(page, limit int, status string) ([]dto.AdminTicketItem, int64, error)
+	GetTicketDetail(ticketID int) (*dto.AdminTicketItem, error)
+	ResolveTicket(ticketID int, adminID uint, verdict, status string) error
 }
 
 type adminRepository struct {
@@ -341,5 +344,90 @@ func (r *adminRepository) UpdateBusinessStatus(businessID int, status string) er
 		return err
 	}
 	return r.db.Model(&models.User{}).Where("id = ? AND role = ?", business.UserID, "business").Update("status", status).Error
+}
+
+func (r *adminRepository) GetTickets(page, limit int, status string) ([]dto.AdminTicketItem, int64, error) {
+	offset := (page - 1) * limit
+	buildQuery := func() *gorm.DB {
+		query := r.db.Table("tickets")
+		if status != "" {
+			query = query.Where("status = ?", status)
+		}
+		return query
+	}
+
+	var total int64
+	if err := buildQuery().Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	items := make([]dto.AdminTicketItem, 0)
+	if err := buildQuery().
+		Select(`
+			tickets.id AS ticket_id,
+			tickets.application_id,
+			tickets.reporter_id,
+			u1.email AS reporter_email,
+			u1.role AS reporter_role,
+			tickets.target_id,
+			u2.email AS target_email,
+			tickets.reason,
+			tickets.description,
+			tickets.status,
+			tickets.verdict,
+			tickets.resolved_at,
+			tickets.created_at
+		`).
+		Joins("LEFT JOIN users u1 ON u1.id = tickets.reporter_id").
+		Joins("LEFT JOIN users u2 ON u2.id = tickets.target_id").
+		Order("tickets.id DESC").
+		Limit(limit).
+		Offset(offset).
+		Scan(&items).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return items, total, nil
+}
+
+func (r *adminRepository) GetTicketDetail(ticketID int) (*dto.AdminTicketItem, error) {
+	var detail dto.AdminTicketItem
+	err := r.db.Table("tickets").
+		Select(`
+			tickets.id AS ticket_id,
+			tickets.application_id,
+			tickets.reporter_id,
+			u1.email AS reporter_email,
+			u1.role AS reporter_role,
+			tickets.target_id,
+			u2.email AS target_email,
+			tickets.reason,
+			tickets.description,
+			tickets.status,
+			tickets.verdict,
+			tickets.resolved_at,
+			tickets.created_at
+		`).
+		Joins("LEFT JOIN users u1 ON u1.id = tickets.reporter_id").
+		Joins("LEFT JOIN users u2 ON u2.id = tickets.target_id").
+		Where("tickets.id = ?", ticketID).
+		Scan(&detail).Error
+	if err != nil {
+		return nil, err
+	}
+	if detail.TicketID == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+	return &detail, nil
+}
+
+func (r *adminRepository) ResolveTicket(ticketID int, adminID uint, verdict, status string) error {
+	now := time.Now()
+	return r.db.Model(&models.Ticket{}).Where("id = ?", ticketID).Updates(map[string]interface{}{
+		"status":      status,
+		"verdict":     verdict,
+		"resolved_by": adminID,
+		"resolved_at": now,
+	}).Error
 }
 

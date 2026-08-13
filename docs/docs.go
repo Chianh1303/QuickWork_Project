@@ -490,6 +490,48 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/admin/tickets": {
+            "get": {
+                "tags": ["Admin Operations"],
+                "summary": "Admin Quản lý Danh sách Ticket Khiếu nại",
+                "produces": ["application/json"],
+                "security": [{ "BearerAuth": [] }],
+                "parameters": [
+                    { "name": "status", "in": "query", "type": "string", "description": "Lọc trạng thái pending, resolved, rejected" }
+                ],
+                "responses": {
+                    "200": { "description": "Danh sách ticket khiếu nại" }
+                }
+            }
+        },
+        "/api/admin/tickets/{id}/resolve": {
+            "put": {
+                "tags": ["Admin Operations"],
+                "summary": "Admin Ban hành Phán quyết Giải quyết Tranh chấp",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "security": [{ "BearerAuth": [] }],
+                "parameters": [
+                    { "name": "id", "in": "path", "required": true, "type": "integer", "example": 1 },
+                    {
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["verdict"],
+                            "properties": {
+                                "verdict": { "type": "string", "example": "Chấp nhận bồi thường tiền ca làm cho sinh viên" },
+                                "status": { "type": "string", "example": "resolved" }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": { "description": "Đã ban hành phán quyết xử lý thành công" }
+                }
+            }
+        },
         "/api/admin/students": {
             "get": {
                 "tags": ["Admin Operations"],

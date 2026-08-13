@@ -31,6 +31,9 @@ type AdminService interface {
 	UpdateStudentStatus(studentID int, status string) error
 	GetBusinesses(page, limit int, search, status string) (*dto.AdminBusinessListResponse, error)
 	UpdateBusinessStatus(businessID int, status string) error
+	GetTickets(page, limit int, status string) (*dto.AdminTicketListResponse, error)
+	GetTicketDetail(ticketID int) (*dto.AdminTicketItem, error)
+	ResolveTicket(ticketID int, adminID uint, req dto.ResolveTicketRequest) error
 }
 
 type adminService struct {
@@ -228,5 +231,64 @@ func (s *adminService) UpdateBusinessStatus(businessID int, status string) error
 		return err
 	}
 	return nil
+}
+
+func (s *adminService) GetTickets(page, limit int, status string) (*dto.AdminTicketListResponse, error) {
+	if page < 1 {
+		return nil, ErrPageInvalid
+	}
+	if limit < 1 || limit > 100 {
+		return nil, ErrLimitInvalid
+	}
+
+	statusClean := strings.TrimSpace(status)
+	items, total, err := s.adminRepo.GetTickets(page, limit, statusClean)
+	if err != nil {
+		return nil, err
+	}
+
+	totalPages := int64(0)
+	if total > 0 {
+		totalPages = int64(math.Ceil(float64(total) / float64(limit)))
+	}
+
+	return &dto.AdminTicketListResponse{
+		Items: items,
+		Pagination: dto.PaginationMeta{
+			Page:       page,
+			Limit:      limit,
+			Total:      total,
+			TotalPages: totalPages,
+		},
+	}, nil
+}
+
+func (s *adminService) GetTicketDetail(ticketID int) (*dto.AdminTicketItem, error) {
+	if ticketID < 1 {
+		return nil, errors.New("ticket id is invalid")
+	}
+	detail, err := s.adminRepo.GetTicketDetail(ticketID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, errors.New("Không tìm thấy khiếu nại")
+		}
+		return nil, err
+	}
+	return detail, nil
+}
+
+func (s *adminService) ResolveTicket(ticketID int, adminID uint, req dto.ResolveTicketRequest) error {
+	if ticketID < 1 {
+		return errors.New("ticket id is invalid")
+	}
+	verdict := strings.TrimSpace(req.Verdict)
+	if len([]rune(verdict)) < 5 {
+		return errors.New("Phán quyết của Admin phải có ít nhất 5 ký tự")
+	}
+	status := strings.TrimSpace(req.Status)
+	if status != "resolved" && status != "rejected" {
+		status = "resolved"
+	}
+	return s.adminRepo.ResolveTicket(ticketID, adminID, verdict, status)
 }
 

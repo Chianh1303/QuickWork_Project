@@ -229,6 +229,70 @@ func (ctrl *AdminController) UpdateBusinessStatus(c *fiber.Ctx) error {
 	})
 }
 
+// GetTickets GET /api/admin/tickets
+func (ctrl *AdminController) GetTickets(c *fiber.Ctx) error {
+	page, err := strconv.Atoi(c.Query("page", "1"))
+	if err != nil || page < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "page must be greater than or equal to 1"})
+	}
+
+	limit, err := strconv.Atoi(c.Query("limit", "10"))
+	if err != nil || limit < 1 || limit > 100 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "limit must be between 1 and 100"})
+	}
+
+	status := c.Query("status")
+	res, err := ctrl.adminService.GetTickets(page, limit, status)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get tickets list"})
+	}
+
+	return c.JSON(res)
+}
+
+// GetTicketDetail GET /api/admin/tickets/:id
+func (ctrl *AdminController) GetTicketDetail(c *fiber.Ctx) error {
+	ticketID, err := strconv.Atoi(c.Params("id"))
+	if err != nil || ticketID < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "ticket id is invalid"})
+	}
+
+	detail, err := ctrl.adminService.GetTicketDetail(ticketID)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
+	}
+
+	return c.JSON(detail)
+}
+
+// ResolveTicket PUT /api/admin/tickets/:id/resolve
+func (ctrl *AdminController) ResolveTicket(c *fiber.Ctx) error {
+	ticketID, err := strconv.Atoi(c.Params("id"))
+	if err != nil || ticketID < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "ticket id is invalid"})
+	}
+
+	adminID, ok := localUserID(c)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": "Token không hợp lệ"})
+	}
+
+	var req dto.ResolveTicketRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Dữ liệu không hợp lệ"})
+	}
+
+	err = ctrl.adminService.ResolveTicket(ticketID, adminID, req)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "Đã đưa ra phán quyết xử lý khiếu nại thành công",
+		"status":  req.Status,
+	})
+}
+
 func localUserID(c *fiber.Ctx) (uint, bool) {
 	switch value := c.Locals("user_id").(type) {
 	case float64:

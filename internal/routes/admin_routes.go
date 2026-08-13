@@ -30,4 +30,9 @@ func RegisterAdminRoutes(app *fiber.App, db *gorm.DB) {
 	// Quản lý Doanh nghiệp (Feature A7)
 	admin.Get("/businesses", adminController.GetBusinesses)
 	admin.Put("/businesses/:id/status", adminController.UpdateBusinessStatus)
+
+	// Xử lý Khiếu nại (Feature A8)
+	admin.Get("/tickets", adminController.GetTickets)
+	admin.Get("/tickets/:id", adminController.GetTicketDetail)
+	admin.Put("/tickets/:id/resolve", adminController.ResolveTicket)
 }

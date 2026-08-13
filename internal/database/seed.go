@@ -157,6 +157,34 @@ func SeedDatabase(db *gorm.DB) {
 		db.Create(&job)
 	}
 
+	// ==========================================
+	// ⚖️ SEED TICKET KHIẾU NẠI MẪU (FEATURE A8)
+	// ==========================================
+	app1 := models.Application{JobID: 1, StudentID: 1, Status: "accepted", CoverNote: "Em đã hoàn thành các ca làm việc."}
+	db.Create(&app1)
+
+	tickets := []models.Ticket{
+		{
+			ApplicationID: app1.ID,
+			ReporterID:    9, // Student student0@gmail.com
+			TargetID:      2, // Business FPT Software
+			Reason:        "Khiếu nại chưa nhận tiền lương ca làm",
+			Description:   "Tôi đã hoàn thành đủ 5 ca làm việc theo thỏa thuận hợp đồng nhưng doanh nghiệp chưa thanh toán giải ngân tiền lương.",
+			Status:        "pending",
+		},
+		{
+			ApplicationID: app1.ID,
+			ReporterID:    2, // Business FPT Software
+			TargetID:      9, // Student student0@gmail.com
+			Reason:        "Tranh chấp thời gian điểm danh ca làm",
+			Description:   "Sinh viên vắng mặt không lý do vào ca làm ngày Thứ 4 nhưng hệ thống vẫn nhận được yêu cầu xác nhận.",
+			Status:        "pending",
+		},
+	}
+	for _, t := range tickets {
+		db.Create(&t)
+	}
+
 	log.Println("🎉 Khởi tạo dữ liệu thực tế thành công mỹ mãn! Tất cả mật khẩu đều là: 12345678")
 }
 
