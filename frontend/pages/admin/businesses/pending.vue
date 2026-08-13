@@ -2,29 +2,30 @@
   <AdminShell>
     <div class="space-y-6">
       <section class="rounded-3xl border border-white/10 bg-slate-950/80 p-6 shadow-2xl shadow-slate-950/40 ring-1 ring-cyan-400/10 lg:p-7">
-        <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
-          <div>
-            <span class="inline-flex rounded-full bg-amber-400/10 px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-amber-200 ring-1 ring-amber-400/25">
-              Hàng chờ duyệt KYB Doanh nghiệp
-            </span>
-            <h1 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-              Doanh nghiệp Chờ Xét Duyệt
-            </h1>
-            <p class="mt-2 max-w-2xl text-sm font-semibold leading-6 text-slate-300 sm:text-base">
-              Tìm kiếm, xem hồ sơ KYB, duyệt hoặc từ chối doanh nghiệp đang chờ xác minh.
-            </p>
+        <div class="flex flex-col gap-6">
+          <div class="flex flex-col gap-5 lg:flex-row lg:items-center lg:justify-between">
+            <div>
+              <h1 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                Doanh nghiệp Chờ Xét Duyệt
+              </h1>
+              <p class="mt-2 max-w-2xl text-sm font-semibold leading-6 text-slate-300 sm:text-base">
+                Tìm kiếm, xem hồ sơ KYB, duyệt hoặc từ chối doanh nghiệp đang chờ xác minh.
+              </p>
+            </div>
+
+            <div class="grid min-w-0 grid-cols-2 gap-3 sm:min-w-[360px]">
+              <div class="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-5 py-4">
+                <p class="text-xs font-extrabold uppercase tracking-wide text-cyan-200">Tổng số kết quả</p>
+                <p class="mt-1 text-2xl font-extrabold text-white">{{ pagination.total }}</p>
+              </div>
+              <div class="rounded-2xl border border-white/10 bg-white/[0.06] px-5 py-4">
+                <p class="text-xs font-extrabold uppercase tracking-wide text-slate-400">Trang hiện tại</p>
+                <p class="mt-1 text-2xl font-extrabold text-white">{{ pagination.page }}</p>
+              </div>
+            </div>
           </div>
 
-          <div class="grid min-w-0 grid-cols-2 gap-3 sm:min-w-[360px]">
-            <div class="rounded-2xl border border-cyan-400/20 bg-cyan-400/10 px-5 py-4">
-              <p class="text-xs font-extrabold uppercase tracking-wide text-cyan-200">Tổng số kết quả</p>
-              <p class="mt-1 text-2xl font-extrabold text-white">{{ pagination.total }}</p>
-            </div>
-            <div class="rounded-2xl border border-white/10 bg-white/[0.06] px-5 py-4">
-              <p class="text-xs font-extrabold uppercase tracking-wide text-slate-400">Trang hiện tại</p>
-              <p class="mt-1 text-2xl font-extrabold text-white">{{ pagination.page }}</p>
-            </div>
-          </div>
+          <AdminHeaderNav />
         </div>
       </section>
 

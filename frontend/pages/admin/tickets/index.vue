@@ -3,25 +3,26 @@
     <div class="space-y-6">
       <!-- Header Banner -->
       <section class="rounded-3xl border border-white/10 bg-slate-950/80 p-6 shadow-2xl shadow-slate-950/40 ring-1 ring-cyan-400/10 lg:p-8">
-        <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
-          <div>
-            <span class="inline-flex rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-extrabold uppercase tracking-wide text-cyan-200 ring-1 ring-cyan-400/25">
-              Admin Feature A8
-            </span>
-            <h1 class="mt-3 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-              Xử lý Khiếu nại & Tranh chấp (Ticket System)
-            </h1>
-            <p class="mt-2 text-sm font-semibold text-slate-300">
-              Xem chi tiết các ticket khiếu nại giữa Sinh viên & Doanh nghiệp và đưa ra phán quyết giải quyết chính thức.
-            </p>
+        <div class="flex flex-col gap-6">
+          <div class="flex flex-col gap-4 sm:flex-row sm:items-center sm:justify-between">
+            <div>
+              <h1 class="text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
+                Xử lý Khiếu nại & Tranh chấp
+              </h1>
+              <p class="mt-2 text-sm font-semibold text-slate-300">
+                Xem chi tiết các ticket khiếu nại giữa Sinh viên & Doanh nghiệp và đưa ra phán quyết giải quyết chính thức.
+              </p>
+            </div>
+
+            <NuxtLink
+              to="/admin/dashboard"
+              class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/10 px-4 py-2.5 text-sm font-bold text-slate-200 transition-colors hover:bg-white/15"
+            >
+              Quay lại Dashboard
+            </NuxtLink>
           </div>
 
-          <NuxtLink
-            to="/admin/dashboard"
-            class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/10 px-4 py-2.5 text-sm font-bold text-slate-200 transition-colors hover:bg-white/15"
-          >
-            ← Quay lại Dashboard
-          </NuxtLink>
+          <AdminHeaderNav />
         </div>
       </section>
 
