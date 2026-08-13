@@ -16,6 +16,9 @@ type AdminRepository interface {
 	GetPendingBusinesses(page, limit int, search string) ([]dto.PendingBusinessItem, int64, error)
 	GetBusinessKYBDetail(businessID int) (*dto.BusinessKYBDetail, error)
 	ReviewBusinessKYB(businessID int, adminID uint, decision, rejectReason string) error
+	GetStudents(page, limit int, search, status string) ([]dto.AdminStudentItem, int64, error)
+	GetStudentDetail(studentID int) (*dto.AdminStudentItem, error)
+	UpdateStudentStatus(studentID int, status string) error
 }
 
 type adminRepository struct {
@@ -180,3 +183,96 @@ func (r *adminRepository) ReviewBusinessKYB(businessID int, adminID uint, decisi
 		return nil
 	})
 }
+
+func (r *adminRepository) GetStudents(page, limit int, search, status string) ([]dto.AdminStudentItem, int64, error) {
+	offset := (page - 1) * limit
+	buildQuery := func() *gorm.DB {
+		query := r.db.
+			Table("students").
+			Joins("JOIN users ON users.id = students.user_id").
+			Where("users.role = ?", "student")
+
+		if status != "" {
+			query = query.Where("users.status = ?", status)
+		}
+
+		if search != "" {
+			keyword := "%" + search + "%"
+			query = query.Where(
+				"(students.full_name LIKE ? OR students.phone LIKE ? OR users.email LIKE ?)",
+				keyword,
+				keyword,
+				keyword,
+			)
+		}
+
+		return query
+	}
+
+	var total int64
+	if err := buildQuery().Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	items := make([]dto.AdminStudentItem, 0)
+	if err := buildQuery().
+		Select(`
+			students.id AS student_id,
+			students.user_id,
+			students.full_name,
+			users.email,
+			students.phone,
+			students.gender,
+			students.avatar_url,
+			students.skills,
+			students.cv_url,
+			users.status,
+			users.created_at
+		`).
+		Order("students.id DESC").
+		Limit(limit).
+		Offset(offset).
+		Scan(&items).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return items, total, nil
+}
+
+func (r *adminRepository) GetStudentDetail(studentID int) (*dto.AdminStudentItem, error) {
+	var detail dto.AdminStudentItem
+	err := r.db.
+		Table("students").
+		Joins("JOIN users ON users.id = students.user_id").
+		Where("students.id = ? AND users.role = ?", studentID, "student").
+		Select(`
+			students.id AS student_id,
+			students.user_id,
+			students.full_name,
+			users.email,
+			students.phone,
+			students.gender,
+			students.avatar_url,
+			students.skills,
+			students.cv_url,
+			users.status,
+			users.created_at
+		`).
+		Scan(&detail).Error
+	if err != nil {
+		return nil, err
+	}
+	if detail.StudentID == 0 {
+		return nil, gorm.ErrRecordNotFound
+	}
+	return &detail, nil
+}
+
+func (r *adminRepository) UpdateStudentStatus(studentID int, status string) error {
+	var student models.Student
+	if err := r.db.First(&student, studentID).Error; err != nil {
+		return err
+	}
+	return r.db.Model(&models.User{}).Where("id = ? AND role = ?", student.UserID, "student").Update("status", status).Error
+}
+

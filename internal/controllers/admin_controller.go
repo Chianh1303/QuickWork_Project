@@ -115,6 +115,72 @@ func (ctrl *AdminController) ReviewBusinessKYB(c *fiber.Ctx) error {
 	})
 }
 
+// GetStudents GET /api/admin/students
+func (ctrl *AdminController) GetStudents(c *fiber.Ctx) error {
+	page, err := strconv.Atoi(c.Query("page", "1"))
+	if err != nil || page < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "page must be greater than or equal to 1"})
+	}
+
+	limit, err := strconv.Atoi(c.Query("limit", "10"))
+	if err != nil || limit < 1 || limit > 100 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "limit must be between 1 and 100"})
+	}
+
+	search := c.Query("search")
+	status := c.Query("status")
+	res, err := ctrl.adminService.GetStudents(page, limit, search, status)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get students list"})
+	}
+
+	return c.JSON(res)
+}
+
+// GetStudentDetail GET /api/admin/students/:id
+func (ctrl *AdminController) GetStudentDetail(c *fiber.Ctx) error {
+	studentID, err := strconv.Atoi(c.Params("id"))
+	if err != nil || studentID < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "student id is invalid"})
+	}
+
+	detail, err := ctrl.adminService.GetStudentDetail(studentID)
+	if err != nil {
+		if errors.Is(err, services.ErrStudentNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get student detail"})
+	}
+
+	return c.JSON(detail)
+}
+
+// UpdateStudentStatus PUT /api/admin/students/:id/status
+func (ctrl *AdminController) UpdateStudentStatus(c *fiber.Ctx) error {
+	studentID, err := strconv.Atoi(c.Params("id"))
+	if err != nil || studentID < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "student id is invalid"})
+	}
+
+	var req dto.UpdateStudentStatusRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Dữ liệu không hợp lệ"})
+	}
+
+	err = ctrl.adminService.UpdateStudentStatus(studentID, req.Status)
+	if err != nil {
+		if errors.Is(err, services.ErrStudentNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
+		}
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "Đã cập nhật trạng thái sinh viên thành công",
+		"status":  req.Status,
+	})
+}
+
 func localUserID(c *fiber.Ctx) (uint, bool) {
 	switch value := c.Locals("user_id").(type) {
 	case float64:

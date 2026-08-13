@@ -21,4 +21,9 @@ func RegisterAdminRoutes(app *fiber.App, db *gorm.DB) {
 	admin.Get("/businesses/pending", adminController.GetPendingBusinesses)
 	admin.Get("/businesses/:id", adminController.GetBusinessKYBDetail)
 	admin.Put("/businesses/:id/review", adminController.ReviewBusinessKYB)
+
+	// Quản lý Sinh viên (Feature A6)
+	admin.Get("/students", adminController.GetStudents)
+	admin.Get("/students/:id", adminController.GetStudentDetail)
+	admin.Put("/students/:id/status", adminController.UpdateStudentStatus)
 }

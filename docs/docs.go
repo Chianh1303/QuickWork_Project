@@ -447,6 +447,63 @@ const docTemplate = `{
                     "200": { "description": "Danh sách doanh nghiệp chờ phê duyệt" }
                 }
             }
+        },
+        "/api/admin/students": {
+            "get": {
+                "tags": ["Admin Operations"],
+                "summary": "Admin Quản lý Danh sách Sinh viên (Có lọc Tên/Email/SĐT & Trạng thái)",
+                "produces": ["application/json"],
+                "security": [{ "BearerAuth": [] }],
+                "parameters": [
+                    { "name": "search", "in": "query", "type": "string", "description": "Từ khóa tìm kiếm Tên, Email hoặc SĐT" },
+                    { "name": "status", "in": "query", "type": "string", "description": "Trạng thái approved hoặc locked" }
+                ],
+                "responses": {
+                    "200": { "description": "Danh sách sinh viên kèm phân trang" }
+                }
+            }
+        },
+        "/api/admin/students/{id}": {
+            "get": {
+                "tags": ["Admin Operations"],
+                "summary": "Admin Xem Chi tiết Hồ sơ Sinh viên theo ID",
+                "produces": ["application/json"],
+                "security": [{ "BearerAuth": [] }],
+                "parameters": [
+                    { "name": "id", "in": "path", "required": true, "type": "integer", "example": 1 }
+                ],
+                "responses": {
+                    "200": { "description": "Thông tin chi tiết sinh viên" },
+                    "404": { "description": "Không tìm thấy sinh viên" }
+                }
+            }
+        },
+        "/api/admin/students/{id}/status": {
+            "put": {
+                "tags": ["Admin Operations"],
+                "summary": "Admin Khóa (locked) hoặc Mở khóa (approved) Tài khoản Sinh viên",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "security": [{ "BearerAuth": [] }],
+                "parameters": [
+                    { "name": "id", "in": "path", "required": true, "type": "integer", "example": 1 },
+                    {
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["status"],
+                            "properties": {
+                                "status": { "type": "string", "example": "locked" }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "200": { "description": "Đã cập nhật trạng thái sinh viên thành công" }
+                }
+            }
         }
     },
     "securityDefinitions": {

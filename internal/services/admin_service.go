@@ -26,6 +26,9 @@ type AdminService interface {
 	GetPendingBusinesses(page, limit int, search string) (*dto.PendingBusinessListResponse, error)
 	GetBusinessKYBDetail(businessID int) (*dto.BusinessKYBDetail, error)
 	ReviewBusinessKYB(businessID int, adminID uint, req dto.ReviewBusinessRequest) error
+	GetStudents(page, limit int, search, status string) (*dto.AdminStudentListResponse, error)
+	GetStudentDetail(studentID int) (*dto.AdminStudentItem, error)
+	UpdateStudentStatus(studentID int, status string) error
 }
 
 type adminService struct {
@@ -112,3 +115,67 @@ func (s *adminService) ReviewBusinessKYB(businessID int, adminID uint, req dto.R
 
 	return nil
 }
+
+func (s *adminService) GetStudents(page, limit int, search, status string) (*dto.AdminStudentListResponse, error) {
+	if page < 1 {
+		return nil, ErrPageInvalid
+	}
+	if limit < 1 || limit > 100 {
+		return nil, ErrLimitInvalid
+	}
+
+	searchClean := strings.TrimSpace(search)
+	statusClean := strings.TrimSpace(status)
+	items, total, err := s.adminRepo.GetStudents(page, limit, searchClean, statusClean)
+	if err != nil {
+		return nil, err
+	}
+
+	totalPages := int64(0)
+	if total > 0 {
+		totalPages = int64(math.Ceil(float64(total) / float64(limit)))
+	}
+
+	return &dto.AdminStudentListResponse{
+		Items: items,
+		Pagination: dto.PaginationMeta{
+			Page:       page,
+			Limit:      limit,
+			Total:      total,
+			TotalPages: totalPages,
+		},
+	}, nil
+}
+
+func (s *adminService) GetStudentDetail(studentID int) (*dto.AdminStudentItem, error) {
+	if studentID < 1 {
+		return nil, errors.New("student id is invalid")
+	}
+	detail, err := s.adminRepo.GetStudentDetail(studentID)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return nil, ErrStudentNotFound
+		}
+		return nil, err
+	}
+	return detail, nil
+}
+
+func (s *adminService) UpdateStudentStatus(studentID int, status string) error {
+	if studentID < 1 {
+		return errors.New("student id is invalid")
+	}
+	statusClean := strings.TrimSpace(status)
+	if statusClean != "approved" && statusClean != "locked" {
+		return errors.New("status chỉ được là approved hoặc locked")
+	}
+	err := s.adminRepo.UpdateStudentStatus(studentID, statusClean)
+	if err != nil {
+		if errors.Is(err, gorm.ErrRecordNotFound) {
+			return ErrStudentNotFound
+		}
+		return err
+	}
+	return nil
+}
+
