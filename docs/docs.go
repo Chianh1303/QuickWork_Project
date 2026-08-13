@@ -532,6 +532,78 @@ const docTemplate = `{
                 }
             }
         },
+        "/api/admin/categories": {
+            "get": {
+                "tags": ["Admin Operations"],
+                "summary": "Lấy danh sách Ngành nghề tuyển dụng",
+                "produces": ["application/json"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Danh sách Ngành nghề" }
+                }
+            },
+            "post": {
+                "tags": ["Admin Operations"],
+                "summary": "Admin Tạo Ngành nghề tuyển dụng mới",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "security": [{ "BearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["name"],
+                            "properties": {
+                                "name": { "type": "string", "example": "Lập trình Trí tuệ nhân tạo (AI/ML)" },
+                                "description": { "type": "string", "example": "Machine Learning, Deep Learning, Python" }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": { "description": "Tạo ngành nghề mới thành công" }
+                }
+            }
+        },
+        "/api/admin/skills": {
+            "get": {
+                "tags": ["Admin Operations"],
+                "summary": "Lấy danh sách Kỹ năng chuẩn hóa",
+                "produces": ["application/json"],
+                "security": [{ "BearerAuth": [] }],
+                "responses": {
+                    "200": { "description": "Danh sách Kỹ năng" }
+                }
+            },
+            "post": {
+                "tags": ["Admin Operations"],
+                "summary": "Admin Tạo Kỹ năng chuẩn hóa mới (Phục vụ AI Match Job)",
+                "consumes": ["application/json"],
+                "produces": ["application/json"],
+                "security": [{ "BearerAuth": [] }],
+                "parameters": [
+                    {
+                        "name": "request",
+                        "in": "body",
+                        "required": true,
+                        "schema": {
+                            "type": "object",
+                            "required": ["name"],
+                            "properties": {
+                                "name": { "type": "string", "example": "PyTorch" },
+                                "category": { "type": "string", "example": "AI/ML" }
+                            }
+                        }
+                    }
+                ],
+                "responses": {
+                    "201": { "description": "Tạo kỹ năng thành công" }
+                }
+            }
+        },
         "/api/admin/students": {
             "get": {
                 "tags": ["Admin Operations"],

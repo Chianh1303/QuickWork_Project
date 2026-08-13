@@ -6,6 +6,7 @@ import (
 	"strings"
 
 	"QuickWork/internal/dto"
+	"QuickWork/internal/models"
 	"QuickWork/internal/repositories"
 
 	"gorm.io/gorm"
@@ -34,6 +35,12 @@ type AdminService interface {
 	GetTickets(page, limit int, status string) (*dto.AdminTicketListResponse, error)
 	GetTicketDetail(ticketID int) (*dto.AdminTicketItem, error)
 	ResolveTicket(ticketID int, adminID uint, req dto.ResolveTicketRequest) error
+	GetCategories() ([]models.Category, error)
+	CreateCategory(req dto.CreateCategoryRequest) (*models.Category, error)
+	DeleteCategory(id uint) error
+	GetSkills() ([]models.Skill, error)
+	CreateSkill(req dto.CreateSkillRequest) (*models.Skill, error)
+	DeleteSkill(id uint) error
 }
 
 type adminService struct {
@@ -290,5 +297,61 @@ func (s *adminService) ResolveTicket(ticketID int, adminID uint, req dto.Resolve
 		status = "resolved"
 	}
 	return s.adminRepo.ResolveTicket(ticketID, adminID, verdict, status)
+}
+
+func (s *adminService) GetCategories() ([]models.Category, error) {
+	return s.adminRepo.GetCategories()
+}
+
+func (s *adminService) CreateCategory(req dto.CreateCategoryRequest) (*models.Category, error) {
+	name := strings.TrimSpace(req.Name)
+	if name == "" {
+		return nil, errors.New("Tên ngành nghề không được để trống")
+	}
+	cat := &models.Category{
+		Name:        name,
+		Description: strings.TrimSpace(req.Description),
+	}
+	if err := s.adminRepo.CreateCategory(cat); err != nil {
+		return nil, err
+	}
+	return cat, nil
+}
+
+func (s *adminService) DeleteCategory(id uint) error {
+	if id < 1 {
+		return errors.New("ID ngành nghề không hợp lệ")
+	}
+	return s.adminRepo.DeleteCategory(id)
+}
+
+func (s *adminService) GetSkills() ([]models.Skill, error) {
+	return s.adminRepo.GetSkills()
+}
+
+func (s *adminService) CreateSkill(req dto.CreateSkillRequest) (*models.Skill, error) {
+	name := strings.TrimSpace(req.Name)
+	if name == "" {
+		return nil, errors.New("Tên kỹ năng không được để trống")
+	}
+	category := strings.TrimSpace(req.Category)
+	if category == "" {
+		category = "General"
+	}
+	skill := &models.Skill{
+		Name:     name,
+		Category: category,
+	}
+	if err := s.adminRepo.CreateSkill(skill); err != nil {
+		return nil, err
+	}
+	return skill, nil
+}
+
+func (s *adminService) DeleteSkill(id uint) error {
+	if id < 1 {
+		return errors.New("ID kỹ năng không hợp lệ")
+	}
+	return s.adminRepo.DeleteSkill(id)
 }
 

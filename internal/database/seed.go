@@ -185,6 +185,41 @@ func SeedDatabase(db *gorm.DB) {
 		db.Create(&t)
 	}
 
+	// ==========================================
+	// 📁 SEED DANH MỤC & KỸ NĂNG MẪU (FEATURE A9)
+	// ==========================================
+	categories := []models.Category{
+		{Name: "Lập trình Backend", Description: "Go, Java, Python, NodeJS, PHP"},
+		{Name: "Lập trình Frontend", Description: "VueJS, ReactJS, Angular, NuxtJS"},
+		{Name: "Lập trình Mobile", Description: "React Native, Flutter, iOS, Android"},
+		{Name: "DevOps & Cloud", Description: "Docker, Kubernetes, AWS, CI/CD"},
+		{Name: "Tester / QA", Description: "Automation Test, Manual Test"},
+		{Name: "Data & AI", Description: "Machine Learning, Data Engineering, Python"},
+	}
+	for _, c := range categories {
+		db.Create(&c)
+	}
+
+	skills := []models.Skill{
+		{Name: "Go", Category: "Backend"},
+		{Name: "Golang", Category: "Backend"},
+		{Name: "Java", Category: "Backend"},
+		{Name: "NodeJS", Category: "Backend"},
+		{Name: "VueJS", Category: "Frontend"},
+		{Name: "NuxtJS", Category: "Frontend"},
+		{Name: "ReactJS", Category: "Frontend"},
+		{Name: "React Native", Category: "Mobile"},
+		{Name: "Docker", Category: "DevOps"},
+		{Name: "Kubernetes", Category: "DevOps"},
+		{Name: "Python", Category: "Data"},
+		{Name: "SQL", Category: "Database"},
+		{Name: "MySQL", Category: "Database"},
+		{Name: "Git", Category: "General"},
+	}
+	for _, s := range skills {
+		db.Create(&s)
+	}
+
 	log.Println("🎉 Khởi tạo dữ liệu thực tế thành công mỹ mãn! Tất cả mật khẩu đều là: 12345678")
 }
 

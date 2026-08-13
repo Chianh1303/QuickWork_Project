@@ -41,6 +41,12 @@
               >
                 ⚖️ Xử lý Khiếu nại (A8)
               </NuxtLink>
+              <NuxtLink
+                to="/admin/categories"
+                class="inline-flex items-center justify-center rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-5 py-3 text-sm font-extrabold text-cyan-200 transition-colors hover:bg-cyan-400 hover:text-slate-950"
+              >
+                📁 Quản lý Danh mục (A9)
+              </NuxtLink>
               <button
                 type="button"
                 class="inline-flex items-center justify-center rounded-xl border border-white/10 bg-white/[0.06] px-5 py-3 text-sm font-bold text-slate-200 transition-colors hover:bg-white/10 disabled:cursor-not-allowed disabled:opacity-60"

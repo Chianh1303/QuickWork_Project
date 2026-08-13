@@ -35,4 +35,12 @@ func RegisterAdminRoutes(app *fiber.App, db *gorm.DB) {
 	admin.Get("/tickets", adminController.GetTickets)
 	admin.Get("/tickets/:id", adminController.GetTicketDetail)
 	admin.Put("/tickets/:id/resolve", adminController.ResolveTicket)
+
+	// Quản lý Danh mục & Kỹ năng (Feature A9)
+	admin.Get("/categories", adminController.GetCategories)
+	admin.Post("/categories", adminController.CreateCategory)
+	admin.Delete("/categories/:id", adminController.DeleteCategory)
+	admin.Get("/skills", adminController.GetSkills)
+	admin.Post("/skills", adminController.CreateSkill)
+	admin.Delete("/skills/:id", adminController.DeleteSkill)
 }

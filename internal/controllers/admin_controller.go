@@ -293,6 +293,80 @@ func (ctrl *AdminController) ResolveTicket(c *fiber.Ctx) error {
 	})
 }
 
+// GetCategories GET /api/admin/categories
+func (ctrl *AdminController) GetCategories(c *fiber.Ctx) error {
+	categories, err := ctrl.adminService.GetCategories()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get categories"})
+	}
+	return c.JSON(categories)
+}
+
+// CreateCategory POST /api/admin/categories
+func (ctrl *AdminController) CreateCategory(c *fiber.Ctx) error {
+	var req dto.CreateCategoryRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Dữ liệu không hợp lệ"})
+	}
+
+	cat, err := ctrl.adminService.CreateCategory(req)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
+	}
+	return c.Status(fiber.StatusCreated).JSON(cat)
+}
+
+// DeleteCategory DELETE /api/admin/categories/:id
+func (ctrl *AdminController) DeleteCategory(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil || id < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "id is invalid"})
+	}
+
+	if err := ctrl.adminService.DeleteCategory(uint(id)); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to delete category"})
+	}
+
+	return c.JSON(fiber.Map{"message": "Đã xóa ngành nghề thành công"})
+}
+
+// GetSkills GET /api/admin/skills
+func (ctrl *AdminController) GetSkills(c *fiber.Ctx) error {
+	skills, err := ctrl.adminService.GetSkills()
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get skills"})
+	}
+	return c.JSON(skills)
+}
+
+// CreateSkill POST /api/admin/skills
+func (ctrl *AdminController) CreateSkill(c *fiber.Ctx) error {
+	var req dto.CreateSkillRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Dữ liệu không hợp lệ"})
+	}
+
+	skill, err := ctrl.adminService.CreateSkill(req)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
+	}
+	return c.Status(fiber.StatusCreated).JSON(skill)
+}
+
+// DeleteSkill DELETE /api/admin/skills/:id
+func (ctrl *AdminController) DeleteSkill(c *fiber.Ctx) error {
+	id, err := strconv.Atoi(c.Params("id"))
+	if err != nil || id < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "id is invalid"})
+	}
+
+	if err := ctrl.adminService.DeleteSkill(uint(id)); err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to delete skill"})
+	}
+
+	return c.JSON(fiber.Map{"message": "Đã xóa kỹ năng thành công"})
+}
+
 func localUserID(c *fiber.Ctx) (uint, bool) {
 	switch value := c.Locals("user_id").(type) {
 	case float64:

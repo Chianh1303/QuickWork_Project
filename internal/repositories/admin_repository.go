@@ -24,6 +24,12 @@ type AdminRepository interface {
 	GetTickets(page, limit int, status string) ([]dto.AdminTicketItem, int64, error)
 	GetTicketDetail(ticketID int) (*dto.AdminTicketItem, error)
 	ResolveTicket(ticketID int, adminID uint, verdict, status string) error
+	GetCategories() ([]models.Category, error)
+	CreateCategory(category *models.Category) error
+	DeleteCategory(id uint) error
+	GetSkills() ([]models.Skill, error)
+	CreateSkill(skill *models.Skill) error
+	DeleteSkill(id uint) error
 }
 
 type adminRepository struct {
@@ -429,5 +435,33 @@ func (r *adminRepository) ResolveTicket(ticketID int, adminID uint, verdict, sta
 		"resolved_by": adminID,
 		"resolved_at": now,
 	}).Error
+}
+
+func (r *adminRepository) GetCategories() ([]models.Category, error) {
+	var categories []models.Category
+	err := r.db.Order("id ASC").Find(&categories).Error
+	return categories, err
+}
+
+func (r *adminRepository) CreateCategory(category *models.Category) error {
+	return r.db.Create(category).Error
+}
+
+func (r *adminRepository) DeleteCategory(id uint) error {
+	return r.db.Delete(&models.Category{}, id).Error
+}
+
+func (r *adminRepository) GetSkills() ([]models.Skill, error) {
+	var skills []models.Skill
+	err := r.db.Order("id ASC").Find(&skills).Error
+	return skills, err
+}
+
+func (r *adminRepository) CreateSkill(skill *models.Skill) error {
+	return r.db.Create(skill).Error
+}
+
+func (r *adminRepository) DeleteSkill(id uint) error {
+	return r.db.Delete(&models.Skill{}, id).Error
 }
 
