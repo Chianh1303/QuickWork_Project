@@ -196,10 +196,10 @@ const handleLogout = () => {
 const activeSection = useState<string>('studentDashboardActiveSection', () => 'jobs')
 
 const navItems = [
-  { id: 'jobs', name: 'Dashboard' },
-  { id: 'profile', name: 'Profile' },
-  { id: 'applications', name: 'My Applications' },
-  { id: 'wallet', name: 'Wallet' }
+  { id: 'jobs', name: 'Trang chủ tìm việc' },
+  { id: 'profile', name: 'Hồ sơ cá nhân' },
+  { id: 'applications', name: 'Đơn ứng tuyển' },
+  { id: 'wallet', name: 'Ví thu nhập' }
 ]
 
 const filterSearch = ref('')

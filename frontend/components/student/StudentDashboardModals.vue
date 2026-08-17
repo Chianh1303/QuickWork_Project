@@ -364,14 +364,14 @@
           <div class="flex flex-wrap items-start justify-between gap-3">
             <div>
               <p class="text-[11px] font-black uppercase tracking-wider text-slate-400">Thông tin công việc</p>
-              <h4 class="mt-1.5 text-base font-extrabold text-white">{{ selectedManagedApplication.job?.title || 'Unknown Position' }}</h4>
+              <h4 class="mt-1.5 text-base font-extrabold text-white">{{ selectedManagedApplication.job?.title || 'Vị trí chưa xác định' }}</h4>
               <p class="mt-0.5 text-xs font-bold text-indigo-300">{{ companyNameLookup(selectedManagedApplication.job) }}</p>
             </div>
             <span :class="[
               statusBadgeClass(selectedManagedApplication.status),
               'inline-flex items-center rounded-full border px-3 py-1 text-xs font-black capitalize'
             ]">
-              {{ selectedManagedApplication.status ? selectedManagedApplication.status.replace('_', ' ') : 'Pending' }}
+              {{ selectedManagedApplication.status ? selectedManagedApplication.status.replace('_', ' ') : 'Chờ duyệt' }}
             </span>
           </div>
 

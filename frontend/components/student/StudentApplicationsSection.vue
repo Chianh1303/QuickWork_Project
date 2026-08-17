@@ -5,7 +5,7 @@
     <div class="rounded-3xl border border-indigo-500/20 bg-slate-900/90 p-6 shadow-xl backdrop-blur-xl flex flex-col sm:flex-row sm:items-center sm:justify-between gap-4">
       <div>
         <span class="inline-flex rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-black uppercase tracking-wider text-indigo-300 ring-1 ring-indigo-500/30">
-          Application Tracking Portal
+          Cổng Theo Dõi Đơn Ứng Tuyển
         </span>
         <h2 class="mt-2 text-2xl font-extrabold text-white tracking-tight">Danh Sách Đơn Ứng Tuyển Của Tôi</h2>
         <p class="mt-1 text-xs font-semibold text-slate-300">Theo dõi tiến trình xét duyệt đơn, phản hồi offer & tiến độ ca làm việc với Doanh nghiệp</p>

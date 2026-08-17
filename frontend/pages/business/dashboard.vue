@@ -173,10 +173,10 @@ const handleLogout = () => {
 const activeSection = useState<string>('businessDashboardActiveSection', () => 'dashboard')
 
 const navItems = [
-  { id: 'dashboard', name: 'Dashboard' },
-  { id: 'profile', name: 'Company Profile' },
-  { id: 'jobs', name: 'Jobs' },
-  { id: 'applicants', name: 'Applicants' }
+  { id: 'dashboard', name: 'Tổng quan' },
+  { id: 'profile', name: 'Hồ sơ công ty' },
+  { id: 'jobs', name: 'Bài đăng tuyển dụng' },
+  { id: 'applicants', name: 'Danh sách ứng viên' }
 ]
 
 // API Client references
@@ -507,10 +507,10 @@ const metricsCards = computed(() => {
   const rejected = applications.value.filter(app => app.status?.toLowerCase() === 'rejected').length
 
   return [
-    { title: 'Total Applications', value: total, label: 'Applications', color: 'bg-slate-50 border-slate-200 text-slate-700' },
-    { title: 'Pending Applications', value: pending, label: 'Awaiting Review', color: 'bg-amber-50 border-amber-200 text-amber-700' },
-    { title: 'Approved Applications', value: approved, label: 'Accepted', color: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
-    { title: 'Rejected Applications', value: rejected, label: 'Declined', color: 'bg-rose-50 border-rose-200 text-rose-700' }
+    { title: 'Tổng Đơn Ứng Tuyển', value: total, label: 'Đơn ứng tuyển', color: 'bg-slate-50 border-slate-200 text-slate-700' },
+    { title: 'Đơn Chờ Xét Duyệt', value: pending, label: 'Chờ HR đánh giá', color: 'bg-amber-50 border-amber-200 text-amber-700' },
+    { title: 'Đơn Đã Trúng Tuyển', value: approved, label: 'Đã nhận việc', color: 'bg-emerald-50 border-emerald-200 text-emerald-700' },
+    { title: 'Đơn Đã Từ Chối', value: rejected, label: 'Từ chối', color: 'bg-rose-50 border-rose-200 text-rose-700' }
   ]
 })
 

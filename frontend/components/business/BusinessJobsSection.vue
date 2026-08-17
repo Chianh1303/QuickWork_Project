@@ -211,10 +211,10 @@
                   <td class="px-6 py-4 whitespace-nowrap text-xs text-slate-300 font-bold">{{ job.slots }} người</td>
                   <td class="px-6 py-4 whitespace-nowrap">
                     <span :class="[
-                      job.status === 'approved' ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' : 'bg-amber-500/10 text-amber-300 border-amber-500/20',
+                      job.status === 'approved' ? 'bg-emerald-500/10 text-emerald-300 border-emerald-500/20' : (job.status === 'rejected' ? 'bg-rose-500/10 text-rose-300 border-rose-500/20' : 'bg-amber-500/10 text-amber-300 border-amber-500/20'),
                       'inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-extrabold border uppercase'
                     ]">
-                      {{ job.status || 'pending' }}
+                      {{ job.status === 'approved' ? 'Đã duyệt' : (job.status === 'rejected' ? 'Từ chối' : 'Chờ duyệt') }}
                     </span>
                   </td>
                 </tr>
