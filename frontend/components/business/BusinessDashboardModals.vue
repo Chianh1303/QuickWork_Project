@@ -123,23 +123,18 @@
         </div>
         <div class="rounded-xl border border-white/10 bg-white/[0.04] p-4">
           <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Vị trí</p>
-          <p class="mt-2 text-base font-extrabold text-white">{{ selectedCompletionApp.job?.title || jobTitleLookup(selectedCompletionApp.job_id) }}</p>
-          <p class="mt-1 text-sm font-medium text-slate-400">Mã đơn #{{ selectedCompletionApp.id }}</p>
-        </div>
-      </div>
-
-      <div class="rounded-xl border border-cyan-400/20 bg-cyan-400/10 p-4">
+          <p class="mt-2 text-base font-extrabold text-white">{{ selectedCompletionApp.job?.title || jobTitleLookup(selectedCo      <div class="rounded-xl border border-cyan-400/20 bg-cyan-400/10 p-4">
         <div class="grid gap-3 sm:grid-cols-3">
           <div>
-            <p class="text-xs font-bold uppercase tracking-wider text-cyan-200">Offer salary</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-cyan-200">Mức lương Offer</p>
             <p class="mt-1 text-sm font-extrabold text-white">{{ selectedCompletionApp.offer_salary || 'Thỏa thuận' }}</p>
           </div>
           <div>
-            <p class="text-xs font-bold uppercase tracking-wider text-cyan-200">Start date</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-cyan-200">Ngày bắt đầu</p>
             <p class="mt-1 text-sm font-extrabold text-white">{{ selectedCompletionApp.offer_start_date || 'N/A' }}</p>
           </div>
           <div>
-            <p class="text-xs font-bold uppercase tracking-wider text-cyan-200">Payment</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-cyan-200">Thanh toán Escrow</p>
             <p class="mt-1 text-sm font-extrabold text-white">Giả lập giải ngân</p>
           </div>
         </div>
@@ -147,6 +142,7 @@
 
       <div class="rounded-xl border border-amber-400/20 bg-amber-400/10 p-4 text-sm font-medium text-amber-100">
         Sau khi xác nhận, hệ thống sẽ chuyển trạng thái đơn sang <span class="font-extrabold">paid</span>, đánh dấu doanh nghiệp đã xác nhận và ghi nhận thời điểm giải ngân.
+      </div>
       </div>
     </div>
 
@@ -172,7 +168,7 @@
   <button
     type="button"
     class="absolute inset-0 cursor-default"
-    aria-label="Close applicant details"
+    aria-label="Đóng chi tiết ứng viên"
     @click="closeManagedApplicantModal"
   ></button>
 
@@ -180,12 +176,12 @@
     <div class="border-b border-white/10 bg-slate-900/90 p-5">
       <div class="flex items-start justify-between gap-4">
         <div class="min-w-0">
-          <p class="text-xs font-bold uppercase tracking-wider text-cyan-300">Applicant Management</p>
+          <p class="text-xs font-bold uppercase tracking-wider text-cyan-300">Quản lý Ứng viên</p>
           <h3 class="mt-1 truncate text-2xl font-extrabold text-white">
             {{ selectedManagedApplicant.student?.full_name || 'Ứng viên' }}
           </h3>
           <p class="mt-1 text-sm font-medium text-slate-400">
-            Application #{{ selectedManagedApplicant.id }} · {{ selectedManagedApplicant.job?.title || jobTitleLookup(selectedManagedApplicant.job_id) }}
+            Mã đơn #{{ selectedManagedApplicant.id }} · {{ selectedManagedApplicant.job?.title || jobTitleLookup(selectedManagedApplicant.job_id) }}
           </p>
         </div>
         <button
@@ -220,7 +216,7 @@
                 statusBadgeClass(selectedManagedApplicant.status),
                 'inline-flex items-center rounded-full border px-2.5 py-1 text-xs font-bold capitalize'
               ]">
-                {{ selectedManagedApplicant.status ? selectedManagedApplicant.status.replace('_', ' ') : 'Pending' }}
+                {{ selectedManagedApplicant.status ? selectedManagedApplicant.status.replace('_', ' ') : 'Chờ duyệt' }}
               </span>
             </div>
             <p class="mt-1 text-sm font-medium text-slate-400">
@@ -232,7 +228,7 @@
               target="_blank"
               class="mt-3 inline-flex items-center rounded-lg border border-rose-400/20 bg-rose-500/10 px-3 py-1.5 text-xs font-bold text-rose-200 hover:bg-rose-500/20 hover:text-white"
             >
-              CV Profile
+              Hồ sơ CV
             </a>
           </div>
         </div>
@@ -249,86 +245,86 @@
             v-if="!selectedManagedApplicant.student?.skills || parseSkills(selectedManagedApplicant.student?.skills).length === 0"
             class="text-xs font-semibold text-slate-500"
           >
-            No skills specified
+            Chưa cập nhật kỹ năng
           </span>
         </div>
       </section>
 
       <section class="grid gap-4 sm:grid-cols-2">
         <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-          <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Job Information</p>
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Thông tin Công việc</p>
           <h4 class="mt-2 text-base font-extrabold text-white">
             {{ selectedManagedApplicant.job?.title || jobTitleLookup(selectedManagedApplicant.job_id) }}
           </h4>
           <div class="mt-3 space-y-2 text-sm font-medium text-slate-400">
-            <p>Location: <span class="font-bold text-slate-200">{{ selectedManagedApplicant.job?.location || 'N/A' }}</span></p>
-            <p>Salary: <span class="font-bold text-emerald-300">{{ selectedManagedApplicant.job?.salary ? Number(selectedManagedApplicant.job.salary).toLocaleString() : 'Thỏa thuận' }}</span></p>
-            <p>Applied: <span class="font-bold text-slate-200">{{ formatDate(selectedManagedApplicant.applied_at || selectedManagedApplicant.id) }}</span></p>
+            <p>Địa điểm: <span class="font-bold text-slate-200">{{ selectedManagedApplicant.job?.location || 'N/A' }}</span></p>
+            <p>Mức lương: <span class="font-bold text-emerald-300">{{ selectedManagedApplicant.job?.salary ? Number(selectedManagedApplicant.job.salary).toLocaleString() : 'Thỏa thuận' }}</span></p>
+            <p>Ngày nộp đơn: <span class="font-bold text-slate-200">{{ formatDate(selectedManagedApplicant.applied_at || selectedManagedApplicant.id) }}</span></p>
           </div>
         </div>
 
         <div class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-          <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Payment Status</p>
+          <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Trạng thái Thanh toán</p>
           <div
             v-if="selectedManagedApplicant.status?.toLowerCase() === 'paid'"
             class="mt-3 rounded-xl border border-cyan-400/20 bg-cyan-400/10 p-3"
           >
-            <p class="text-sm font-extrabold text-cyan-200">Paid / Released</p>
-            <p class="mt-1 text-xs font-medium text-slate-400">Payment has been released for this application.</p>
+            <p class="text-sm font-extrabold text-cyan-200">Đã thanh toán Escrow</p>
+            <p class="mt-1 text-xs font-medium text-slate-400">Lương ca làm đã được giải ngân cho ứng viên này.</p>
           </div>
           <div
             v-else-if="selectedManagedApplicant.status?.toLowerCase() === 'student_completed'"
             class="mt-3 rounded-xl border border-amber-400/20 bg-amber-400/10 p-3"
           >
-            <p class="text-sm font-extrabold text-amber-200">Waiting Confirmation</p>
-            <p class="mt-1 text-xs font-medium text-slate-400">Student marked the work complete. Employer confirmation is required.</p>
+            <p class="text-sm font-extrabold text-amber-200">Chờ Doanh nghiệp duyệt</p>
+            <p class="mt-1 text-xs font-medium text-slate-400">Sinh viên đã báo hoàn thành công việc. Cần xác nhận của doanh nghiệp.</p>
           </div>
           <div v-else class="mt-3 rounded-xl border border-white/10 bg-slate-900 p-3">
-            <p class="text-sm font-extrabold text-slate-300">Not Released</p>
-            <p class="mt-1 text-xs font-medium text-slate-500">Payment actions appear after work completion.</p>
+            <p class="text-sm font-extrabold text-slate-300">Chưa giải ngân</p>
+            <p class="mt-1 text-xs font-medium text-slate-500">Nút thanh toán sẽ hiển thị khi ca làm được sinh viên báo hoàn tất.</p>
           </div>
         </div>
       </section>
 
       <section class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
-        <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Offer Information</p>
+        <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Thông tin Offer</p>
         <div
           v-if="selectedManagedApplicant.offer_salary || selectedManagedApplicant.offer_start_date || selectedManagedApplicant.offer_message"
           class="mt-3 grid gap-3 sm:grid-cols-3"
         >
           <div class="rounded-xl border border-emerald-400/20 bg-emerald-400/10 p-3">
-            <p class="text-xs font-bold uppercase tracking-wider text-emerald-200">Salary</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-emerald-200">Mức lương Offer</p>
             <p class="mt-1 text-sm font-extrabold text-white">{{ selectedManagedApplicant.offer_salary || 'Thỏa thuận' }}</p>
           </div>
           <div class="rounded-xl border border-cyan-400/20 bg-cyan-400/10 p-3">
-            <p class="text-xs font-bold uppercase tracking-wider text-cyan-200">Start Date</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-cyan-200">Ngày bắt đầu</p>
             <p class="mt-1 text-sm font-extrabold text-white">{{ selectedManagedApplicant.offer_start_date || 'N/A' }}</p>
           </div>
           <div class="rounded-xl border border-white/10 bg-slate-900 p-3 sm:col-span-3">
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Message</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Lời nhắn</p>
             <p class="mt-1 whitespace-pre-line text-sm font-medium text-slate-300">{{ selectedManagedApplicant.offer_message || 'Không có lời nhắn offer.' }}</p>
           </div>
         </div>
-        <p v-else class="mt-3 text-sm font-medium text-slate-500">No offer information recorded yet.</p>
+        <p v-else class="mt-3 text-sm font-medium text-slate-500">Chưa có thông tin offer nào được ghi nhận.</p>
       </section>
 
       <section class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
         <div class="flex flex-wrap items-center justify-between gap-3">
           <div>
-            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Reviews</p>
+            <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Đánh giá & Nhận xét</p>
             <p class="mt-1 text-sm font-extrabold text-white">
-              {{ reviewSummary.average_rating.toFixed(1) }} / 5 · {{ reviewSummary.total_reviews }} reviews
+              {{ reviewSummary.average_rating.toFixed(1) }} / 5 · {{ reviewSummary.total_reviews }} lượt đánh giá
             </p>
           </div>
           <button
             @click="openReviewsModal(selectedManagedApplicant)"
             class="rounded-lg border border-white/10 bg-white/5 px-3 py-1.5 text-xs font-bold text-slate-200 hover:bg-white/10 hover:text-white"
           >
-            View Reviews
+            Xem đánh giá
           </button>
         </div>
         <div class="mt-3 space-y-2">
-          <div v-if="isLoadingReviews" class="text-sm font-medium text-slate-500">Loading reviews...</div>
+          <div v-if="isLoadingReviews" class="text-sm font-medium text-slate-500">Đang tải đánh giá...</div>
           <div
             v-for="review in reviewsList.slice(0, 3)"
             :key="review.id || review.ID"
@@ -336,11 +332,11 @@
           >
             <div class="flex items-center justify-between gap-2">
               <p class="text-sm font-extrabold text-amber-300">{{ review.rating || review.Rating }} / 5</p>
-              <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ review.review_type || review.ReviewType || 'review' }}</p>
+              <p class="text-xs font-bold uppercase tracking-wider text-slate-500">{{ review.review_type || review.ReviewType || 'đánh giá' }}</p>
             </div>
-            <p class="mt-1 text-sm font-medium text-slate-300">{{ review.comment || review.Comment || 'No comment.' }}</p>
+            <p class="mt-1 text-sm font-medium text-slate-300">{{ review.comment || review.Comment || 'Không có nhận xét.' }}</p>
           </div>
-          <p v-if="!isLoadingReviews && reviewsList.length === 0" class="text-sm font-medium text-slate-500">No reviews for this application yet.</p>
+          <p v-if="!isLoadingReviews && reviewsList.length === 0" class="text-sm font-medium text-slate-500">Chưa có đánh giá nào cho ứng viên này.</p>
         </div>
       </section>
     </div>
@@ -351,7 +347,7 @@
           @click="openChatModal(selectedManagedApplicant); closeManagedApplicantModal()"
           class="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-slate-200 hover:bg-white/10 hover:text-white"
         >
-          Chat with candidate
+          Trò chuyện cùng ứng viên
         </button>
 
         <button
@@ -359,7 +355,7 @@
           @click="openReviewModal(selectedManagedApplicant); closeManagedApplicantModal()"
           class="rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-extrabold text-slate-950 shadow-lg shadow-cyan-500/20 hover:bg-cyan-300"
         >
-          Review & Offer
+          Đánh giá & Gửi Offer
         </button>
 
         <button
@@ -367,7 +363,7 @@
           @click="openReviewModal(selectedManagedApplicant); closeManagedApplicantModal()"
           class="rounded-lg border border-cyan-400/30 bg-cyan-400/10 px-4 py-2.5 text-sm font-bold text-cyan-200 hover:bg-cyan-400/15"
         >
-          View Details
+          Xem chi tiết
         </button>
 
         <button
@@ -375,14 +371,14 @@
           @click="openCompletionModal(selectedManagedApplicant); closeManagedApplicantModal()"
           class="rounded-lg bg-emerald-400 px-4 py-2.5 text-sm font-extrabold text-slate-950 shadow-lg shadow-emerald-500/20 hover:bg-emerald-300"
         >
-          Confirm Complete
+          Xác nhận hoàn thành
         </button>
 
         <div
           v-if="selectedManagedApplicant.status?.toLowerCase() === 'paid'"
           class="rounded-lg border border-cyan-400/20 bg-cyan-400/10 px-4 py-2.5 text-center text-sm font-extrabold text-cyan-200"
         >
-          Paid / Released
+          Đã thanh toán Escrow
         </div>
 
         <button
@@ -390,11 +386,19 @@
           @click="openBusinessReviewModal(selectedManagedApplicant); closeManagedApplicantModal()"
           class="rounded-lg bg-amber-400 px-4 py-2.5 text-sm font-extrabold text-slate-950 shadow-lg shadow-amber-500/20 hover:bg-amber-300"
         >
-          Review Student
+          Đánh giá sinh viên
         </button>
 
         <button
           @click="openReviewsModal(selectedManagedApplicant)"
+          class="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-slate-200 hover:bg-white/10 hover:text-white"
+        >
+          Xem đánh giá
+        </button>
+      </div>
+    </div>
+  </aside>
+</div>edManagedApplicant)"
           class="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-slate-200 hover:bg-white/10 hover:text-white"
         >
           View Reviews

@@ -13,11 +13,11 @@ import (
 )
 
 var (
-	ErrPageInvalid           = errors.New("page must be greater than or equal to 1")
-	ErrLimitInvalid          = errors.New("limit must be between 1 and 100")
-	ErrBusinessIDInvalid     = errors.New("business id is invalid")
-	ErrAdminBusinessNotFound = errors.New("business not found")
-	ErrDecisionInvalid       = errors.New("decision chỉ được là approved hoặc rejected")
+	ErrPageInvalid           = errors.New("Trang phải lớn hơn hoặc bằng 1")
+	ErrLimitInvalid          = errors.New("Số lượng giới hạn phải từ 1 đến 100")
+	ErrBusinessIDInvalid     = errors.New("Mã doanh nghiệp không hợp lệ")
+	ErrAdminBusinessNotFound = errors.New("Không tìm thấy doanh nghiệp")
+	ErrDecisionInvalid       = errors.New("Quyết định duyệt chỉ được là approved hoặc rejected")
 	ErrRejectReasonTooShort  = errors.New("Lý do từ chối phải có ít nhất 10 ký tự")
 	ErrProfileAlreadyHandled = errors.New("Hồ sơ doanh nghiệp đã được xử lý")
 )

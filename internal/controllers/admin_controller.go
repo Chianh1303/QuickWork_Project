@@ -22,7 +22,7 @@ func NewAdminController(adminService services.AdminService) *AdminController {
 func (ctrl *AdminController) GetAdminDashboardStats(c *fiber.Ctx) error {
 	stats, err := ctrl.adminService.GetDashboardStats()
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get dashboard stats"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Không thể lấy thống kê dashboard"})
 	}
 	return c.JSON(stats)
 }
@@ -50,7 +50,7 @@ func (ctrl *AdminController) GetPendingBusinesses(c *fiber.Ctx) error {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
 		}
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{
-			"message": "failed to count pending businesses",
+			"message": "Không thể lấy danh sách doanh nghiệp chờ duyệt",
 		})
 	}
 
@@ -72,7 +72,7 @@ func (ctrl *AdminController) GetBusinessKYBDetail(c *fiber.Ctx) error {
 		if errors.Is(err, services.ErrAdminBusinessNotFound) {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
 		}
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get business detail"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Không thể lấy chi tiết doanh nghiệp"})
 	}
 
 	return c.JSON(detail)
@@ -106,7 +106,7 @@ func (ctrl *AdminController) ReviewBusinessKYB(c *fiber.Ctx) error {
 		if errors.Is(err, services.ErrAdminBusinessNotFound) {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
 		}
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to review business"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Không thể xử lý duyệt doanh nghiệp"})
 	}
 
 	return c.JSON(fiber.Map{
@@ -131,7 +131,7 @@ func (ctrl *AdminController) GetStudents(c *fiber.Ctx) error {
 	status := c.Query("status")
 	res, err := ctrl.adminService.GetStudents(page, limit, search, status)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get students list"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Không thể lấy danh sách sinh viên"})
 	}
 
 	return c.JSON(res)
@@ -149,7 +149,7 @@ func (ctrl *AdminController) GetStudentDetail(c *fiber.Ctx) error {
 		if errors.Is(err, services.ErrStudentNotFound) {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
 		}
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get student detail"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Không thể lấy chi tiết sinh viên"})
 	}
 
 	return c.JSON(detail)
@@ -197,7 +197,7 @@ func (ctrl *AdminController) GetBusinesses(c *fiber.Ctx) error {
 	status := c.Query("status")
 	res, err := ctrl.adminService.GetBusinesses(page, limit, search, status)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get businesses list"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Không thể lấy danh sách doanh nghiệp"})
 	}
 
 	return c.JSON(res)
@@ -244,7 +244,7 @@ func (ctrl *AdminController) GetTickets(c *fiber.Ctx) error {
 	status := c.Query("status")
 	res, err := ctrl.adminService.GetTickets(page, limit, status)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get tickets list"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Không thể lấy danh sách khiếu nại"})
 	}
 
 	return c.JSON(res)
@@ -297,7 +297,7 @@ func (ctrl *AdminController) ResolveTicket(c *fiber.Ctx) error {
 func (ctrl *AdminController) GetCategories(c *fiber.Ctx) error {
 	categories, err := ctrl.adminService.GetCategories()
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get categories"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Không thể lấy danh sách ngành nghề"})
 	}
 	return c.JSON(categories)
 }
@@ -324,7 +324,7 @@ func (ctrl *AdminController) DeleteCategory(c *fiber.Ctx) error {
 	}
 
 	if err := ctrl.adminService.DeleteCategory(uint(id)); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to delete category"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Không thể xóa ngành nghề"})
 	}
 
 	return c.JSON(fiber.Map{"message": "Đã xóa ngành nghề thành công"})
@@ -334,7 +334,7 @@ func (ctrl *AdminController) DeleteCategory(c *fiber.Ctx) error {
 func (ctrl *AdminController) GetSkills(c *fiber.Ctx) error {
 	skills, err := ctrl.adminService.GetSkills()
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get skills"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Không thể lấy danh sách kỹ năng"})
 	}
 	return c.JSON(skills)
 }
@@ -361,7 +361,7 @@ func (ctrl *AdminController) DeleteSkill(c *fiber.Ctx) error {
 	}
 
 	if err := ctrl.adminService.DeleteSkill(uint(id)); err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to delete skill"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Không thể xóa kỹ năng"})
 	}
 
 	return c.JSON(fiber.Map{"message": "Đã xóa kỹ năng thành công"})
@@ -382,7 +382,7 @@ func (ctrl *AdminController) GetPendingJobs(c *fiber.Ctx) error {
 	search := c.Query("search")
 	res, err := ctrl.adminService.GetPendingJobs(page, limit, search)
 	if err != nil {
-		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get pending jobs"})
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "Không thể lấy danh sách tin tuyển dụng chờ duyệt"})
 	}
 
 	return c.JSON(res)
