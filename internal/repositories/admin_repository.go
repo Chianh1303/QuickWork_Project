@@ -503,7 +503,7 @@ func (r *adminRepository) GetPendingJobs(page, limit int, search string) ([]dto.
 			jobs.category,
 			jobs.job_type,
 			jobs.status,
-			jobs.created_at
+			businesses.created_at
 		`).
 		Order("jobs.id DESC").
 		Limit(limit).
