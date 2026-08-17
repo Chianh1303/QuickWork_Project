@@ -123,7 +123,12 @@
         </div>
         <div class="rounded-xl border border-white/10 bg-white/[0.04] p-4">
           <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Vị trí</p>
-          <p class="mt-2 text-base font-extrabold text-white">{{ selectedCompletionApp.job?.title || jobTitleLookup(selectedCo      <div class="rounded-xl border border-cyan-400/20 bg-cyan-400/10 p-4">
+          <p class="mt-2 text-base font-extrabold text-white">{{ selectedCompletionApp.job?.title || jobTitleLookup(selectedCompletionApp.job_id) }}</p>
+          <p class="mt-1 text-sm font-medium text-slate-400">Mã đơn #{{ selectedCompletionApp.id }}</p>
+        </div>
+      </div>
+
+      <div class="rounded-xl border border-cyan-400/20 bg-cyan-400/10 p-4">
         <div class="grid gap-3 sm:grid-cols-3">
           <div>
             <p class="text-xs font-bold uppercase tracking-wider text-cyan-200">Mức lương Offer</p>
@@ -142,7 +147,6 @@
 
       <div class="rounded-xl border border-amber-400/20 bg-amber-400/10 p-4 text-sm font-medium text-amber-100">
         Sau khi xác nhận, hệ thống sẽ chuyển trạng thái đơn sang <span class="font-extrabold">paid</span>, đánh dấu doanh nghiệp đã xác nhận và ghi nhận thời điểm giải ngân.
-      </div>
       </div>
     </div>
 
@@ -394,14 +398,6 @@
           class="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-slate-200 hover:bg-white/10 hover:text-white"
         >
           Xem đánh giá
-        </button>
-      </div>
-    </div>
-  </aside>
-</div>edManagedApplicant)"
-          class="rounded-lg border border-white/10 bg-white/5 px-4 py-2.5 text-sm font-bold text-slate-200 hover:bg-white/10 hover:text-white"
-        >
-          View Reviews
         </button>
       </div>
     </div>
