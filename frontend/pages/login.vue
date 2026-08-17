@@ -53,51 +53,8 @@
               Đăng Nhập QuickWork
             </h2>
             <p class="mt-2 text-center text-sm text-slate-300">
-              Truy cập vào bảng điều khiển Sinh viên hoặc Doanh nghiệp.
+              Nhập thông tin tài khoản để truy cập vào hệ thống QuickWork.
             </p>
-          </div>
-
-          <!-- Role Switcher Pills -->
-          <div class="mt-6 flex rounded-2xl bg-slate-950/80 p-1 border border-white/10">
-            <button
-              type="button"
-              @click="selectedRole = 'student'"
-              :class="[
-                selectedRole === 'student'
-                  ? 'bg-cyan-400 text-slate-950 font-black shadow-md shadow-cyan-500/20'
-                  : 'text-slate-400 hover:text-white font-bold',
-                'flex-1 py-2 text-xs rounded-xl transition-all flex items-center justify-center gap-1.5'
-              ]"
-            >
-              <span>🎓</span>
-              <span>Sinh Viên</span>
-            </button>
-            <button
-              type="button"
-              @click="selectedRole = 'business'"
-              :class="[
-                selectedRole === 'business'
-                  ? 'bg-cyan-400 text-slate-950 font-black shadow-md shadow-cyan-500/20'
-                  : 'text-slate-400 hover:text-white font-bold',
-                'flex-1 py-2 text-xs rounded-xl transition-all flex items-center justify-center gap-1.5'
-              ]"
-            >
-              <span>🏢</span>
-              <span>Doanh Nghiệp</span>
-            </button>
-            <button
-              type="button"
-              @click="selectedRole = 'admin'"
-              :class="[
-                selectedRole === 'admin'
-                  ? 'bg-cyan-400 text-slate-950 font-black shadow-md shadow-cyan-500/20'
-                  : 'text-slate-400 hover:text-white font-bold',
-                'flex-1 py-2 text-xs rounded-xl transition-all flex items-center justify-center gap-1.5'
-              ]"
-            >
-              <span>🛡️</span>
-              <span>Admin</span>
-            </button>
           </div>
 
           <!-- Alert for error messages -->
@@ -127,7 +84,7 @@
                     required
                     v-model="form.email"
                     class="appearance-none relative block w-full pl-10 pr-3.5 py-2.5 border border-white/10 placeholder-slate-500 text-white rounded-xl bg-slate-950/70 hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 text-xs font-medium"
-                    :placeholder="selectedRole === 'business' ? 'hr@company.com' : selectedRole === 'admin' ? 'admin@quickwork.vn' : 'sinhvien@vku.udn.vn'"
+                    placeholder="nhap.email@domain.com"
                   />
                 </div>
               </div>
@@ -223,8 +180,6 @@ definePageMeta({
 })
 
 const { login } = useAuth()
-
-const selectedRole = ref<'student' | 'business' | 'admin'>('student')
 
 const form = reactive({
   email: '',
