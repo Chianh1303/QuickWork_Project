@@ -17,15 +17,15 @@
         <!-- Sticky Header (Luôn cố định trên cùng) -->
         <div class="flex items-center justify-between border-b border-white/10 p-5 sm:p-6 bg-slate-900/90 rounded-t-3xl backdrop-blur sticky top-0 z-20">
           <div class="flex items-center space-x-3">
-            <div class="h-11 w-11 rounded-2xl bg-gradient-to-tr from-cyan-400 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-2xl shadow-lg shadow-cyan-500/30">
+            <div class="h-11 w-11 rounded-2xl bg-gradient-to-tr from-cyan-400 to-emerald-400 flex items-center justify-center text-slate-950 font-semibold text-2xl shadow-lg shadow-cyan-500/30">
               🤖
             </div>
             <div>
               <div class="flex items-center gap-2">
-                <h3 class="text-xl font-extrabold text-white">Báo Cáo Phân Tích CV Chuyên Sâu AI</h3>
+                <h3 class="text-xl font-semibold text-white">Báo Cáo Phân Tích CV Chuyên Sâu AI</h3>
                 <span 
                   v-if="result?.evaluation_source"
-                  class="px-2.5 py-0.5 text-[10px] font-black uppercase rounded-full border shadow-sm"
+                  class="px-2.5 py-0.5 text-[10px] font-semibold uppercase rounded-full border shadow-sm"
                   :class="result.evaluation_source === 'gemini' ? 'bg-emerald-400/10 text-emerald-300 border-emerald-400/30' : 'bg-cyan-400/10 text-cyan-300 border-cyan-400/30'"
                 >
                   {{ result.evaluation_source === 'gemini' ? '✨ Gemini AI Multimodal' : '⚡ Smart Heuristic Parser' }}
@@ -37,7 +37,7 @@
           
           <button 
             @click="close" 
-            class="h-9 w-9 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-base font-bold"
+            class="h-9 w-9 rounded-xl bg-white/10 hover:bg-white/20 text-slate-300 hover:text-white flex items-center justify-center transition-colors text-base font-semibold"
             title="Đóng cửa sổ"
           >
             ✕
@@ -54,18 +54,18 @@
               <!-- Score Ring -->
               <div class="flex flex-col items-center justify-center text-center border-b md:border-b-0 md:border-r border-white/10 pb-4 md:pb-0 md:pr-4">
                 <div class="relative flex h-28 w-28 items-center justify-center rounded-full bg-gradient-to-tr from-cyan-500/20 to-emerald-500/20 p-2 ring-4 ring-cyan-400/40 shadow-xl shadow-cyan-950/50">
-                  <span class="text-4xl font-black text-white tracking-tight">{{ result.score }}<span class="text-xl font-extrabold text-cyan-300">%</span></span>
+                  <span class="text-4xl font-semibold text-white tracking-tight">{{ result.score }}<span class="text-xl font-semibold text-cyan-300">%</span></span>
                 </div>
-                <span class="mt-3 text-xs font-black uppercase tracking-wider text-cyan-300">Điểm CV Tổng Thể</span>
+                <span class="mt-3 text-xs font-semibold uppercase tracking-wider text-cyan-300">Điểm CV Tổng Thể</span>
               </div>
 
               <!-- HR Recommendation Box -->
               <div class="space-y-3 flex flex-col justify-center">
                 <div class="flex flex-wrap items-center justify-between gap-2">
-                  <span class="text-xs font-extrabold uppercase tracking-wider text-cyan-200/90">📢 Đánh Giá Kết Luận Từ HR</span>
+                  <span class="text-xs font-semibold uppercase tracking-wider text-cyan-200/90">📢 Đánh Giá Kết Luận Từ HR</span>
                   <span 
                     v-if="result.recommendation?.decision"
-                    class="px-3 py-1 rounded-lg text-xs font-black uppercase tracking-wider border shadow-md"
+                    class="px-3 py-1 rounded-lg text-xs font-semibold uppercase tracking-wider border shadow-md"
                     :class="getDecisionBadgeClass(result.recommendation.decision)"
                   >
                     {{ getDecisionLabel(result.recommendation.decision) }}
@@ -81,14 +81,14 @@
                   <div class="w-24 bg-slate-800 h-2 rounded-full overflow-hidden border border-white/10">
                     <div class="bg-cyan-400 h-full rounded-full" :style="{ width: (result.recommendation.confidence * 100) + '%' }"></div>
                   </div>
-                  <span class="text-cyan-300 font-bold">{{ Math.round(result.recommendation.confidence * 100) }}%</span>
+                  <span class="text-cyan-300 font-semibold">{{ Math.round(result.recommendation.confidence * 100) }}%</span>
                 </div>
               </div>
             </div>
 
             <!-- 2. BÓC TÁCH DỮ LIỆU TỪ FILE PDF (EXTRACTED PDF DATA) -->
             <div class="rounded-2xl border border-white/10 bg-slate-950/70 p-5 space-y-4">
-              <h4 class="text-xs font-extrabold uppercase tracking-wider text-cyan-300 flex items-center gap-2">
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-cyan-300 flex items-center gap-2">
                 <span>📄</span> Báo Cáo Bóc Tách Trực Tiếp Từ File CV PDF
               </h4>
 
@@ -96,10 +96,10 @@
                 
                 <!-- Học vấn -->
                 <div class="bg-slate-900/90 p-4 rounded-xl border border-white/10 space-y-2">
-                  <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">🎓 Học Vấn & Trường Học</span>
+                  <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">🎓 Học Vấn & Trường Học</span>
                   <div v-if="result.education?.items && result.education.items.length > 0" class="space-y-1.5">
-                    <div v-for="(edu, idx) in result.education.items" :key="idx" class="text-xs text-slate-200 font-bold">
-                      <p class="text-cyan-300 font-extrabold">{{ edu.institution !== 'not_found' ? edu.institution : 'Chưa rõ tên trường' }}</p>
+                    <div v-for="(edu, idx) in result.education.items" :key="idx" class="text-xs text-slate-200 font-semibold">
+                      <p class="text-cyan-300 font-semibold">{{ edu.institution !== 'not_found' ? edu.institution : 'Chưa rõ tên trường' }}</p>
                       <p v-if="edu.degree !== 'not_found'" class="text-[11px] text-slate-400 font-medium">{{ edu.degree }}</p>
                     </div>
                   </div>
@@ -108,12 +108,12 @@
 
                 <!-- Kỹ năng -->
                 <div class="bg-slate-900/90 p-4 rounded-xl border border-white/10 space-y-2">
-                  <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">🛠️ Kỹ Năng & Công Nghệ</span>
+                  <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">🛠️ Kỹ Năng & Công Nghệ</span>
                   <div v-if="result.skills?.technical && result.skills.technical.length > 0" class="flex flex-wrap gap-1.5">
                     <span 
                       v-for="(tech, idx) in result.skills.technical" 
                       :key="idx"
-                      class="px-2 py-0.5 bg-cyan-400/10 text-cyan-200 border border-cyan-400/20 text-[11px] font-bold rounded-md"
+                      class="px-2 py-0.5 bg-cyan-400/10 text-cyan-200 border border-cyan-400/20 text-[11px] font-semibold rounded-md"
                     >
                       {{ tech }}
                     </span>
@@ -123,10 +123,10 @@
 
                 <!-- Dự án -->
                 <div class="bg-slate-900/90 p-4 rounded-xl border border-white/10 space-y-2">
-                  <span class="text-xs font-bold text-slate-400 uppercase tracking-wider block">💻 Dự Án Thực Tế</span>
+                  <span class="text-xs font-semibold text-slate-400 uppercase tracking-wider block">💻 Dự Án Thực Tế</span>
                   <div v-if="result.experience?.projects && result.experience.projects.length > 0" class="space-y-2">
                     <div v-for="(proj, idx) in result.experience.projects" :key="idx" class="text-xs space-y-0.5">
-                      <p class="font-extrabold text-emerald-300">● {{ proj.name }}</p>
+                      <p class="font-semibold text-emerald-300">● {{ proj.name }}</p>
                       <p v-if="proj.impact && proj.impact !== 'not_found'" class="text-[11px] text-slate-300 italic">{{ proj.impact }}</p>
                     </div>
                   </div>
@@ -142,8 +142,8 @@
               <!-- ATS Formatting Review -->
               <div class="rounded-2xl border border-cyan-400/20 bg-slate-950/70 p-5 space-y-3">
                 <div class="flex items-center justify-between">
-                  <h4 class="text-xs font-extrabold uppercase tracking-wider text-cyan-300">⚙️ Khung Chuẩn ATS (ATS Score)</h4>
-                  <span class="text-sm font-black text-cyan-300">{{ result.ats?.score || result.score }}%</span>
+                  <h4 class="text-xs font-semibold uppercase tracking-wider text-cyan-300">⚙️ Khung Chuẩn ATS (ATS Score)</h4>
+                  <span class="text-sm font-semibold text-cyan-300">{{ result.ats?.score || result.score }}%</span>
                 </div>
                 <div class="w-full bg-slate-800 h-2 rounded-full overflow-hidden border border-white/10">
                   <div class="bg-cyan-400 h-full rounded-full transition-all duration-500" :style="{ width: (result.ats?.score || result.score) + '%' }"></div>
@@ -158,9 +158,9 @@
 
               <!-- STAR Analysis Progress Bars -->
               <div class="rounded-2xl border border-emerald-400/20 bg-slate-950/70 p-5 space-y-3">
-                <h4 class="text-xs font-extrabold uppercase tracking-wider text-emerald-300">⭐ Phân Tích Chuẩn STAR (Situation-Task-Action-Result)</h4>
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-emerald-300">⭐ Phân Tích Chuẩn STAR (Situation-Task-Action-Result)</h4>
                 
-                <div class="space-y-2 text-xs font-bold text-slate-300">
+                <div class="space-y-2 text-xs font-semibold text-slate-300">
                   <div class="flex items-center justify-between">
                     <span>S - Context/Situation:</span>
                     <span class="text-emerald-300">{{ result.star_analysis?.situation || 70 }}%</span>
@@ -185,10 +185,10 @@
             <!-- 4. SUGGESTED SUMMARY (KÈM NÚT SAO CHÉP 1-CHẠM) -->
             <div class="rounded-2xl border border-cyan-400/30 bg-cyan-400/10 p-5 space-y-2">
               <div class="flex items-center justify-between">
-                <span class="text-xs font-extrabold uppercase tracking-wider text-cyan-200">Gợi Ý Đoạn Tóm Tắt Bản Thân Chuẩn HR (AI Executive Summary)</span>
+                <span class="text-xs font-semibold uppercase tracking-wider text-cyan-200">Gợi Ý Đoạn Tóm Tắt Bản Thân Chuẩn HR (AI Executive Summary)</span>
                 <button
                   @click="copySummary"
-                  class="inline-flex items-center gap-1.5 rounded-lg bg-cyan-400 px-3.5 py-1.5 text-xs font-black text-slate-950 shadow-md shadow-cyan-500/25 hover:bg-cyan-300 active:scale-95 transition-all"
+                  class="inline-flex items-center gap-1.5 rounded-lg bg-cyan-400 px-3.5 py-1.5 text-xs font-semibold text-slate-950 shadow-md shadow-cyan-500/25 hover:bg-cyan-300 active:scale-95 transition-all"
                 >
                   <span>{{ copied ? '✓ Đã Sao Chép' : '📋 Sao Chép 1-Chạm' }}</span>
                 </button>
@@ -203,12 +203,12 @@
               
               <!-- Strengths -->
               <div class="rounded-2xl border border-emerald-400/20 bg-emerald-400/10 p-5 space-y-2">
-                <h4 class="text-xs font-extrabold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-emerald-300 flex items-center gap-1.5">
                   <span>✅</span> Điểm Mạnh Cốt Lõi
                 </h4>
                 <ul class="space-y-2 text-xs font-semibold text-emerald-100">
                   <li v-for="(item, idx) in result.strengths" :key="idx" class="flex items-start gap-2">
-                    <span class="text-emerald-400 font-bold">•</span>
+                    <span class="text-emerald-400 font-semibold">•</span>
                     <span>{{ item }}</span>
                   </li>
                 </ul>
@@ -216,12 +216,12 @@
 
               <!-- Weaknesses / Improvements -->
               <div class="rounded-2xl border border-amber-400/20 bg-amber-400/10 p-5 space-y-2">
-                <h4 class="text-xs font-extrabold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
+                <h4 class="text-xs font-semibold uppercase tracking-wider text-amber-300 flex items-center gap-1.5">
                   <span>⚠️</span> Điểm Cần Khắc Phục / Thiếu Sót
                 </h4>
                 <ul class="space-y-2 text-xs font-semibold text-amber-100">
                   <li v-for="(item, idx) in (result.weaknesses || result.improvements || [])" :key="idx" class="flex items-start gap-2">
-                    <span class="text-amber-400 font-bold">•</span>
+                    <span class="text-amber-400 font-semibold">•</span>
                     <span>{{ item }}</span>
                   </li>
                 </ul>
@@ -231,10 +231,10 @@
 
             <!-- 6. ACTIONABLE TIPS (CỐNG THỨC GOOGLE RESUME) -->
             <div class="rounded-2xl border border-white/10 bg-slate-950/70 p-5 space-y-3">
-              <h4 class="text-xs font-extrabold uppercase tracking-wider text-cyan-300">💡 Các Bước Cải Thiện Cụ Thể (Google Resume Formula)</h4>
+              <h4 class="text-xs font-semibold uppercase tracking-wider text-cyan-300">💡 Các Bước Cải Thiện Cụ Thể (Google Resume Formula)</h4>
               <div class="grid grid-cols-1 sm:grid-cols-2 gap-3 text-xs font-semibold text-slate-300">
                 <div v-for="(tip, idx) in result.actionable_tips" :key="idx" class="flex items-center gap-2.5 rounded-xl bg-white/5 p-3 border border-white/5">
-                  <span class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-cyan-400/20 text-cyan-300 font-black text-xs">{{ idx + 1 }}</span>
+                  <span class="flex h-6 w-6 flex-shrink-0 items-center justify-center rounded-full bg-cyan-400/20 text-cyan-300 font-semibold text-xs">{{ idx + 1 }}</span>
                   <span class="leading-snug">{{ tip }}</span>
                 </div>
               </div>
@@ -247,14 +247,14 @@
         <div class="flex items-center justify-between border-t border-white/10 p-4 sm:p-5 bg-slate-900/90 rounded-b-3xl backdrop-blur sticky bottom-0 z-20">
           <button
             @click="scrollToTop"
-            class="inline-flex items-center gap-1.5 rounded-xl bg-white/10 hover:bg-white/20 px-4 py-2 text-xs font-bold text-slate-200 transition-colors"
+            class="inline-flex items-center gap-1.5 rounded-xl bg-white/10 hover:bg-white/20 px-4 py-2 text-xs font-semibold text-slate-200 transition-colors"
           >
             <span>⬆ Scroll Lên Đầu</span>
           </button>
 
           <button
             @click="close"
-            class="rounded-xl bg-cyan-400 px-6 py-2.5 text-xs font-extrabold text-slate-950 shadow-lg shadow-cyan-500/20 hover:bg-cyan-300 transition-colors"
+            class="rounded-xl bg-cyan-400 px-6 py-2.5 text-xs font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 hover:bg-cyan-300 transition-colors"
           >
             Đóng Cửa Sổ
           </button>

@@ -16,6 +16,7 @@ type RecommendedJobItem struct {
 	JobID          uint     `json:"job_id"`
 	JobTitle       string   `json:"job_title"`
 	Company        string   `json:"company"`
+	LogoURL        string   `json:"logo_url"`
 	Description    string   `json:"description"`
 	Salary         float64  `json:"salary"`
 	Location       string   `json:"location"`

@@ -41,6 +41,8 @@ type AdminService interface {
 	GetSkills() ([]models.Skill, error)
 	CreateSkill(req dto.CreateSkillRequest) (*models.Skill, error)
 	DeleteSkill(id uint) error
+	GetPendingJobs(page, limit int, search string) (*dto.PendingJobListResponse, error)
+	UpdateJobStatus(jobID uint, status string) error
 }
 
 type adminService struct {
@@ -353,5 +355,46 @@ func (s *adminService) DeleteSkill(id uint) error {
 		return errors.New("ID kỹ năng không hợp lệ")
 	}
 	return s.adminRepo.DeleteSkill(id)
+}
+
+func (s *adminService) GetPendingJobs(page, limit int, search string) (*dto.PendingJobListResponse, error) {
+	if page < 1 {
+		return nil, ErrPageInvalid
+	}
+	if limit < 1 || limit > 100 {
+		return nil, ErrLimitInvalid
+	}
+
+	searchClean := strings.TrimSpace(search)
+	items, total, err := s.adminRepo.GetPendingJobs(page, limit, searchClean)
+	if err != nil {
+		return nil, err
+	}
+
+	totalPages := int64(0)
+	if total > 0 {
+		totalPages = int64(math.Ceil(float64(total) / float64(limit)))
+	}
+
+	return &dto.PendingJobListResponse{
+		Items: items,
+		Pagination: dto.PaginationMeta{
+			Page:       page,
+			Limit:      limit,
+			Total:      total,
+			TotalPages: totalPages,
+		},
+	}, nil
+}
+
+func (s *adminService) UpdateJobStatus(jobID uint, status string) error {
+	if jobID < 1 {
+		return errors.New("job id is invalid")
+	}
+	statusClean := strings.TrimSpace(status)
+	if statusClean != "approved" && statusClean != "rejected" && statusClean != "closed" {
+		return errors.New("status chỉ được là approved, rejected hoặc closed")
+	}
+	return s.adminRepo.UpdateJobStatus(jobID, statusClean)
 }
 

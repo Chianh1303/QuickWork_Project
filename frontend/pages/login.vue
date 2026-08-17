@@ -57,22 +57,65 @@
             </p>
           </div>
 
+          <!-- Role Switcher Pills -->
+          <div class="mt-6 flex rounded-2xl bg-slate-950/80 p-1 border border-white/10">
+            <button
+              type="button"
+              @click="selectedRole = 'student'"
+              :class="[
+                selectedRole === 'student'
+                  ? 'bg-cyan-400 text-slate-950 font-black shadow-md shadow-cyan-500/20'
+                  : 'text-slate-400 hover:text-white font-bold',
+                'flex-1 py-2 text-xs rounded-xl transition-all flex items-center justify-center gap-1.5'
+              ]"
+            >
+              <span>🎓</span>
+              <span>Sinh Viên</span>
+            </button>
+            <button
+              type="button"
+              @click="selectedRole = 'business'"
+              :class="[
+                selectedRole === 'business'
+                  ? 'bg-cyan-400 text-slate-950 font-black shadow-md shadow-cyan-500/20'
+                  : 'text-slate-400 hover:text-white font-bold',
+                'flex-1 py-2 text-xs rounded-xl transition-all flex items-center justify-center gap-1.5'
+              ]"
+            >
+              <span>🏢</span>
+              <span>Doanh Nghiệp</span>
+            </button>
+            <button
+              type="button"
+              @click="selectedRole = 'admin'"
+              :class="[
+                selectedRole === 'admin'
+                  ? 'bg-cyan-400 text-slate-950 font-black shadow-md shadow-cyan-500/20'
+                  : 'text-slate-400 hover:text-white font-bold',
+                'flex-1 py-2 text-xs rounded-xl transition-all flex items-center justify-center gap-1.5'
+              ]"
+            >
+              <span>🛡️</span>
+              <span>Admin</span>
+            </button>
+          </div>
+
           <!-- Alert for error messages -->
-          <div v-if="errorMessage" class="mt-6 bg-rose-400/10 border border-rose-400/30 text-rose-100 px-4 py-3 rounded-lg text-sm flex items-center space-x-3" role="alert">
+          <div v-if="errorMessage" class="mt-4 bg-rose-400/10 border border-rose-400/30 text-rose-100 px-4 py-3 rounded-xl text-xs flex items-center space-x-3" role="alert">
             <svg class="h-5 w-5 text-red-400 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
             </svg>
             <span class="font-medium">{{ errorMessage }}</span>
           </div>
 
-          <form class="mt-8 space-y-6" @submit.prevent="handleLogin">
+          <form class="mt-6 space-y-5" @submit.prevent="handleLogin">
             <div class="space-y-4">
               <!-- Email Address -->
               <div>
-                <label for="email-address" class="block text-sm font-semibold text-slate-200 mb-1">Địa chỉ Email</label>
+                <label for="email-address" class="block text-xs font-extrabold text-cyan-300 uppercase tracking-wider mb-1.5">Địa chỉ Email</label>
                 <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <svg class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M3 8l7.89 5.26a2 2 0 002.22 0L21 8M5 19h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
                   </div>
@@ -83,18 +126,18 @@
                     autocomplete="email"
                     required
                     v-model="form.email"
-                    class="appearance-none relative block w-full pl-10 pr-3 py-3 border border-white/10 placeholder-slate-500 text-white rounded-lg bg-slate-950/70 hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 sm:text-sm"
-                    placeholder="ten@viethan.edu.vn"
+                    class="appearance-none relative block w-full pl-10 pr-3.5 py-2.5 border border-white/10 placeholder-slate-500 text-white rounded-xl bg-slate-950/70 hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 text-xs font-medium"
+                    :placeholder="selectedRole === 'business' ? 'hr@company.com' : selectedRole === 'admin' ? 'admin@quickwork.vn' : 'sinhvien@vku.udn.vn'"
                   />
                 </div>
               </div>
 
               <!-- Password -->
               <div>
-                <label for="password" class="block text-sm font-semibold text-slate-200 mb-1">Mật khẩu</label>
+                <label for="password" class="block text-xs font-extrabold text-cyan-300 uppercase tracking-wider mb-1.5">Mật khẩu</label>
                 <div class="relative">
-                  <div class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none">
-                    <svg class="h-5 w-5 text-slate-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <div class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none">
+                    <svg class="h-4 w-4 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 7a2 2 0 012 2m-2 2a2 2 0 00-2 2v2a2 2 0 002 2h2a2 2 0 002-2V9a2 2 0 00-2-2h-2zm0 0V5.5A2.5 2.5 0 0012.5 3h-5A2.5 2.5 0 005 5.5V7m10 4V9" />
                     </svg>
                   </div>
@@ -105,7 +148,7 @@
                     autocomplete="current-password"
                     required
                     v-model="form.password"
-                    class="appearance-none relative block w-full pl-10 pr-3 py-3 border border-white/10 placeholder-slate-500 text-white rounded-lg bg-slate-950/70 hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 sm:text-sm"
+                    class="appearance-none relative block w-full pl-10 pr-3.5 py-2.5 border border-white/10 placeholder-slate-500 text-white rounded-xl bg-slate-950/70 hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 text-xs font-medium"
                     placeholder="••••••••"
                   />
                 </div>
@@ -180,6 +223,8 @@ definePageMeta({
 })
 
 const { login } = useAuth()
+
+const selectedRole = ref<'student' | 'business' | 'admin'>('student')
 
 const form = reactive({
   email: '',

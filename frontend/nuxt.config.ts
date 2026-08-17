@@ -26,9 +26,10 @@ export default defineNuxtConfig({
     '@pinia/nuxt'
   ],
 
-  // Proxy /api requests to the Go Fiber backend running at http://localhost:3000
+  // Proxy /api and /uploads requests to the Go Fiber backend running at http://localhost:3000
   routeRules: {
-    '/api/**': { proxy: 'http://localhost:3000/api/**' }
+    '/api/**': { proxy: 'http://localhost:3000/api/**' },
+    '/uploads/**': { proxy: 'http://localhost:3000/uploads/**' }
   },
 
   // Tailwind configuration options

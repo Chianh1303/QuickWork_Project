@@ -21,8 +21,6 @@
               Quay lại Dashboard
             </NuxtLink>
           </div>
-
-          <AdminHeaderNav />
         </div>
       </section>
 

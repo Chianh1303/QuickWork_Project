@@ -691,6 +691,7 @@ func (s *aiService) GetRecommendedJobs(userID uint) (*dto.RecommendedJobsRespons
 			JobID:          job.ID,
 			JobTitle:       job.Title,
 			Company:        companyName,
+			LogoURL:        job.Business.LogoUrl,
 			Description:    job.Description,
 			Salary:         job.Salary,
 			Location:       job.Location,

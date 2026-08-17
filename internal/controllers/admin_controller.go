@@ -367,6 +367,50 @@ func (ctrl *AdminController) DeleteSkill(c *fiber.Ctx) error {
 	return c.JSON(fiber.Map{"message": "Đã xóa kỹ năng thành công"})
 }
 
+// GetPendingJobs GET /api/admin/jobs/pending
+func (ctrl *AdminController) GetPendingJobs(c *fiber.Ctx) error {
+	page, err := strconv.Atoi(c.Query("page", "1"))
+	if err != nil || page < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "page must be greater than or equal to 1"})
+	}
+
+	limit, err := strconv.Atoi(c.Query("limit", "10"))
+	if err != nil || limit < 1 || limit > 100 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "limit must be between 1 and 100"})
+	}
+
+	search := c.Query("search")
+	res, err := ctrl.adminService.GetPendingJobs(page, limit, search)
+	if err != nil {
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": "failed to get pending jobs"})
+	}
+
+	return c.JSON(res)
+}
+
+// UpdateJobStatus PUT /api/admin/jobs/:id/status
+func (ctrl *AdminController) UpdateJobStatus(c *fiber.Ctx) error {
+	jobID, err := strconv.Atoi(c.Params("id"))
+	if err != nil || jobID < 1 {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "job id is invalid"})
+	}
+
+	var req dto.UpdateJobStatusRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Dữ liệu không hợp lệ"})
+	}
+
+	err = ctrl.adminService.UpdateJobStatus(uint(jobID), req.Status)
+	if err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "Đã cập nhật trạng thái bài tuyển dụng thành công",
+		"status":  req.Status,
+	})
+}
+
 func localUserID(c *fiber.Ctx) (uint, bool) {
 	switch value := c.Locals("user_id").(type) {
 	case float64:

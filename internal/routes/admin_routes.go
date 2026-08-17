@@ -43,4 +43,8 @@ func RegisterAdminRoutes(app *fiber.App, db *gorm.DB) {
 	admin.Get("/skills", adminController.GetSkills)
 	admin.Post("/skills", adminController.CreateSkill)
 	admin.Delete("/skills/:id", adminController.DeleteSkill)
+
+	// Duyệt Bài Tuyển Dụng (Admin Job Approval)
+	admin.Get("/jobs/pending", adminController.GetPendingJobs)
+	admin.Put("/jobs/:id/status", adminController.UpdateJobStatus)
 }

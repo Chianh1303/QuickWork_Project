@@ -57,6 +57,21 @@
             </p>
           </div>
 
+          <!-- Role Switcher Pills -->
+          <div class="mt-6 flex rounded-2xl bg-slate-950/80 p-1 border border-white/10">
+            <span class="flex-1 py-2 text-xs rounded-xl bg-cyan-400 text-slate-950 font-black shadow-md shadow-cyan-500/20 text-center flex items-center justify-center gap-1.5 cursor-default">
+              <span>🎓</span>
+              <span>Sinh Viên</span>
+            </span>
+            <NuxtLink
+              to="/employer-register"
+              class="flex-1 py-2 text-xs rounded-xl text-slate-400 hover:text-white font-bold text-center flex items-center justify-center gap-1.5 transition-all"
+            >
+              <span>🏢</span>
+              <span>Doanh Nghiệp</span>
+            </NuxtLink>
+          </div>
+
           <!-- Success / Error Alert -->
           <div v-if="successMessage" class="mt-6 bg-emerald-400/10 border border-emerald-400/30 text-emerald-100 px-4 py-3 rounded-lg text-sm flex items-center space-x-3" role="alert">
             <svg class="h-5 w-5 text-emerald-300 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -210,7 +225,7 @@ const handleRegister = async () => {
     successMessage.value = res.message || '🎉 Đăng ký thành công! Chào mừng bạn đến với QuickWork.'
     registrationSuccess.value = true
   } catch (err: any) {
-    errorMessage.value = err.response?._data?.message || 'Đăng ký thất bại. Vui lòng kiểm tra lại thông tin đã nhập.'
+    errorMessage.value = err?.data?.message || err?.response?._data?.message || err?.message || 'Đăng ký thất bại. Vui lòng kiểm tra lại thông tin đã nhập.'
   } finally {
     isLoading.value = false
   }

@@ -44,6 +44,9 @@ export const useAuth = () => {
    */
   const register = async (registrationData: any) => {
     try {
+      // Clear old token to ensure clean guest registration
+      token.value = null
+      authStore.clearAuth()
       const response = await api.post('/api/auth/register', registrationData)
       return response
     } catch (error: any) {

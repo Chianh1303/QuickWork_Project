@@ -30,6 +30,8 @@ type AdminRepository interface {
 	GetSkills() ([]models.Skill, error)
 	CreateSkill(skill *models.Skill) error
 	DeleteSkill(id uint) error
+	GetPendingJobs(page, limit int, search string) ([]dto.PendingJobDTO, int64, error)
+	UpdateJobStatus(jobID uint, status string) error
 }
 
 type adminRepository struct {
@@ -463,5 +465,57 @@ func (r *adminRepository) CreateSkill(skill *models.Skill) error {
 
 func (r *adminRepository) DeleteSkill(id uint) error {
 	return r.db.Delete(&models.Skill{}, id).Error
+}
+
+func (r *adminRepository) GetPendingJobs(page, limit int, search string) ([]dto.PendingJobDTO, int64, error) {
+	offset := (page - 1) * limit
+	buildQuery := func() *gorm.DB {
+		query := r.db.Table("jobs").
+			Joins("JOIN businesses ON businesses.id = jobs.business_id").
+			Where("jobs.status = ?", "pending")
+
+		if search != "" {
+			keyword := "%" + search + "%"
+			query = query.Where("(jobs.title LIKE ? OR businesses.company_name LIKE ? OR jobs.location LIKE ?)", keyword, keyword, keyword)
+		}
+		return query
+	}
+
+	var total int64
+	if err := buildQuery().Count(&total).Error; err != nil {
+		return nil, 0, err
+	}
+
+	items := make([]dto.PendingJobDTO, 0)
+	if err := buildQuery().
+		Select(`
+			jobs.id,
+			jobs.business_id,
+			businesses.company_name,
+			businesses.logo_url,
+			businesses.tax_code,
+			jobs.title,
+			jobs.description,
+			jobs.location,
+			jobs.salary,
+			jobs.slots,
+			jobs.working_date,
+			jobs.category,
+			jobs.job_type,
+			jobs.status,
+			jobs.created_at
+		`).
+		Order("jobs.id DESC").
+		Limit(limit).
+		Offset(offset).
+		Scan(&items).Error; err != nil {
+		return nil, 0, err
+	}
+
+	return items, total, nil
+}
+
+func (r *adminRepository) UpdateJobStatus(jobID uint, status string) error {
+	return r.db.Model(&models.Job{}).Where("id = ?", jobID).Update("status", status).Error
 }
 

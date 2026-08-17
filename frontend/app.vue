@@ -1,7 +1,7 @@
 <template>
   <div class="app-shell min-h-screen flex flex-col text-slate-900 font-sans">
     <!-- Premium Navigation Bar -->
-    <header class="bg-slate-950/95 backdrop-blur-md border-b border-cyan-400/10 sticky top-0 z-40 transition-all duration-200 shadow-lg shadow-slate-950/10">
+    <header v-if="!isStudentDashboard && !isBusinessDashboard && !isAdminRoute" class="bg-slate-950/95 backdrop-blur-md border-b border-cyan-400/10 sticky top-0 z-40 transition-all duration-200 shadow-lg shadow-slate-950/10">
       <div v-if="isLandingRoute" class="hidden border-b border-white/10 bg-slate-900/80 text-xs font-semibold text-slate-300 lg:block">
         <div class="mx-auto flex max-w-7xl items-center justify-between px-4 py-2 sm:px-6 lg:px-8">
           <div class="flex items-center gap-5">
@@ -43,6 +43,9 @@
                 </NuxtLink>
               </template>
 
+              <template v-else-if="isStudentDashboard">
+                <span class="px-3 py-2 text-sm font-medium text-slate-400">Không gian Sinh viên</span>
+              </template>
               <template v-else-if="isDashboardRoute">
                 <button
                   v-for="item in dashboardNavItems"
@@ -206,6 +209,12 @@
           </NuxtLink>
         </template>
 
+        <template v-else-if="isStudentDashboard">
+          <div class="px-3 py-2">
+            <p class="text-xs font-semibold uppercase tracking-wider text-cyan-300">Không gian Sinh viên</p>
+            <p class="mt-1 text-xs text-slate-500">Dùng menu bên trong trang để chuyển mục.</p>
+          </div>
+        </template>
         <template v-else-if="isDashboardRoute">
           <div class="px-3 py-2">
             <p class="text-xs font-semibold uppercase tracking-wider text-cyan-300">{{ dashboardWorkspaceLabel }}</p>

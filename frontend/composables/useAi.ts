@@ -83,6 +83,7 @@ export interface RecommendedJobItem {
   job_id: number
   job_title: string
   company: string
+  logo_url?: string
   description?: string
   salary?: number
   location?: string

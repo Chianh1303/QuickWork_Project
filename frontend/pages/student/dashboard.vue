@@ -1,77 +1,180 @@
 <template>
-  <div class="dashboard-body min-h-screen">
-    <section class="border-b border-slate-800 bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950">
-      <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-        <div class="grid gap-5 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-          <div>
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="inline-flex items-center rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-cyan-200 ring-1 ring-cyan-400/30">
-                Không gian Sinh viên
-              </span>
-              <span class="text-xs font-semibold text-slate-400">Bảng điều khiển sự nghiệp</span>
-            </div>
-            <h1 class="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-              {{ studentHero.title }}
-            </h1>
-            <p class="mt-2 max-w-2xl text-sm font-semibold leading-6 text-slate-300">
-              {{ studentHero.description }}
-            </p>
-            <div class="mt-4 flex flex-wrap gap-3">
-              <button
-                @click="handleStudentHeroAction"
-                class="inline-flex items-center justify-center rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-bold text-slate-950 shadow-sm shadow-cyan-950/30 transition-colors hover:bg-cyan-300 focus-ring"
-              >
-                {{ studentHero.cta }}
-              </button>
-              <button
-                v-if="activeSection !== 'profile'"
-                @click="activeSection = 'profile'"
-                class="inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-white/15 focus-ring"
-              >
-                Cập nhật hồ sơ
-              </button>
-            </div>
+  <div class="dashboard-body min-h-screen bg-slate-950 text-slate-100 lg:flex font-sans">
+    <!-- Sidebar navigation (desktop) -->
+    <aside class="hidden lg:flex lg:w-64 lg:flex-shrink-0 lg:flex-col lg:border-r lg:border-indigo-500/15 lg:bg-slate-950/90 lg:px-4 lg:py-6 backdrop-blur-xl sticky top-0 h-screen overflow-y-auto z-30">
+      <!-- Enterprise Platform Logo Badge -->
+      <div class="px-3 pb-6 border-b border-indigo-500/10 mb-4">
+        <button @click="activeSection = 'jobs'" class="flex items-center gap-2.5 group text-left w-full">
+          <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-lg shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform">
+            QW
           </div>
+          <div>
+            <span class="text-[10px] font-black uppercase tracking-wider text-indigo-400">Enterprise AI</span>
+            <p class="text-sm font-extrabold text-white tracking-tight group-hover:text-indigo-300 transition-colors">QuickWork Portal</p>
+          </div>
+        </button>
+      </div>
 
-          <div class="grid grid-cols-2 gap-3">
-            <div
-              v-for="stat in studentHeroStats"
-              :key="stat.label"
-              class="rounded-xl border border-white/10 bg-white/[0.07] px-4 py-3 shadow-sm shadow-slate-950/20 backdrop-blur ring-1 ring-white/10"
+      <nav class="flex flex-1 flex-col gap-1.5">
+        <button
+          v-for="item in navItems"
+          :key="item.id"
+          @click="activeSection = item.id"
+          :class="[
+            activeSection === item.id
+              ? 'bg-gradient-to-r from-indigo-500/20 to-emerald-500/10 text-indigo-200 border-l-4 border-indigo-400 shadow-md shadow-indigo-500/10 font-extrabold'
+              : 'text-slate-400 hover:bg-white/[0.04] hover:text-white font-medium',
+            'flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm transition-all text-left'
+          ]"
+        >
+          <svg v-if="item.id === 'jobs'" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <svg v-else-if="item.id === 'profile'" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+          </svg>
+          <svg v-else-if="item.id === 'applications'" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+          </svg>
+          <svg v-else class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2m0-6h4v6h-4a3 3 0 010-6z" />
+          </svg>
+          <div class="flex items-center justify-between w-full">
+            <span>{{ item.name }}</span>
+            <span
+              v-if="item.id === 'applications' && filteredApps.length > 0"
+              class="rounded-full bg-indigo-500/20 px-2 py-0.5 text-[10px] font-black text-indigo-300 ring-1 ring-indigo-500/30"
             >
-              <div class="flex items-start justify-between gap-3">
-                <div>
-                  <p class="text-xs font-bold uppercase tracking-wide text-slate-400">{{ stat.label }}</p>
-                  <p class="mt-1 text-2xl font-extrabold text-white">{{ stat.value }}</p>
-                  <p class="mt-1 text-xs font-semibold text-slate-300">{{ stat.caption }}</p>
+              {{ filteredApps.length }}
+            </span>
+            <span
+              v-else-if="item.id === 'jobs' && filteredJobs.length > 0"
+              class="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-black text-emerald-300 ring-1 ring-emerald-500/30"
+            >
+              {{ filteredJobs.length }}
+            </span>
+          </div>
+        </button>
+      </nav>
+
+      <!-- Bottom Profile & Logout Box -->
+      <div class="mt-auto space-y-3 pt-4 border-t border-indigo-500/10">
+        <div class="rounded-2xl border border-indigo-500/20 bg-gradient-to-b from-indigo-950/40 to-slate-900/60 p-3.5 ring-1 ring-indigo-500/10">
+          <div class="flex items-center justify-between mb-2">
+            <p class="truncate text-xs font-bold text-white max-w-[130px]">{{ profileForm.full_name || 'Hồ sơ Sinh viên' }}</p>
+            <span class="rounded-full bg-emerald-400/10 px-2 py-0.5 text-[10px] font-extrabold text-emerald-300 ring-1 ring-emerald-400/30">
+              {{ profileReadiness }}% ATS
+            </span>
+          </div>
+          <div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
+            <div
+              class="h-full rounded-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-500"
+              :style="{ width: profileReadiness + '%' }"
+            ></div>
+          </div>
+        </div>
+
+        <!-- Integrated Logout Button -->
+        <button
+          @click="handleLogout"
+          class="w-full flex items-center justify-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-2.5 text-xs font-extrabold text-rose-300 hover:bg-rose-500/20 hover:text-rose-200 transition-all"
+        >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>Đăng xuất tài khoản</span>
+        </button>
+      </div>
+    </aside>
+
+    <div class="min-w-0 flex-1">
+      <!-- Section switcher (mobile / tablet) -->
+      <div class="flex gap-2 overflow-x-auto border-b border-indigo-500/15 bg-slate-950/80 px-4 py-3 lg:hidden">
+        <button
+          v-for="item in navItems"
+          :key="item.id"
+          @click="activeSection = item.id"
+          :class="[
+            activeSection === item.id ? 'bg-gradient-to-r from-indigo-500 to-emerald-500 text-white font-extrabold shadow-lg shadow-indigo-500/20' : 'bg-white/5 text-slate-300',
+            'flex-shrink-0 rounded-xl px-4 py-2 text-xs font-semibold transition-colors'
+          ]"
+        >
+          {{ item.name }}
+        </button>
+      </div>
+
+      <!-- Hero Header Banner -->
+      <section class="border-b border-indigo-500/15 bg-gradient-to-r from-slate-950 via-indigo-950/40 to-slate-950">
+        <div class="w-full px-4 py-6 sm:px-6 lg:px-8">
+          <div class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
+            <div>
+              <span class="inline-flex rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-black uppercase tracking-wider text-indigo-300 ring-1 ring-indigo-500/30">
+                Enterprise AI Student Portal
+              </span>
+              <h1 class="mt-3 text-2xl font-extrabold tracking-tight text-white sm:text-3xl lg:text-4xl">
+                {{ studentHero.title }}
+              </h1>
+              <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-300 font-medium">
+                {{ studentHero.description }}
+              </p>
+              <div class="mt-5 flex flex-wrap gap-3">
+                <button
+                  @click="handleStudentHeroAction"
+                  class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 via-blue-600 to-emerald-500 px-5 py-2.5 text-sm font-extrabold text-white shadow-xl shadow-indigo-500/25 transition-all hover:from-indigo-400 hover:to-emerald-400 focus-ring"
+                >
+                  {{ studentHero.cta }}
+                </button>
+                <button
+                  v-if="activeSection !== 'profile'"
+                  @click="activeSection = 'profile'"
+                  class="inline-flex items-center justify-center rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-5 py-2.5 text-sm font-bold text-indigo-200 transition-all hover:bg-indigo-500/20 hover:text-white focus-ring"
+                >
+                  Cập nhật hồ sơ
+                </button>
+              </div>
+            </div>
+
+            <!-- Stats metric grid -->
+            <div class="grid grid-cols-2 gap-3.5 sm:grid-cols-4 lg:grid-cols-2">
+              <div
+                v-for="stat in studentHeroStats"
+                :key="stat.label"
+                class="rounded-2xl border border-indigo-500/20 bg-slate-900/80 p-4 shadow-xl shadow-indigo-950/30 backdrop-blur-md transition-all hover:border-indigo-500/40"
+              >
+                <div class="flex items-start justify-between gap-2">
+                  <div class="min-w-0">
+                    <p class="truncate text-[11px] font-extrabold uppercase tracking-wider text-indigo-300/80">{{ stat.label }}</p>
+                    <p class="mt-1.5 text-2xl font-black text-white tracking-tight">{{ stat.value }}</p>
+                    <p class="mt-1 truncate text-xs font-semibold text-slate-400">{{ stat.caption }}</p>
+                  </div>
+                  <span :class="[stat.iconClass, 'inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-300 ring-1 ring-indigo-500/20']">
+                    <svg v-if="stat.icon === 'jobs'" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+                    </svg>
+                    <svg v-else-if="stat.icon === 'apps'" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <svg v-else-if="stat.icon === 'accepted'" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <svg v-else class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
+                    </svg>
+                  </span>
                 </div>
-                <span :class="[stat.iconClass, 'inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg']">
-                  <svg v-if="stat.icon === 'jobs'" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-                  </svg>
-                  <svg v-else-if="stat.icon === 'apps'" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <svg v-else-if="stat.icon === 'accepted'" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-                  </svg>
-                </span>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <StudentJobsSection :state="studentDashboardState" />
-      <StudentProfileSection :state="studentDashboardState" />
-      <StudentApplicationsSection :state="studentDashboardState" />
-      <StudentWalletSection :state="studentDashboardState" />
-    </main>
+      <main class="w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
+        <StudentJobsSection :state="studentDashboardState" />
+        <StudentProfileSection :state="studentDashboardState" />
+        <StudentApplicationsSection :state="studentDashboardState" />
+        <StudentWalletSection :state="studentDashboardState" />
+      </main>
+    </div>
   </div>
 
   <StudentDashboardModals :state="studentDashboardState" />
@@ -85,9 +188,10 @@ import StudentApplicationsSection from '~/components/student/StudentApplications
 import StudentDashboardModals from '~/components/student/StudentDashboardModals.vue'
 import StudentWalletSection from '~/components/student/StudentWalletSection.vue'
 
-definePageMeta({
-  middleware: 'auth'
-})
+const { logout, user } = useAuth()
+const handleLogout = () => {
+  logout()
+}
 
 const activeSection = useState<string>('studentDashboardActiveSection', () => 'jobs')
 
@@ -325,14 +429,22 @@ const statusBadgeClass = (status: string): string => {
   return 'bg-slate-50 border-slate-200 text-slate-700'
 }
 
-// Computeds for filtering with defensive null-safety
+const checkIfApplied = (jobId: number): boolean => {
+  const list = Array.isArray(applications.value) ? applications.value : []
+  return list.some(app => app.job_id === jobId)
+}
+
+const filterApplyStatus = ref('all') // 'all' | 'unapplied' | 'applied'
+
+// Computeds for filtering with defensive null-safety & smart sorting
 const filteredJobs = computed(() => {
   const list = Array.isArray(jobs.value) ? jobs.value : []
-  return list.filter(job => {
+  const result = list.filter(job => {
     if (!job) return false
     const title = (job.title || '').toLowerCase()
     const description = (job.description || '').toLowerCase()
     const location = (job.location || '').toLowerCase()
+    const isApplied = checkIfApplied(job.id)
 
     const matchesSearch = !jobsSearchQuery.value ||
       title.includes(jobsSearchQuery.value.toLowerCase()) ||
@@ -341,7 +453,26 @@ const filteredJobs = computed(() => {
     const matchesLocation = !jobsLocationQuery.value ||
       location.includes(jobsLocationQuery.value.toLowerCase())
 
-    return matchesSearch && matchesLocation
+    let matchesApplyStatus = true
+    if (filterApplyStatus.value === 'unapplied') {
+      matchesApplyStatus = !isApplied
+    } else if (filterApplyStatus.value === 'applied') {
+      matchesApplyStatus = isApplied
+    }
+
+    return matchesSearch && matchesLocation && matchesApplyStatus
+  })
+
+  // SẮP XẾP THÔNG MINH:
+  // Nhóm 1: Các việc làm CHƯA ỨNG TUYỂN -> đưa lên trên cùng (xếp theo ID giảm dần = mới nhất lên đầu)
+  // Nhóm 2: Các việc làm ĐÃ ỨNG TUYỂN -> đẩy xuống dưới cùng để không chiếm chỗ
+  return result.sort((a, b) => {
+    const aApplied = checkIfApplied(a.id) ? 1 : 0
+    const bApplied = checkIfApplied(b.id) ? 1 : 0
+    if (aApplied !== bApplied) {
+      return aApplied - bApplied // 0 (chưa nộp) trước 1 (đã nộp)
+    }
+    return (b.id || 0) - (a.id || 0)
   })
 })
 
@@ -728,11 +859,6 @@ const handleOfferResponse = async (responseType: 'accept' | 'decline') => {
   }
 }
 
-const checkIfApplied = (jobId: number): boolean => {
-  const list = Array.isArray(applications.value) ? applications.value : []
-  return list.some(app => app.job_id === jobId)
-}
-
 // ⏰ QUẢN LÝ ATTENDANCE & REALTIME TIMERS
 const activeAttendance = ref<{ [key: number]: string }>({})
 const timers = ref<{ [key: number]: string }>({})
@@ -837,6 +963,7 @@ const studentDashboardState = reactive({
   filterCategory,
   filterJobType,
   filterMinSalary,
+  filterApplyStatus,
   resetFilters,
   fetchJobs,
   isLoadingJobs,

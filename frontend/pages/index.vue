@@ -96,6 +96,27 @@
       </div>
     </section>
 
+    <!-- Top Ngành Nghề Nổi Bật -->
+    <section id="categories" class="px-4 py-16 sm:px-6 lg:px-8">
+      <div class="mx-auto max-w-7xl">
+        <SectionHeading eyebrow="Khám Phá Xu Hướng" title="Top Ngành Nghề Tuyển Dụng Sinh Viên Sôi Động" />
+        <div class="mt-10 grid grid-cols-2 sm:grid-cols-3 lg:grid-cols-6 gap-3.5">
+          <a
+            v-for="cat in popularCategories"
+            :key="cat.name"
+            href="#explore-jobs"
+            class="group relative flex flex-col items-center text-center p-4 rounded-2xl border border-white/10 bg-slate-900/80 hover:bg-slate-900 hover:border-cyan-400/40 shadow-lg shadow-slate-950/20 backdrop-blur transition-all duration-200 hover:-translate-y-1"
+          >
+            <div class="h-12 w-12 rounded-2xl bg-cyan-400/10 border border-cyan-400/20 flex items-center justify-center text-2xl group-hover:scale-110 group-hover:bg-cyan-400/20 transition-all">
+              {{ cat.icon }}
+            </div>
+            <h4 class="mt-3 text-xs font-black text-white group-hover:text-cyan-300 transition-colors">{{ cat.name }}</h4>
+            <span class="mt-1 text-[11px] font-bold text-slate-400">{{ cat.jobsCount }} việc làm</span>
+          </a>
+        </div>
+      </div>
+    </section>
+
     <ExploreJobsSection :show-hero="false" :standalone="false" section-id="explore-jobs" />
 
     <section class="border-y border-white/10 bg-slate-900/45 px-4 py-16 sm:px-6 lg:px-8">
@@ -175,6 +196,15 @@ const heroStats = [
   { value: '300+', label: 'Việc làm' },
   { value: '500+', label: 'Sinh viên' },
   { value: '150+', label: 'Doanh nghiệp' }
+]
+
+const popularCategories = [
+  { icon: '💻', name: 'CNTT & Phần mềm', jobsCount: 45 },
+  { icon: '📈', name: 'Marketing & Media', jobsCount: 38 },
+  { icon: '🎨', name: 'Thiết Kế Đồ Họa', jobsCount: 24 },
+  { icon: '☕', name: 'F&B & Phục Vụ', jobsCount: 52 },
+  { icon: '📚', name: 'Gia Sư & Giáo Dục', jobsCount: 19 },
+  { icon: '🛍️', name: 'Bán Hàng & Sales', jobsCount: 31 }
 ]
 
 const introCards = [

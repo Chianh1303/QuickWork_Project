@@ -1,78 +1,150 @@
 <template>
-  <div class="dashboard-body min-h-screen">
-    <section class="border-b border-slate-800 bg-gradient-to-br from-slate-950 via-slate-900 to-cyan-950">
-      <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-5">
-        <div class="grid gap-5 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
-          <div>
-            <div class="flex flex-wrap items-center gap-2">
-              <span class="inline-flex items-center rounded-full bg-cyan-400/10 px-3 py-1 text-xs font-bold uppercase tracking-wide text-cyan-200 ring-1 ring-cyan-400/30">
-                Không gian Doanh nghiệp
-              </span>
-              <span class="text-xs font-semibold text-slate-400">Trung tâm quản lý tuyển dụng</span>
-            </div>
-            <h1 class="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
-              {{ businessHero.title }}
-            </h1>
-            <p class="mt-2 max-w-2xl text-sm font-semibold leading-6 text-slate-300">
-              {{ businessHero.description }}
-            </p>
-            <div class="mt-4 flex flex-wrap gap-3">
-              <button
-                @click="handleBusinessHeroAction"
-                class="inline-flex items-center justify-center rounded-lg bg-cyan-400 px-4 py-2.5 text-sm font-bold text-slate-950 shadow-sm shadow-cyan-950/30 transition-colors hover:bg-cyan-300 focus-ring"
-              >
-                {{ businessHero.cta }}
-              </button>
-              <button
-                v-if="activeSection !== 'applicants'"
-                @click="activeSection = 'applicants'"
-                class="inline-flex items-center justify-center rounded-lg border border-white/10 bg-white/10 px-4 py-2.5 text-sm font-bold text-white transition-colors hover:bg-white/15 focus-ring"
-              >
-                Xem danh sách ứng viên
-              </button>
-            </div>
+  <div class="dashboard-body min-h-screen bg-slate-950 text-slate-100 lg:flex font-sans">
+    <!-- Sidebar navigation (desktop) -->
+    <aside class="hidden lg:flex lg:w-64 lg:flex-shrink-0 lg:flex-col lg:border-r lg:border-indigo-500/15 lg:bg-slate-950/90 lg:px-4 lg:py-6 backdrop-blur-xl sticky top-0 h-screen overflow-y-auto z-30">
+      <!-- Enterprise Platform Logo Badge -->
+      <div class="px-3 pb-6 border-b border-indigo-500/10 mb-4">
+        <button @click="activeSection = 'dashboard'" class="flex items-center gap-2.5 group text-left w-full">
+          <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-emerald-400 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform">
+            QW
           </div>
+          <div>
+            <span class="text-[10px] font-black uppercase tracking-wider text-indigo-400">Business SaaS</span>
+            <p class="text-sm font-extrabold text-white tracking-tight group-hover:text-indigo-300 transition-colors">QuickWork Portal</p>
+          </div>
+        </button>
+      </div>
 
-          <div class="grid grid-cols-2 gap-3">
-            <div
-              v-for="stat in businessHeroStats"
-              :key="stat.label"
-              class="rounded-xl border border-white/10 bg-white/[0.07] px-4 py-3 shadow-sm shadow-slate-950/20 backdrop-blur ring-1 ring-white/10"
-            >
-              <div class="flex items-start justify-between gap-3">
-                <div>
-                  <p class="text-xs font-bold uppercase tracking-wide text-slate-400">{{ stat.label }}</p>
-                  <p class="mt-1 text-2xl font-extrabold text-white">{{ stat.value }}</p>
-                  <p class="mt-1 text-xs font-semibold text-slate-300">{{ stat.caption }}</p>
-                </div>
-                <span :class="[stat.iconClass, 'inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-lg']">
-                  <svg v-if="stat.icon === 'jobs'" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-                  </svg>
-                  <svg v-else-if="stat.icon === 'apps'" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
-                  </svg>
-                  <svg v-else-if="stat.icon === 'pending'" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
-                  </svg>
-                  <svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
-                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
-                  </svg>
+      <nav class="flex flex-1 flex-col gap-1.5">
+        <button
+          v-for="item in navItems"
+          :key="item.id"
+          @click="activeSection = item.id"
+          :class="[
+            activeSection === item.id
+              ? 'bg-gradient-to-r from-indigo-500/20 to-emerald-500/10 text-indigo-200 border-l-4 border-indigo-400 shadow-md shadow-indigo-500/10 font-extrabold'
+              : 'text-slate-400 hover:bg-white/[0.04] hover:text-white font-medium',
+            'flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm transition-all text-left'
+          ]"
+        >
+          <svg v-if="item.id === 'dashboard'" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+          </svg>
+          <svg v-else-if="item.id === 'profile'" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M19 21V5a2 2 0 00-2-2H7a2 2 0 00-2 2v16m14 0h2m-2 0h-5m-9 0H3m2 0h5M9 7h1m-1 4h1m4-4h1m-1 4h1m-5 10v-5a1 1 0 011-1h2a1 1 0 011 1v5m-4 0h4" />
+          </svg>
+          <svg v-else-if="item.id === 'jobs'" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
+          </svg>
+          <svg v-else class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+          </svg>
+          <span>{{ item.name }}</span>
+        </button>
+      </nav>
+
+      <!-- Bottom Profile & Logout Box -->
+      <div class="mt-auto space-y-3 pt-4 border-t border-indigo-500/10">
+        <div class="rounded-2xl border border-indigo-500/20 bg-gradient-to-b from-indigo-950/40 to-slate-900/60 p-3.5 ring-1 ring-indigo-500/10">
+          <div class="flex items-center justify-between mb-1">
+            <p class="truncate text-xs font-bold text-white max-w-[130px]">{{ profileForm.company_name || 'Doanh Nghiệp' }}</p>
+            <span class="rounded-full bg-emerald-400/10 px-2 py-0.5 text-[10px] font-extrabold text-emerald-300 ring-1 ring-emerald-400/30">
+              Đã Duyệt
+            </span>
+          </div>
+          <p class="text-[11px] font-medium text-slate-400 truncate">MST: {{ profileForm.tax_code || 'Đã xác minh' }}</p>
+        </div>
+
+        <!-- Integrated Logout Button -->
+        <button
+          @click="handleLogout"
+          class="w-full flex items-center justify-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-2.5 text-xs font-extrabold text-rose-300 hover:bg-rose-500/20 hover:text-rose-200 transition-all"
+        >
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+          </svg>
+          <span>Đăng xuất tài khoản</span>
+        </button>
+      </div>
+    </aside>
+
+    <!-- Main Content Area -->
+    <div class="flex-1 min-w-0">
+      <section class="border-b border-indigo-500/15 bg-gradient-to-r from-slate-950 via-indigo-950/40 to-slate-950">
+        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+          <div class="grid gap-5 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
+            <div>
+              <div class="flex flex-wrap items-center gap-2">
+                <span class="inline-flex items-center rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-black uppercase tracking-wide text-indigo-300 ring-1 ring-indigo-500/30">
+                  Không gian Doanh nghiệp
                 </span>
+                <span class="text-xs font-semibold text-slate-400">Trung tâm quản lý tuyển dụng & Smart Escrow</span>
+              </div>
+              <h1 class="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
+                {{ businessHero.title }}
+              </h1>
+              <p class="mt-2 max-w-2xl text-xs sm:text-sm font-semibold leading-relaxed text-slate-300">
+                {{ businessHero.description }}
+              </p>
+              <div class="mt-4 flex flex-wrap gap-3">
+                <button
+                  @click="handleBusinessHeroAction"
+                  class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 via-blue-600 to-emerald-500 px-5 py-2.5 text-xs font-black text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-400 hover:to-emerald-400 focus-ring"
+                >
+                  {{ businessHero.cta }}
+                </button>
+                <button
+                  v-if="activeSection !== 'applicants'"
+                  @click="activeSection = 'applicants'"
+                  class="inline-flex items-center justify-center rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-5 py-2.5 text-xs font-black text-indigo-200 hover:bg-indigo-500/20 hover:text-white transition-all focus-ring"
+                >
+                  Xem danh sách ứng viên
+                </button>
+              </div>
+            </div>
+
+            <div class="grid grid-cols-2 gap-3">
+              <div
+                v-for="stat in businessHeroStats"
+                :key="stat.label"
+                class="rounded-2xl border border-indigo-500/20 bg-slate-900/80 px-4 py-3.5 shadow-xl shadow-indigo-950/30 backdrop-blur"
+              >
+                <div class="flex items-start justify-between gap-3">
+                  <div>
+                    <p class="text-[10px] font-black uppercase tracking-wider text-indigo-300">{{ stat.label }}</p>
+                    <p class="mt-1 text-2xl font-black text-white">{{ stat.value }}</p>
+                    <p class="mt-1 text-[11px] font-semibold text-slate-400">{{ stat.caption }}</p>
+                  </div>
+                  <span :class="[stat.iconClass, 'inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-300 ring-1 ring-indigo-500/20']">
+                    <svg v-if="stat.icon === 'jobs'" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
+                    </svg>
+                    <svg v-else-if="stat.icon === 'apps'" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 4.354a4 4 0 110 5.292M15 21H3v-1a6 6 0 0112 0v1zm0 0h6v-1a6 6 0 00-9-5.197M13 7a4 4 0 11-8 0 4 4 0 018 0z" />
+                    </svg>
+                    <svg v-else-if="stat.icon === 'pending'" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 8v4l3 3m6-3a9 9 0 11-18 0 9 9 0 0118 0z" />
+                    </svg>
+                    <svg v-else class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M11 3.055A9.001 9.001 0 1020.945 13H11V3.055z" />
+                      <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M20.488 9H15V3.512A9.025 9.025 0 0120.488 9z" />
+                    </svg>
+                  </span>
+                </div>
               </div>
             </div>
           </div>
         </div>
-      </div>
-    </section>
+      </section>
 
-    <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
-      <BusinessOverviewSection :state="businessDashboardState" />
-      <BusinessProfileSection :state="businessDashboardState" />
-      <BusinessJobsSection :state="businessDashboardState" />
-      <BusinessApplicantsSection :state="businessDashboardState" />
-    </main>
+      <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+        <BusinessOverviewSection :state="businessDashboardState" />
+        <BusinessProfileSection :state="businessDashboardState" />
+        <BusinessJobsSection :state="businessDashboardState" />
+        <BusinessApplicantsSection :state="businessDashboardState" />
+      </main>
+    </div>
   </div>
 
   <BusinessDashboardModals :state="businessDashboardState" />
@@ -86,10 +158,16 @@ import BusinessJobsSection from '~/components/business/BusinessJobsSection.vue'
 import BusinessApplicantsSection from '~/components/business/BusinessApplicantsSection.vue'
 import BusinessDashboardModals from '~/components/business/BusinessDashboardModals.vue'
 import { useApi } from '~/composables/useApi'
+import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({
   middleware: 'auth'
 })
+
+const { logout } = useAuth()
+const handleLogout = () => {
+  logout()
+}
 
 // Navigation setups
 const activeSection = useState<string>('businessDashboardActiveSection', () => 'dashboard')
