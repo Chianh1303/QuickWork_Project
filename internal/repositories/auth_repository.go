@@ -9,6 +9,7 @@ type AuthRepository interface {
 	GetUserByEmail(email string) (*models.User, error)
 	GetBusinessByTaxCode(taxCode string) (*models.Business, error)
 	CreateUserWithProfile(user *models.User, student *models.Student, business *models.Business) error
+	UpdateUser(user *models.User) error
 }
 
 type authRepository struct {
@@ -54,4 +55,8 @@ func (r *authRepository) CreateUserWithProfile(user *models.User, student *model
 		}
 		return nil
 	})
+}
+
+func (r *authRepository) UpdateUser(user *models.User) error {
+	return r.db.Save(user).Error
 }

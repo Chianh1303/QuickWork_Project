@@ -243,17 +243,19 @@ const handleLogin = async () => {
     })
   } catch (err: any) {
     const status = err.response?.status
-    const msg = err.response?._data?.message || ''
+    const data = err.response?._data || {}
+    const msg = data.message || ''
+    const remainingSec = data.remaining_seconds || 60
 
     errorMessage.value = msg || 'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.'
 
     // Khoá nút bấm và lưu thời điểm hết hạn vào localStorage để giữ khoá qua F5
-    if (status === 429 || msg.includes('quá 10 lần')) {
+    if (status === 429 || status === 423 || msg.includes('khóa') || msg.includes('quá 10 lần')) {
       if (process.client) {
-        const lockUntil = Date.now() + 60 * 1000
+        const lockUntil = Date.now() + remainingSec * 1000
         localStorage.setItem('login_lock_until', lockUntil.toString())
       }
-      startLockTimer(60)
+      startLockTimer(remainingSec)
     }
   } finally {
     isLoading.value = false

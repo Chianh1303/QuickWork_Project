@@ -35,6 +35,15 @@ func (e *AccountForbiddenError) Error() string {
 	return e.Message
 }
 
+type AccountLockedError struct {
+	Message          string
+	RemainingSeconds int
+}
+
+func (e *AccountLockedError) Error() string {
+	return e.Message
+}
+
 type AuthService interface {
 	Register(req dto.RegisterRequest) error
 	Login(req dto.LoginRequest) (*dto.LoginResponse, error)
@@ -121,8 +130,55 @@ func (s *authService) Login(req dto.LoginRequest) (*dto.LoginResponse, error) {
 		return nil, err
 	}
 
+	// 1. Kiểm tra khóa theo thời gian (Progressive Lockout Check)
+	if user.LockedUntil != nil && user.LockedUntil.After(time.Now()) {
+		remainingSec := int(time.Until(*user.LockedUntil).Seconds()) + 1
+		return nil, &AccountLockedError{
+			Message:          fmt.Sprintf("⚠️ Tài khoản tạm bị khóa do nhập sai mật khẩu nhiều lần. Vui lòng thử lại sau %d giây!", remainingSec),
+			RemainingSeconds: remainingSec,
+		}
+	}
+
+	// 2. Kiểm tra mật khẩu
 	if err := bcrypt.CompareHashAndPassword([]byte(user.Password), []byte(req.Password)); err != nil {
+		user.FailedAttempts++
+		now := time.Now()
+
+		if user.FailedAttempts >= 10 {
+			user.Status = "suspended"
+			user.LockedUntil = nil
+			_ = s.authRepo.UpdateUser(user)
+			return nil, &AccountForbiddenError{
+				Message: "🛑 Tài khoản của bạn đã bị tạm ngưng hoạt động do nhập sai mật khẩu quá 10 lần.",
+				Status:  "suspended",
+			}
+		} else if user.FailedAttempts >= 8 {
+			lockedTime := now.Add(15 * time.Minute)
+			user.LockedUntil = &lockedTime
+			_ = s.authRepo.UpdateUser(user)
+			return nil, &AccountLockedError{
+				Message:          "⚠️ Nhập sai 8 lần liên tiếp. Tài khoản bị tạm khóa 15 phút!",
+				RemainingSeconds: 900,
+			}
+		} else if user.FailedAttempts >= 5 {
+			lockedTime := now.Add(1 * time.Minute)
+			user.LockedUntil = &lockedTime
+			_ = s.authRepo.UpdateUser(user)
+			return nil, &AccountLockedError{
+				Message:          "⚠️ Nhập sai 5 lần liên tiếp. Tài khoản bị tạm khóa 1 phút!",
+				RemainingSeconds: 60,
+			}
+		}
+
+		_ = s.authRepo.UpdateUser(user)
 		return nil, ErrInvalidCredentials
+	}
+
+	// 3. Mật khẩu chính xác -> Reset số lần sai về 0
+	if user.FailedAttempts > 0 || user.LockedUntil != nil {
+		user.FailedAttempts = 0
+		user.LockedUntil = nil
+		_ = s.authRepo.UpdateUser(user)
 	}
 
 	if user.Status != "approved" && user.Status != "active" {

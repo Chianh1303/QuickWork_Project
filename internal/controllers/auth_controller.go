@@ -53,6 +53,13 @@ func (ctrl *AuthController) Login(c *fiber.Ctx) error {
 		if errors.Is(err, services.ErrInvalidCredentials) {
 			return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"message": err.Error()})
 		}
+		var lockedErr *services.AccountLockedError
+		if errors.As(err, &lockedErr) {
+			return c.Status(fiber.StatusLocked).JSON(fiber.Map{
+				"message":           lockedErr.Message,
+				"remaining_seconds": lockedErr.RemainingSeconds,
+			})
+		}
 		var forbiddenErr *services.AccountForbiddenError
 		if errors.As(err, &forbiddenErr) {
 			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{
