@@ -7,4 +7,5 @@ const (
 	AvatarDir   = "./uploads/avatars"
 	CVDir       = "./uploads/cvs"
 	CORSOrigins = "http://localhost:3001,http://127.0.0.1:3001"
+	RabbitMQURL = "amqp://guest:guest@localhost:5672/"
 )

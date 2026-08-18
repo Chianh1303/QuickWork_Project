@@ -17,6 +17,7 @@ import (
 	"QuickWork/internal/engine"
 	"QuickWork/internal/models"
 	"QuickWork/internal/parsers"
+	"QuickWork/internal/queue"
 	"QuickWork/internal/repositories"
 
 	"gorm.io/gorm"
@@ -42,6 +43,7 @@ type aiService struct {
 	pdfParser      parsers.PDFParser
 	matchingEngine engine.MatchingEngine
 	cacheClient    cache.CacheClient
+	queueClient    queue.RabbitMQClient
 }
 
 func NewAIService(aiRepo repositories.AIRepository, jobRepo repositories.JobRepository, geminiClient clients.GeminiClient, pdfParser parsers.PDFParser, matchingEngine engine.MatchingEngine, cacheClient ...cache.CacheClient) AIService {
@@ -67,6 +69,7 @@ func NewAIService(aiRepo repositories.AIRepository, jobRepo repositories.JobRepo
 		pdfParser:      pdfParser,
 		matchingEngine: matchingEngine,
 		cacheClient:    cc,
+		queueClient:    queue.NewRabbitMQClient("amqp://guest:guest@localhost:5672/"),
 	}
 }
 
@@ -85,6 +88,13 @@ func (s *aiService) EvaluateCV(userID uint, req dto.EvaluateCVRequest) (*dto.Eva
 	req.Phone = student.Phone
 	req.Gender = student.Gender
 	req.CvURL = student.CvUrl
+
+	if s.queueClient != nil && s.queueClient.IsAvailable() {
+		_ = s.queueClient.Publish(queue.QueueCVParsing, queue.CVParsingPayload{
+			UserID: userID,
+			CvURL:  student.CvUrl,
+		})
+	}
 
 	if student.Skills != "" {
 		var skills []string

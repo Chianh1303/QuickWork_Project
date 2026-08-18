@@ -4,6 +4,7 @@ import (
 	_ "QuickWork/docs"
 	"QuickWork/internal/config"
 	"QuickWork/internal/database"
+	"QuickWork/internal/queue"
 	"QuickWork/internal/routes"
 	"bufio"
 	"fmt"
@@ -69,7 +70,12 @@ func main() {
 	// 3. Tiến hành Nạp Seed Data thực tế (Chỉ chạy sau khi bảng đã tồn tại an toàn)
 	database.SeedDatabase(DB)
 
-	// 4. Khởi tạo Fiber App
+	// 4. Khởi tạo RabbitMQ Client & Đăng ký Background Workers
+	rmqClient := queue.NewRabbitMQClient(config.RabbitMQURL)
+	defer rmqClient.Close()
+	queue.RegisterWorkers(rmqClient)
+
+	// 5. Khởi tạo Fiber App
 	app := fiber.New()
 	app.Use(logger.New())
 
