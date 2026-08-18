@@ -21,5 +21,6 @@ func AutoMigrate(db *gorm.DB) error {
 		&models.Ticket{},
 		&models.Category{},
 		&models.Skill{},
+		&models.CVEvaluation{},
 	)
 }

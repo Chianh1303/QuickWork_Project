@@ -157,10 +157,24 @@ export const useAi = () => {
     }
   }
 
+  const getLatestCvEvaluation = async (): Promise<EvaluateCvResult | null> => {
+    isLoading.value = true
+    errorMessage.value = ''
+    try {
+      const data = await api.get<EvaluateCvResult>('/api/ai/latest-cv-evaluation')
+      return data
+    } catch (err: any) {
+      return null
+    } finally {
+      isLoading.value = false
+    }
+  }
+
   return {
     isLoading,
     errorMessage,
     evaluateCv,
+    getLatestCvEvaluation,
     matchJob,
     generateJobDescription,
     getRecommendedJobs

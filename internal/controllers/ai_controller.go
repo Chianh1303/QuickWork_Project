@@ -50,6 +50,25 @@ func (ctrl *AIController) EvaluateCV(c *fiber.Ctx) error {
 	return c.JSON(res)
 }
 
+// GetLatestCVEvaluation GET /api/ai/latest-cv-evaluation
+func (ctrl *AIController) GetLatestCVEvaluation(c *fiber.Ctx) error {
+	userID, ok := getUserIDFromContext(c)
+	if !ok {
+		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{
+			"message": "Chưa đăng nhập",
+		})
+	}
+
+	res, err := ctrl.aiService.GetLatestCVEvaluation(userID)
+	if err != nil {
+		return c.Status(fiber.StatusNotFound).JSON(fiber.Map{
+			"message": "Chưa có dữ liệu phân tích CV",
+		})
+	}
+
+	return c.JSON(res)
+}
+
 // MatchJob POST /api/ai/match-job
 func (ctrl *AIController) MatchJob(c *fiber.Ctx) error {
 	var req dto.MatchJobRequest

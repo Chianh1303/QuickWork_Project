@@ -27,6 +27,7 @@ func RegisterAIRoutes(app *fiber.App, db *gorm.DB) {
 
 	// Đánh giá CV (Đã đăng nhập)
 	api.Post("/evaluate-cv", middleware.Protected(), aiController.EvaluateCV)
+	api.Get("/latest-cv-evaluation", middleware.Protected(), middleware.RequireRole("student"), aiController.GetLatestCVEvaluation)
 
 	// AI Gợi ý công việc cho Sinh viên
 	api.Get("/recommended-jobs", middleware.Protected(), middleware.RequireRole("student"), aiController.GetRecommendedJobs)

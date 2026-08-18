@@ -31,6 +31,7 @@ var (
 
 type AIService interface {
 	EvaluateCV(userID uint, req dto.EvaluateCVRequest) (*dto.EvaluateCVResponse, error)
+	GetLatestCVEvaluation(userID uint) (*dto.EvaluateCVResponse, error)
 	MatchJob(userID uint, req dto.MatchJobRequest) (*dto.MatchJobResponse, error)
 	GenerateJobDescription(req dto.GenerateJobRequest) (*dto.GenerateJobResponse, error)
 	GetRecommendedJobs(userID uint) (*dto.RecommendedJobsResponse, error)
@@ -121,6 +122,7 @@ func (s *aiService) EvaluateCV(userID uint, req dto.EvaluateCVRequest) (*dto.Eva
 		res, err := s.callGeminiCVEvaluation(apiKey, req, pdfBytes)
 		if err == nil {
 			res.EvaluationSource = "gemini"
+			s.saveCVEvaluationRecord(userID, req.CvURL, res)
 			return res, nil
 		}
 		log.Printf("⚠️ [Gemini AI CV Evaluation Error]: %v", err)
@@ -129,7 +131,79 @@ func (s *aiService) EvaluateCV(userID uint, req dto.EvaluateCVRequest) (*dto.Eva
 	// 5. Fallback Heuristic Engine
 	parsedCV := s.pdfParser.ParsePDFTextContent(pdfBytes)
 	result := s.evaluateCVHeuristically(req, parsedCV.FullText, parsedCV.Projects, parsedCV.Skills, parsedCV.Universities, cvFilename, cvSizeBytes, cvExists)
+	s.saveCVEvaluationRecord(userID, req.CvURL, &result)
 	return &result, nil
+}
+
+func (s *aiService) saveCVEvaluationRecord(userID uint, cvURL string, res *dto.EvaluateCVResponse) {
+	if s.aiRepo == nil || res == nil {
+		return
+	}
+	strengthsBytes, _ := json.Marshal(res.Strengths)
+	weaknessesBytes, _ := json.Marshal(res.Weaknesses)
+
+	evalRecord := &models.CVEvaluation{
+		UserID:                   userID,
+		CvURL:                    cvURL,
+		ATSScore:                 res.ATS.Score,
+		SkillsScore:              res.Skills.Score,
+		ExperienceScore:          res.Experience.Score,
+		EducationScore:           res.Education.Score,
+		STARSituation:            res.STAR.Situation,
+		STARTask:                 res.STAR.Task,
+		STARAction:               res.STAR.Action,
+		STARResult:               res.STAR.Result,
+		Strengths:                string(strengthsBytes),
+		Weaknesses:               string(weaknessesBytes),
+		RecommendationDecision:   res.Recommendation.Decision,
+		RecommendationConfidence: res.Recommendation.Confidence,
+		EvaluationSource:         res.EvaluationSource,
+	}
+
+	_ = s.aiRepo.SaveCVEvaluation(evalRecord)
+}
+
+func (s *aiService) GetLatestCVEvaluation(userID uint) (*dto.EvaluateCVResponse, error) {
+	eval, err := s.aiRepo.GetLatestCVEvaluation(userID)
+	if err != nil {
+		return nil, err
+	}
+
+	var strengths []string
+	var weaknesses []string
+	_ = json.Unmarshal([]byte(eval.Strengths), &strengths)
+	_ = json.Unmarshal([]byte(eval.Weaknesses), &weaknesses)
+
+	resp := &dto.EvaluateCVResponse{
+		EvaluationSource: eval.EvaluationSource,
+		Score:            eval.ATSScore,
+		ATS: dto.ATSReview{
+			Score: eval.ATSScore,
+		},
+		Skills: dto.SkillsReview{
+			Score: eval.SkillsScore,
+		},
+		Experience: dto.ExperienceReview{
+			Score: eval.ExperienceScore,
+		},
+		Education: dto.EducationReview{
+			Score: eval.EducationScore,
+		},
+		STAR: dto.STARReview{
+			Situation: eval.STARSituation,
+			Task:      eval.STARTask,
+			Action:    eval.STARAction,
+			Result:    eval.STARResult,
+		},
+		Strengths:  strengths,
+		Weaknesses: weaknesses,
+		Recommendation: dto.Recommendation{
+			Decision:   eval.RecommendationDecision,
+			Confidence: eval.RecommendationConfidence,
+		},
+	}
+
+	return resp, nil
 }
 
 func (s *aiService) MatchJob(userID uint, req dto.MatchJobRequest) (*dto.MatchJobResponse, error) {
