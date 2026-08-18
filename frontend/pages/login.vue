@@ -175,7 +175,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, onUnmounted } from 'vue'
+import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({
@@ -193,6 +193,38 @@ const isLoading = ref(false)
 const errorMessage = ref('')
 const lockSeconds = ref(0)
 let lockTimer: any = null
+
+const startLockTimer = (durationSeconds: number) => {
+  lockSeconds.value = durationSeconds
+  if (lockTimer) clearInterval(lockTimer)
+  
+  lockTimer = setInterval(() => {
+    lockSeconds.value--
+    if (lockSeconds.value <= 0) {
+      clearInterval(lockTimer)
+      lockSeconds.value = 0
+      if (process.client) {
+        localStorage.removeItem('login_lock_until')
+      }
+    }
+  }, 1000)
+}
+
+onMounted(() => {
+  if (process.client) {
+    const savedUntil = localStorage.getItem('login_lock_until')
+    if (savedUntil) {
+      const remainingMs = Number(savedUntil) - Date.now()
+      const remainingSec = Math.ceil(remainingMs / 1000)
+      if (remainingSec > 0) {
+        errorMessage.value = '⚠️ Bạn đã thử đăng nhập quá 10 lần trong 1 phút. Vui lòng đợi 1 phút!'
+        startLockTimer(remainingSec)
+      } else {
+        localStorage.removeItem('login_lock_until')
+      }
+    }
+  }
+})
 
 onUnmounted(() => {
   if (lockTimer) clearInterval(lockTimer)
@@ -215,17 +247,13 @@ const handleLogin = async () => {
 
     errorMessage.value = msg || 'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.'
 
-    // Khoá nút bấm và chạy đếm ngược 60 giây nếu dính Rate Limit HTTP 429
+    // Khoá nút bấm và lưu thời điểm hết hạn vào localStorage để giữ khoá qua F5
     if (status === 429 || msg.includes('quá 10 lần')) {
-      lockSeconds.value = 60
-      if (lockTimer) clearInterval(lockTimer)
-      lockTimer = setInterval(() => {
-        lockSeconds.value--
-        if (lockSeconds.value <= 0) {
-          clearInterval(lockTimer)
-          lockSeconds.value = 0
-        }
-      }, 1000)
+      if (process.client) {
+        const lockUntil = Date.now() + 60 * 1000
+        localStorage.setItem('login_lock_until', lockUntil.toString())
+      }
+      startLockTimer(60)
     }
   } finally {
     isLoading.value = false
