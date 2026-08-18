@@ -12,10 +12,12 @@ import (
 	"strings"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/gofiber/fiber/v2/middleware/cors" // Bổ sung CORS để gọi mượt từ Nuxt 4 (Port 3001)
+	"github.com/gofiber/fiber/v2/middleware/cors" // Bổ sung CORS để gọi mượt từ Nuxt (Port 3001)
+	"github.com/gofiber/fiber/v2/middleware/limiter"
 	"github.com/gofiber/fiber/v2/middleware/logger"
 	swagger "github.com/gofiber/swagger"
 	"gorm.io/gorm"
+	"time"
 )
 
 var DB *gorm.DB
@@ -82,6 +84,27 @@ func main() {
 		AllowCredentials: true,
 	}))
 	app.Static("/uploads", config.UploadDir)
+
+	// 6. Cấu hình Rate Limiting bảo vệ các Route nhạy cảm (Chống Brute Force & AI Spam)
+	app.Use("/api/auth/login", limiter.New(limiter.Config{
+		Max:        10,
+		Expiration: 1 * time.Minute,
+		LimitReached: func(c *fiber.Ctx) error {
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+				"message": "⚠️ Bạn đã thử đăng nhập quá 10 lần trong 1 phút. Vui lòng đợi 1 phút!",
+			})
+		},
+	}))
+
+	app.Use("/api/ai/*", limiter.New(limiter.Config{
+		Max:        15,
+		Expiration: 1 * time.Minute,
+		LimitReached: func(c *fiber.Ctx) error {
+			return c.Status(fiber.StatusTooManyRequests).JSON(fiber.Map{
+				"message": "⚠️ Bạn đã gọi dịch vụ AI quá 15 lần trong 1 phút. Vui lòng đợi 1 phút!",
+			})
+		},
+	}))
 
 	// Swagger OpenAPI UI Route
 	app.Get("/swagger/*", swagger.HandlerDefault)
