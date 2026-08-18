@@ -21,19 +21,27 @@ type NotificationPayload struct {
 	Message string `json:"message"`
 }
 
-func RegisterWorkers(rmq RabbitMQClient) {
+type CVParsingHandler func(userID uint, cvURL string) error
+
+func RegisterWorkers(rmq RabbitMQClient, cvHandler CVParsingHandler) {
 	if rmq == nil || !rmq.IsAvailable() {
 		return
 	}
 
-	// 1. Worker xử lý giải mã & phân tích CV ngầm
+	// 1. Worker xử lý giải mã & phân tích CV ngầm thực tế
 	_ = rmq.Consume(QueueCVParsing, func(body []byte) error {
 		var payload CVParsingPayload
 		if err := json.Unmarshal(body, &payload); err != nil {
 			return err
 		}
 		log.Printf("⚙️ [Background Worker]: Bắt đầu giải mã CV PDF ngầm cho User ID %d (URL: %s)...", payload.UserID, payload.CvURL)
-		log.Printf("✅ [Background Worker]: Đã hoàn thành phân tích AI CV cho User ID %d!", payload.UserID)
+		if cvHandler != nil {
+			if err := cvHandler(payload.UserID, payload.CvURL); err != nil {
+				log.Printf("❌ [Background Worker Error]: %v", err)
+				return err
+			}
+		}
+		log.Printf("✅ [Background Worker]: Đã hoàn thành phân tích AI CV ngầm cho User ID %d!", payload.UserID)
 		return nil
 	})
 

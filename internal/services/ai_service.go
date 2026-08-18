@@ -32,6 +32,7 @@ var (
 type AIService interface {
 	EvaluateCV(userID uint, req dto.EvaluateCVRequest) (*dto.EvaluateCVResponse, error)
 	GetLatestCVEvaluation(userID uint) (*dto.EvaluateCVResponse, error)
+	ProcessBackgroundCVEvaluation(userID uint, cvURL string) error
 	MatchJob(userID uint, req dto.MatchJobRequest) (*dto.MatchJobResponse, error)
 	GenerateJobDescription(req dto.GenerateJobRequest) (*dto.GenerateJobResponse, error)
 	GetRecommendedJobs(userID uint) (*dto.RecommendedJobsResponse, error)
@@ -204,6 +205,49 @@ func (s *aiService) GetLatestCVEvaluation(userID uint) (*dto.EvaluateCVResponse,
 	}
 
 	return resp, nil
+}
+
+func (s *aiService) ProcessBackgroundCVEvaluation(userID uint, cvURL string) error {
+	student, err := s.aiRepo.GetStudentByUserID(userID)
+	if err != nil {
+		return err
+	}
+
+	req := dto.EvaluateCVRequest{
+		FullName: student.FullName,
+		Phone:    student.Phone,
+		Gender:   student.Gender,
+		CvURL:    cvURL,
+	}
+
+	if student.Skills != "" {
+		var skills []string
+		if err := json.Unmarshal([]byte(student.Skills), &skills); err == nil {
+			req.Skills = skills
+		}
+	}
+
+	pdfBytes, cvFilename, cvSizeBytes, cvExists := s.pdfParser.GetCVFileBytesAndInfo(req.CvURL)
+	apiKey := strings.TrimSpace(os.Getenv("GEMINI_API_KEY"))
+
+	var res *dto.EvaluateCVResponse
+	if apiKey != "" {
+		gRes, err := s.callGeminiCVEvaluation(apiKey, req, pdfBytes)
+		if err == nil {
+			gRes.EvaluationSource = "gemini"
+			res = gRes
+		}
+	}
+
+	if res == nil {
+		parsedCV := s.pdfParser.ParsePDFTextContent(pdfBytes)
+		hRes := s.evaluateCVHeuristically(req, parsedCV.FullText, parsedCV.Projects, parsedCV.Skills, parsedCV.Universities, cvFilename, cvSizeBytes, cvExists)
+		res = &hRes
+	}
+
+	s.saveCVEvaluationRecord(userID, req.CvURL, res)
+	log.Printf("⚡ [RabbitMQ Background Worker Engine]: Đã phân tích AI CV ngầm và lưu vào Database cho User ID %d thành công!", userID)
+	return nil
 }
 
 func (s *aiService) MatchJob(userID uint, req dto.MatchJobRequest) (*dto.MatchJobResponse, error) {

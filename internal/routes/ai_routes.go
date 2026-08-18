@@ -2,10 +2,12 @@ package routes
 
 import (
 	"QuickWork/internal/clients"
+	"QuickWork/internal/config"
 	"QuickWork/internal/controllers"
 	"QuickWork/internal/engine"
 	"QuickWork/internal/middleware"
 	"QuickWork/internal/parsers"
+	"QuickWork/internal/queue"
 	"QuickWork/internal/repositories"
 	"QuickWork/internal/services"
 
@@ -22,6 +24,9 @@ func RegisterAIRoutes(app *fiber.App, db *gorm.DB) {
 
 	aiService := services.NewAIService(aiRepo, jobRepo, geminiClient, pdfParser, matchingEngine)
 	aiController := controllers.NewAIController(aiService)
+
+	rmqClient := queue.NewRabbitMQClient(config.RabbitMQURL)
+	queue.RegisterWorkers(rmqClient, aiService.ProcessBackgroundCVEvaluation)
 
 	api := app.Group("/api/ai")
 
