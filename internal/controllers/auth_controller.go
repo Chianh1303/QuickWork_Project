@@ -30,7 +30,7 @@ func (ctrl *AuthController) Register(c *fiber.Ctx) error {
 		if errors.Is(err, services.ErrEmptyFields) || errors.Is(err, services.ErrInvalidRole) || errors.Is(err, services.ErrStudentNameRequired) || errors.Is(err, services.ErrBusinessFieldsRequired) {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
 		}
-		if errors.Is(err, services.ErrEmailExists) {
+		if errors.Is(err, services.ErrEmailExists) || errors.Is(err, services.ErrTaxCodeExists) {
 			return c.Status(fiber.StatusConflict).JSON(fiber.Map{"message": err.Error()})
 		}
 		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": err.Error()})

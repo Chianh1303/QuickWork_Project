@@ -20,8 +20,9 @@ var (
 	ErrEmptyFields           = errors.New("Email, password và role không được để trống")
 	ErrInvalidRole           = errors.New("Role phải là 'student' hoặc 'business'")
 	ErrEmailExists           = errors.New("Email này đã được đăng ký sử dụng")
-	ErrStudentNameRequired   = errors.New("họ và tên sinh viên không được để trống")
-	ErrBusinessFieldsRequired = errors.New("tên công ty và mã số thuế không được để trống")
+	ErrTaxCodeExists         = errors.New("Mã số thuế này đã được đăng ký sử dụng")
+	ErrStudentNameRequired   = errors.New("Họ và tên sinh viên không được để trống")
+	ErrBusinessFieldsRequired = errors.New("Tên công ty và mã số thuế không được để trống")
 	ErrInvalidCredentials    = errors.New("Email hoặc mật khẩu không chính xác")
 )
 
@@ -92,6 +93,10 @@ func (s *authService) Register(req dto.RegisterRequest) error {
 	} else if req.Role == "business" {
 		if req.CompanyName == "" || req.TaxCode == "" {
 			return ErrBusinessFieldsRequired
+		}
+		existingBiz, err := s.authRepo.GetBusinessByTaxCode(req.TaxCode)
+		if err == nil && existingBiz != nil {
+			return ErrTaxCodeExists
 		}
 		businessProfile = &models.Business{
 			CompanyName: req.CompanyName,

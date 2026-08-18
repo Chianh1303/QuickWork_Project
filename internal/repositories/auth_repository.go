@@ -7,6 +7,7 @@ import (
 
 type AuthRepository interface {
 	GetUserByEmail(email string) (*models.User, error)
+	GetBusinessByTaxCode(taxCode string) (*models.Business, error)
 	CreateUserWithProfile(user *models.User, student *models.Student, business *models.Business) error
 }
 
@@ -24,6 +25,14 @@ func (r *authRepository) GetUserByEmail(email string) (*models.User, error) {
 		return nil, err
 	}
 	return &user, nil
+}
+
+func (r *authRepository) GetBusinessByTaxCode(taxCode string) (*models.Business, error) {
+	var b models.Business
+	if err := r.db.Where("tax_code = ?", taxCode).First(&b).Error; err != nil {
+		return nil, err
+	}
+	return &b, nil
 }
 
 func (r *authRepository) CreateUserWithProfile(user *models.User, student *models.Student, business *models.Business) error {
