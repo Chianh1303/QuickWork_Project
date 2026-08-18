@@ -135,7 +135,7 @@
             <div>
               <button
                 type="submit"
-                :disabled="isLoading"
+                :disabled="isLoading || lockSeconds > 0"
                 class="group relative w-full flex justify-center py-3 px-4 border border-transparent text-sm font-bold rounded-lg text-slate-950 bg-cyan-400 hover:bg-cyan-300 focus:outline-none focus:ring-2 focus:ring-offset-2 focus:ring-cyan-400 transition-all duration-150 disabled:opacity-50 disabled:cursor-not-allowed shadow-lg shadow-cyan-500/20"
               >
                 <span v-if="isLoading" class="flex items-center space-x-2">
@@ -144,6 +144,9 @@
                     <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
                   </svg>
                   <span>Đang đăng nhập...</span>
+                </span>
+                <span v-else-if="lockSeconds > 0" class="text-slate-950 font-black">
+                  ⏳ Nút đã khóa (Thử lại sau {{ lockSeconds }}s)
                 </span>
                 <span v-else>Đăng Nhập</span>
               </button>
@@ -172,7 +175,7 @@
 </template>
 
 <script setup lang="ts">
-import { ref, reactive } from 'vue'
+import { ref, reactive, onUnmounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
 
 definePageMeta({
@@ -188,8 +191,16 @@ const form = reactive({
 
 const isLoading = ref(false)
 const errorMessage = ref('')
+const lockSeconds = ref(0)
+let lockTimer: any = null
+
+onUnmounted(() => {
+  if (lockTimer) clearInterval(lockTimer)
+})
 
 const handleLogin = async () => {
+  if (lockSeconds.value > 0) return
+
   isLoading.value = true
   errorMessage.value = ''
 
@@ -199,7 +210,23 @@ const handleLogin = async () => {
       password: form.password
     })
   } catch (err: any) {
-    errorMessage.value = err.response?._data?.message || 'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.'
+    const status = err.response?.status
+    const msg = err.response?._data?.message || ''
+
+    errorMessage.value = msg || 'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.'
+
+    // Khoá nút bấm và chạy đếm ngược 60 giây nếu dính Rate Limit HTTP 429
+    if (status === 429 || msg.includes('quá 10 lần')) {
+      lockSeconds.value = 60
+      if (lockTimer) clearInterval(lockTimer)
+      lockTimer = setInterval(() => {
+        lockSeconds.value--
+        if (lockSeconds.value <= 0) {
+          clearInterval(lockTimer)
+          lockSeconds.value = 0
+        }
+      }, 1000)
+    }
   } finally {
     isLoading.value = false
   }
