@@ -66,19 +66,7 @@ func (s *s3StorageProvider) IsS3Active() bool {
 func (s *s3StorageProvider) UploadFile(fileBytes []byte, filename string, folder string) (string, error) {
 	// FALLBACK: Nếu AWS S3 không khả dụng ➔ Lưu vào đĩa local
 	if !s.active {
-		targetDir := filepath.Join(config.UploadDir, folder)
-		_ = os.MkdirAll(targetDir, os.ModePerm)
-
-		uniqueName := fmt.Sprintf("%d_%s", time.Now().UnixNano(), filename)
-		localPath := filepath.Join(targetDir, uniqueName)
-
-		if err := os.WriteFile(localPath, fileBytes, 0644); err != nil {
-			return "", fmt.Errorf("không thể lưu file đĩa local: %w", err)
-		}
-
-		publicURL := fmt.Sprintf("/uploads/%s/%s", folder, uniqueName)
-		log.Printf("📁 [Local Storage]: Đã lưu file vào đĩa local: %s", publicURL)
-		return publicURL, nil
+		return s.saveToLocalDisk(fileBytes, filename, folder)
 	}
 
 	// S3 UPLOAD: Upload trực tiếp lên đám mây AWS S3
@@ -90,12 +78,29 @@ func (s *s3StorageProvider) UploadFile(fileBytes []byte, filename string, folder
 		ContentType: getContentType(filename),
 	})
 	if err != nil {
-		return "", fmt.Errorf("không thể upload file lên AWS S3: %w", err)
+		log.Printf("⚠️ [AWS S3 Upload Notice]: Không thể upload lên AWS S3 (%v). Tự động Fallback sang Local Disk Storage...", err)
+		return s.saveToLocalDisk(fileBytes, filename, folder)
 	}
 
 	s3URL := fmt.Sprintf("https://%s.s3.%s.amazonaws.com/%s", s.bucketName, s.region, uniqueName)
 	log.Printf("🚀 [AWS S3 Engine]: Upload thành công lên đám mây S3: %s", s3URL)
 	return s3URL, nil
+}
+
+func (s *s3StorageProvider) saveToLocalDisk(fileBytes []byte, filename string, folder string) (string, error) {
+	targetDir := filepath.Join(config.UploadDir, folder)
+	_ = os.MkdirAll(targetDir, os.ModePerm)
+
+	uniqueName := fmt.Sprintf("%d_%s", time.Now().UnixNano(), filename)
+	localPath := filepath.Join(targetDir, uniqueName)
+
+	if err := os.WriteFile(localPath, fileBytes, 0644); err != nil {
+		return "", fmt.Errorf("không thể lưu file đĩa local: %w", err)
+	}
+
+	publicURL := fmt.Sprintf("/uploads/%s/%s", folder, uniqueName)
+	log.Printf("📁 [Local Storage]: Đã lưu file vào đĩa local: %s", publicURL)
+	return publicURL, nil
 }
 
 func getContentType(filename string) *string {

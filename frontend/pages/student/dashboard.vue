@@ -813,9 +813,11 @@ const handleUpdateProfile = async () => {
 
     const updatedData = res.data ? res.data : res
     if (updatedData) {
-      profileForm.avatar_url = updatedData.AvatarUrl || updatedData.avatar_url || profileForm.avatar_url
-      profileForm.cv_url = updatedData.CvUrl || updatedData.cv_url || profileForm.cv_url
+      profileForm.avatar_url = updatedData.avatar_url || updatedData.AvatarUrl || profileForm.avatar_url
+      profileForm.cv_url = updatedData.cv_url || updatedData.CvUrl || profileForm.cv_url
     }
+
+    await fetchProfile()
 
     skillsArray.value = parsedSkills
     isEditing.value = false
