@@ -49,10 +49,6 @@ func (c *cloudinaryStorageProvider) IsActive() bool {
 	return c.active
 }
 
-func (c *cloudinaryStorageProvider) IsS3Active() bool {
-	return false
-}
-
 func (c *cloudinaryStorageProvider) UploadFile(fileBytes []byte, filename string, folder string) (string, error) {
 	if !c.active || c.cld == nil {
 		return "", fmt.Errorf("Cloudinary không khả dụng")
