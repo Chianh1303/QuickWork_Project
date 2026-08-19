@@ -211,7 +211,7 @@ definePageMeta({
   middleware: 'auth'
 })
 
-const { login } = useAuth()
+const { login, loginWithGoogle } = useAuth()
 const router = useRouter()
 
 const form = reactive({
@@ -307,35 +307,15 @@ const handleGoogleLogin = async () => {
           const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''))
           const payload = JSON.parse(jsonPayload)
 
-          const res: any = await $fetch('/api/auth/google-login', {
-            method: 'POST',
-            body: {
-              id_token: response.credential,
-              email: payload.email,
-              name: payload.name || payload.email.split('@')[0],
-              picture: payload.picture || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256',
-              role: 'student'
-            }
+          await loginWithGoogle({
+            id_token: response.credential,
+            email: payload.email,
+            name: payload.name || payload.email.split('@')[0],
+            picture: payload.picture || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256',
+            role: 'student'
           })
-
-          if (res.token) {
-            localStorage.setItem('token', res.token)
-            localStorage.setItem('user', JSON.stringify(res.user))
-            const authUser = useCookie('user')
-            const authToken = useCookie('token')
-            authUser.value = JSON.stringify(res.user)
-            authToken.value = res.token
-
-            if (res.user.role === 'student') {
-              router.push('/student/dashboard')
-            } else if (res.user.role === 'business') {
-              router.push('/business/dashboard')
-            } else {
-              router.push('/')
-            }
-          }
         } catch (err: any) {
-          errorMessage.value = err.data?.message || 'Đăng nhập bằng Google không thành công!'
+          errorMessage.value = err.data?.message || err.message || 'Đăng nhập bằng Google không thành công!'
         } finally {
           isLoading.value = false
         }
@@ -362,34 +342,14 @@ const triggerGoogleFallbackLogin = async (email: string) => {
   errorMessage.value = ''
 
   try {
-    const res: any = await $fetch('/api/auth/google-login', {
-      method: 'POST',
-      body: {
-        email: email,
-        name: email.split('@')[0],
-        picture: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256',
-        role: 'student'
-      }
+    await loginWithGoogle({
+      email: email,
+      name: email.split('@')[0],
+      picture: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256',
+      role: 'student'
     })
-
-    if (res.token && process.client) {
-      localStorage.setItem('token', res.token)
-      localStorage.setItem('user', JSON.stringify(res.user))
-      const authUser = useCookie('user')
-      const authToken = useCookie('token')
-      authUser.value = JSON.stringify(res.user)
-      authToken.value = res.token
-
-      if (res.user.role === 'student') {
-        router.push('/student/dashboard')
-      } else if (res.user.role === 'business') {
-        router.push('/business/dashboard')
-      } else {
-        router.push('/')
-      }
-    }
   } catch (err: any) {
-    errorMessage.value = err.data?.message || 'Đăng nhập bằng Google không thành công!'
+    errorMessage.value = err.data?.message || err.message || 'Đăng nhập bằng Google không thành công!'
   } finally {
     isLoading.value = false
   }

@@ -40,6 +40,32 @@ export const useAuth = () => {
   }
 
   /**
+   * Log in via Google OAuth, store JWT token in cookie, update store state, and redirect.
+   */
+  const loginWithGoogle = async (googleData: { id_token?: string; email: string; name?: string; picture?: string; role?: string }) => {
+    try {
+      const response = await api.post('/api/auth/google-login', googleData)
+      
+      if (response && response.token) {
+        token.value = response.token
+        
+        authStore.setUser({
+          id: response.user.id,
+          email: response.user.email,
+          role: response.user.role
+        })
+
+        // Route by role
+        await redirectByUserRole(response.user.role)
+      }
+      return response
+    } catch (error: any) {
+      console.error('Google login error:', error)
+      throw error
+    }
+  }
+
+  /**
    * Register a new user (student or business).
    */
   const register = async (registrationData: any) => {
@@ -105,6 +131,7 @@ export const useAuth = () => {
 
   return {
     login,
+    loginWithGoogle,
     register,
     logout,
     fetchUser,
