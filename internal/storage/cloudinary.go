@@ -55,9 +55,10 @@ func (c *cloudinaryStorageProvider) UploadFile(fileBytes []byte, filename string
 	}
 
 	baseName := strings.TrimSuffix(filepath.Base(filename), filepath.Ext(filename))
-	uniquePublicID := fmt.Sprintf("%s/%d_%s", folder, time.Now().UnixNano(), baseName)
+	uniquePublicID := fmt.Sprintf("%d_%s", time.Now().UnixNano(), baseName)
 
 	resp, err := c.cld.Upload.Upload(context.Background(), bytes.NewReader(fileBytes), uploader.UploadParams{
+		Folder:       folder,
 		PublicID:     uniquePublicID,
 		ResourceType: getCloudinaryResourceType(filename),
 	})
@@ -65,8 +66,16 @@ func (c *cloudinaryStorageProvider) UploadFile(fileBytes []byte, filename string
 		return "", fmt.Errorf("lỗi upload Cloudinary: %w", err)
 	}
 
-	log.Printf("🚀 [Cloudinary Engine]: Upload thành công lên Cloudinary: %s", resp.SecureURL)
-	return resp.SecureURL, nil
+	fileURL := resp.SecureURL
+	if fileURL == "" {
+		fileURL = resp.URL
+	}
+	if fileURL == "" && resp.PublicID != "" {
+		fileURL = fmt.Sprintf("https://res.cloudinary.com/%s/image/upload/%s", c.cld.Config.Cloud.CloudName, resp.PublicID)
+	}
+
+	log.Printf("🚀 [Cloudinary Engine]: Upload thành công lên Cloudinary: %s", fileURL)
+	return fileURL, nil
 }
 
 func getCloudinaryResourceType(filename string) string {
