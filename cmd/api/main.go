@@ -5,6 +5,7 @@ import (
 	"QuickWork/internal/config"
 	"QuickWork/internal/database"
 	"QuickWork/internal/routes"
+	"QuickWork/internal/storage"
 	"bufio"
 	"fmt"
 	"log"
@@ -68,6 +69,9 @@ func main() {
 
 	// 3. Tiến hành Nạp Seed Data thực tế (Chỉ chạy sau khi bảng đã tồn tại an toàn)
 	database.SeedDatabase(DB)
+
+	// 4. Khởi tạo AWS S3 / Local Storage Engine
+	_ = storage.NewStorageProvider()
 
 	// 4. Khởi tạo Fiber App
 	app := fiber.New()

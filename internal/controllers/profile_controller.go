@@ -2,21 +2,31 @@ package controllers
 
 import (
 	"errors"
-	"fmt"
+	"io"
 	"path/filepath"
-	"time"
 
 	"QuickWork/internal/services"
+	"QuickWork/internal/storage"
 
 	"github.com/gofiber/fiber/v2"
 )
 
 type ProfileController struct {
-	profileService services.ProfileService
+	profileService  services.ProfileService
+	storageProvider storage.StorageProvider
 }
 
-func NewProfileController(profileService services.ProfileService) *ProfileController {
-	return &ProfileController{profileService: profileService}
+func NewProfileController(profileService services.ProfileService, storageProvider ...storage.StorageProvider) *ProfileController {
+	var sp storage.StorageProvider
+	if len(storageProvider) > 0 && storageProvider[0] != nil {
+		sp = storageProvider[0]
+	} else {
+		sp = storage.NewStorageProvider()
+	}
+	return &ProfileController{
+		profileService:  profileService,
+		storageProvider: sp,
+	}
 }
 
 // GetStudentProfile GET /api/profile/student
@@ -57,12 +67,17 @@ func (ctrl *ProfileController) UpdateStudentProfile(c *fiber.Ctx) error {
 	var avatarUrl string
 	avatarFile, err := c.FormFile("avatar")
 	if err == nil {
-		avatarName := fmt.Sprintf("%d_%s", time.Now().Unix(), filepath.Base(avatarFile.Filename))
-		avatarPath := filepath.Join("./uploads/avatars", avatarName)
-		if err := c.SaveFile(avatarFile, avatarPath); err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"success": false, "message": "Lỗi khi lưu file ảnh đại diện"})
+		fileHeader, openErr := avatarFile.Open()
+		if openErr == nil {
+			fileBytes, readErr := io.ReadAll(fileHeader)
+			fileHeader.Close()
+			if readErr == nil {
+				url, uploadErr := ctrl.storageProvider.UploadFile(fileBytes, avatarFile.Filename, "avatars")
+				if uploadErr == nil {
+					avatarUrl = url
+				}
+			}
 		}
-		avatarUrl = fmt.Sprintf("http://localhost:3000/uploads/avatars/%s", avatarName)
 	}
 
 	var cvUrl string
@@ -71,12 +86,17 @@ func (ctrl *ProfileController) UpdateStudentProfile(c *fiber.Ctx) error {
 		if filepath.Ext(cvFile.Filename) != ".pdf" {
 			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"success": false, "message": "Hồ sơ đính kèm bắt buộc phải là định dạng file PDF"})
 		}
-		cvName := fmt.Sprintf("%d_%s", time.Now().Unix(), filepath.Base(cvFile.Filename))
-		cvPath := filepath.Join("./uploads/cvs", cvName)
-		if err := c.SaveFile(cvFile, cvPath); err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"success": false, "message": "Lỗi khi lưu file CV PDF"})
+		fileHeader, openErr := cvFile.Open()
+		if openErr == nil {
+			fileBytes, readErr := io.ReadAll(fileHeader)
+			fileHeader.Close()
+			if readErr == nil {
+				url, uploadErr := ctrl.storageProvider.UploadFile(fileBytes, cvFile.Filename, "cvs")
+				if uploadErr == nil {
+					cvUrl = url
+				}
+			}
 		}
-		cvUrl = fmt.Sprintf("http://localhost:3000/uploads/cvs/%s", cvName)
 	}
 
 	student, err := ctrl.profileService.UpdateStudentProfile(userID, fullName, phone, gender, skills, avatarUrl, cvUrl)
@@ -130,12 +150,17 @@ func (ctrl *ProfileController) UpdateBusinessProfile(c *fiber.Ctx) error {
 	var logoUrl string
 	logoFile, err := c.FormFile("logo")
 	if err == nil {
-		logoName := fmt.Sprintf("%d_%s", time.Now().Unix(), filepath.Base(logoFile.Filename))
-		logoPath := filepath.Join("./uploads/avatars", logoName)
-		if err := c.SaveFile(logoFile, logoPath); err != nil {
-			return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"success": false, "message": "Lỗi khi lưu file Logo công ty"})
+		fileHeader, openErr := logoFile.Open()
+		if openErr == nil {
+			fileBytes, readErr := io.ReadAll(fileHeader)
+			fileHeader.Close()
+			if readErr == nil {
+				url, uploadErr := ctrl.storageProvider.UploadFile(fileBytes, logoFile.Filename, "avatars")
+				if uploadErr == nil {
+					logoUrl = url
+				}
+			}
 		}
-		logoUrl = fmt.Sprintf("http://localhost:3000/uploads/avatars/%s", logoName)
 	}
 
 	business, err := ctrl.profileService.UpdateBusinessProfile(userID, companyName, phone, address, logoUrl)
