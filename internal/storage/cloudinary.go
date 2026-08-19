@@ -10,6 +10,8 @@ import (
 	"strings"
 	"time"
 
+	"QuickWork/internal/config"
+
 	"github.com/cloudinary/cloudinary-go/v2"
 	"github.com/cloudinary/cloudinary-go/v2/api/uploader"
 )
@@ -63,7 +65,8 @@ func (c *cloudinaryStorageProvider) UploadFile(fileBytes []byte, filename string
 		ResourceType: getCloudinaryResourceType(filename),
 	})
 	if err != nil {
-		return "", fmt.Errorf("lỗi upload Cloudinary: %w", err)
+		log.Printf("⚠️ [Cloudinary Upload Notice]: Lỗi Cloudinary (%v). Tự động Fallback sang Local Disk Storage...", err)
+		return c.saveToLocalDisk(fileBytes, filename, folder)
 	}
 
 	fileURL := resp.SecureURL
@@ -74,8 +77,29 @@ func (c *cloudinaryStorageProvider) UploadFile(fileBytes []byte, filename string
 		fileURL = fmt.Sprintf("https://res.cloudinary.com/%s/image/upload/%s", c.cld.Config.Cloud.CloudName, resp.PublicID)
 	}
 
+	if fileURL == "" {
+		log.Printf("⚠️ [Cloudinary Upload Notice]: Cloudinary URL rỗng (Resp: %+v). Tự động Fallback sang Local Disk Storage...", resp)
+		return c.saveToLocalDisk(fileBytes, filename, folder)
+	}
+
 	log.Printf("🚀 [Cloudinary Engine]: Upload thành công lên Cloudinary: %s", fileURL)
 	return fileURL, nil
+}
+
+func (c *cloudinaryStorageProvider) saveToLocalDisk(fileBytes []byte, filename string, folder string) (string, error) {
+	targetDir := filepath.Join(config.UploadDir, folder)
+	_ = os.MkdirAll(targetDir, os.ModePerm)
+
+	uniqueName := fmt.Sprintf("%d_%s", time.Now().UnixNano(), filename)
+	localPath := filepath.Join(targetDir, uniqueName)
+
+	if err := os.WriteFile(localPath, fileBytes, 0644); err != nil {
+		return "", fmt.Errorf("không thể lưu file đĩa local: %w", err)
+	}
+
+	publicURL := fmt.Sprintf("/uploads/%s/%s", folder, uniqueName)
+	log.Printf("📁 [Local Storage]: Đã lưu file vào đĩa local: %s", publicURL)
+	return publicURL, nil
 }
 
 func getCloudinaryResourceType(filename string) string {
