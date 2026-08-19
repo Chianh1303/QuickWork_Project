@@ -293,9 +293,9 @@ const handleLogin = async () => {
 }
 
 const handleGoogleLogin = async () => {
-  const googleClientId = '108293847291-demo.apps.googleusercontent.com'
+  const googleClientId = '635598150710-c7rj8p5vb10bh3j7nc10u744coao6rdr.apps.googleusercontent.com'
   
-  if (process.client && window.google && !googleClientId.includes('demo')) {
+  if (process.client && window.google) {
     window.google.accounts.id.initialize({
       client_id: googleClientId,
       callback: async (response: any) => {
