@@ -293,9 +293,11 @@ const handleLogin = async () => {
 }
 
 const handleGoogleLogin = async () => {
-  if (process.client && window.google) {
+  const googleClientId = '108293847291-demo.apps.googleusercontent.com'
+  
+  if (process.client && window.google && !googleClientId.includes('demo')) {
     window.google.accounts.id.initialize({
-      client_id: '108293847291-demo.apps.googleusercontent.com',
+      client_id: googleClientId,
       callback: async (response: any) => {
         if (!response.credential) return
         isLoading.value = true
