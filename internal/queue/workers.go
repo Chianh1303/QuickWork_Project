@@ -66,7 +66,8 @@ func RegisterWorkers(rmq RabbitMQClient, cvHandler CVParsingHandler, otpHandler 
 	_ = rmq.Consume(QueueEmailOTP, func(body []byte) error {
 		var payload EmailOTPPayload
 		if err := json.Unmarshal(body, &payload); err != nil {
-			return err
+			log.Printf("⚠️ [RabbitMQ Worker Notice]: Đã dọn dẹp message rác cũ khỏi Queue: %s", string(body))
+			return nil
 		}
 		log.Printf("📧 [RabbitMQ Email Worker]: Bắt đầu gửi Email OTP ngầm đến %s...", payload.Email)
 		if otpHandler != nil {

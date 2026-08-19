@@ -3,7 +3,6 @@ package services
 import (
 	"context"
 	"crypto/rand"
-	"encoding/json"
 	"errors"
 	"fmt"
 	"math/big"
@@ -255,11 +254,10 @@ func (s *authService) SendPasswordResetOTP(email string) error {
 
 	// Off-thread Async Queueing via RabbitMQ or Direct Service Call
 	if s.rmqClient != nil && s.rmqClient.IsAvailable() {
-		payload, _ := json.Marshal(queue.EmailOTPPayload{
+		_ = s.rmqClient.Publish(queue.QueueEmailOTP, queue.EmailOTPPayload{
 			Email:   email,
 			OTPCode: otpCode,
 		})
-		_ = s.rmqClient.Publish(queue.QueueEmailOTP, payload)
 	} else if s.emailService != nil {
 		go func() {
 			_ = s.emailService.SendOTPEmail(email, otpCode)
