@@ -126,9 +126,9 @@
               </div>
 
               <div class="text-sm">
-                <a href="#" class="font-bold text-cyan-300 hover:text-cyan-200 transition-colors">
+                <button @click.prevent="isForgotPasswordOpen = true" class="font-bold text-cyan-300 hover:text-cyan-200 transition-colors">
                   Quên mật khẩu?
-                </a>
+                </button>
               </div>
             </div>
 
@@ -153,6 +153,28 @@
             </div>
           </form>
 
+          <!-- Divider -->
+          <div class="my-5 flex items-center">
+            <div class="flex-grow border-t border-white/10"></div>
+            <span class="px-3 text-xs font-semibold uppercase tracking-wider text-slate-500">Hoặc</span>
+            <div class="flex-grow border-t border-white/10"></div>
+          </div>
+
+          <!-- Google 1-Click Sign-In Button -->
+          <button
+            @click="handleGoogleLogin"
+            type="button"
+            class="w-full flex items-center justify-center space-x-3 rounded-xl border border-white/10 bg-slate-950/70 hover:bg-slate-950 py-3 px-4 text-xs font-bold text-white transition-all hover:border-cyan-400/40 shadow-md"
+          >
+            <svg class="h-5 w-5" viewBox="0 0 24 24">
+              <path fill="#EA4335" d="M12 5c1.6 0 3 .6 4.1 1.7l3.1-3.1C17.3 1.8 14.8 1 12 1 7.5 1 3.7 3.6 1.9 7.3l3.7 2.9C6.5 7.4 9 5 12 5z"/>
+              <path fill="#4285F4" d="M23.5 12.3c0-.8-.1-1.6-.2-2.3H12v4.5h6.5c-.3 1.5-1.1 2.8-2.4 3.7l3.7 2.9c2.2-2 3.7-5 3.7-8.8z"/>
+              <path fill="#FBBC05" d="M5.6 14.8c-.3-.8-.4-1.7-.4-2.8s.1-2 .4-2.8L1.9 6.3C.7 8.7 0 10.3 0 12s.7 3.3 1.9 5.7l3.7-2.9z"/>
+              <path fill="#34A853" d="M12 23c3.2 0 6-1.1 8-3l-3.7-2.9c-1.1.7-2.5 1.2-4.3 1.2-3 0-5.5-2.4-6.4-5.2L1.9 16C3.7 19.7 7.5 23 12 23z"/>
+            </svg>
+            <span>Tiếp Tục Với Google (Gmail)</span>
+          </button>
+
           <!-- Navigation Links -->
           <div class="border-t border-white/10 pt-6 flex flex-col space-y-3 text-center text-sm">
             <div class="text-slate-300">
@@ -171,18 +193,26 @@
         </div>
       </section>
     </div>
+
+    <!-- Forgot Password OTP Modal -->
+    <ForgotPasswordModal
+      :isOpen="isForgotPasswordOpen"
+      @close="isForgotPasswordOpen = false"
+    />
   </div>
 </template>
 
 <script setup lang="ts">
 import { ref, reactive, onMounted, onUnmounted } from 'vue'
 import { useAuth } from '~/composables/useAuth'
+import ForgotPasswordModal from '~/components/auth/ForgotPasswordModal.vue'
 
 definePageMeta({
   middleware: 'auth'
 })
 
 const { login } = useAuth()
+const router = useRouter()
 
 const form = reactive({
   email: '',
@@ -192,6 +222,7 @@ const form = reactive({
 const isLoading = ref(false)
 const errorMessage = ref('')
 const lockSeconds = ref(0)
+const isForgotPasswordOpen = ref(false)
 let lockTimer: any = null
 
 const startLockTimer = (durationSeconds: number) => {
@@ -249,7 +280,6 @@ const handleLogin = async () => {
 
     errorMessage.value = msg || 'Đăng nhập thất bại. Vui lòng kiểm tra lại email và mật khẩu.'
 
-    // Khoá nút bấm và lưu thời điểm hết hạn vào localStorage để giữ khoá qua F5
     if (status === 429 || status === 423 || msg.includes('khóa') || msg.includes('quá 10 lần')) {
       if (process.client) {
         const lockUntil = Date.now() + remainingSec * 1000
@@ -261,5 +291,45 @@ const handleLogin = async () => {
     isLoading.value = false
   }
 }
-</script>
 
+const handleGoogleLogin = async () => {
+  const emailPrompt = prompt('Nhập địa chỉ Gmail của bạn để đăng nhập nhanh 1-Click qua Google:', 'demo.user@gmail.com')
+  if (!emailPrompt) return
+
+  isLoading.value = true
+  errorMessage.value = ''
+
+  try {
+    const res: any = await $fetch('/api/auth/google-login', {
+      method: 'POST',
+      body: {
+        email: emailPrompt,
+        name: emailPrompt.split('@')[0],
+        picture: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256',
+        role: 'student'
+      }
+    })
+
+    if (res.token && process.client) {
+      localStorage.setItem('token', res.token)
+      localStorage.setItem('user', JSON.stringify(res.user))
+      const authUser = useCookie('user')
+      const authToken = useCookie('token')
+      authUser.value = JSON.stringify(res.user)
+      authToken.value = res.token
+
+      if (res.user.role === 'student') {
+        router.push('/student/dashboard')
+      } else if (res.user.role === 'business') {
+        router.push('/business/dashboard')
+      } else {
+        router.push('/')
+      }
+    }
+  } catch (err: any) {
+    errorMessage.value = err.data?.message || 'Đăng nhập bằng Google không thành công!'
+  } finally {
+    isLoading.value = false
+  }
+}
+</script>

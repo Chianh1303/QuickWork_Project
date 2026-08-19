@@ -1,12 +1,20 @@
 package services
 
 import (
+	"context"
+	"crypto/rand"
+	"encoding/json"
 	"errors"
 	"fmt"
+	"math/big"
+	"strings"
+	"sync"
 	"time"
 
+	"QuickWork/internal/cache"
 	"QuickWork/internal/dto"
 	"QuickWork/internal/models"
+	"QuickWork/internal/queue"
 	"QuickWork/internal/repositories"
 
 	"github.com/golang-jwt/jwt/v5"
@@ -17,13 +25,15 @@ import (
 var (
 	jwtSecret = []byte("quickwork_secret_key_2026")
 
-	ErrEmptyFields           = errors.New("Email, password và role không được để trống")
-	ErrInvalidRole           = errors.New("Role phải là 'student' hoặc 'business'")
-	ErrEmailExists           = errors.New("Email này đã được đăng ký sử dụng")
-	ErrTaxCodeExists         = errors.New("Mã số thuế này đã được đăng ký sử dụng")
-	ErrStudentNameRequired   = errors.New("Họ và tên sinh viên không được để trống")
+	ErrEmptyFields            = errors.New("Email, password và role không được để trống")
+	ErrInvalidRole            = errors.New("Role phải là 'student' hoặc 'business'")
+	ErrEmailExists            = errors.New("Email này đã được đăng ký sử dụng")
+	ErrTaxCodeExists          = errors.New("Mã số thuế này đã được đăng ký sử dụng")
+	ErrStudentNameRequired    = errors.New("Họ và tên sinh viên không được để trống")
 	ErrBusinessFieldsRequired = errors.New("Tên công ty và mã số thuế không được để trống")
-	ErrInvalidCredentials    = errors.New("Email hoặc mật khẩu không chính xác")
+	ErrInvalidCredentials     = errors.New("Email hoặc mật khẩu không chính xác")
+	ErrUserNotFound           = errors.New("Tài khoản với Email này không tồn tại trên hệ thống")
+	ErrInvalidOTP             = errors.New("Mã OTP không chính xác hoặc đã hết hạn 5 phút")
 )
 
 type AccountForbiddenError struct {
@@ -44,17 +54,39 @@ func (e *AccountLockedError) Error() string {
 	return e.Message
 }
 
+// In-memory OTP storage fallback when Redis is not available
+var (
+	otpMemoryStore = make(map[string]otpItem)
+	otpStoreMutex  sync.RWMutex
+)
+
+type otpItem struct {
+	Code      string
+	ExpiresAt time.Time
+}
+
 type AuthService interface {
 	Register(req dto.RegisterRequest) error
 	Login(req dto.LoginRequest) (*dto.LoginResponse, error)
+	SendPasswordResetOTP(email string) error
+	VerifyPasswordResetOTP(email string, otpCode string, newPassword string) error
+	GoogleLogin(req dto.GoogleLoginRequest) (*dto.LoginResponse, error)
 }
 
 type authService struct {
-	authRepo repositories.AuthRepository
+	authRepo     repositories.AuthRepository
+	emailService EmailService
+	cacheClient  cache.CacheClient
+	rmqClient    queue.RabbitMQClient
 }
 
-func NewAuthService(authRepo repositories.AuthRepository) AuthService {
-	return &authService{authRepo: authRepo}
+func NewAuthService(authRepo repositories.AuthRepository, emailSvc EmailService, cacheClient cache.CacheClient, rmqClient queue.RabbitMQClient) AuthService {
+	return &authService{
+		authRepo:     authRepo,
+		emailService: emailSvc,
+		cacheClient:  cacheClient,
+		rmqClient:    rmqClient,
+	}
 }
 
 func (s *authService) Register(req dto.RegisterRequest) error {
@@ -188,6 +220,166 @@ func (s *authService) Login(req dto.LoginRequest) (*dto.LoginResponse, error) {
 		}
 	}
 
+	return s.generateAuthResponse(user, "🔒 Đăng nhập thành công!")
+}
+
+func (s *authService) SendPasswordResetOTP(email string) error {
+	if email == "" {
+		return errors.New("Email không được để trống")
+	}
+
+	user, err := s.authRepo.GetUserByEmail(email)
+	if err != nil || user == nil {
+		return ErrUserNotFound
+	}
+
+	// Generate 6-digit random numeric OTP code
+	nBig, err := rand.Int(rand.Reader, big.NewInt(900000))
+	if err != nil {
+		return errors.New("Lỗi tạo mã OTP hệ thống")
+	}
+	otpCode := fmt.Sprintf("%06d", nBig.Int64()+100000)
+
+	// Save OTP to Redis (5 min TTL) or In-Memory fallback
+	otpKey := fmt.Sprintf("otp_reset:%s", email)
+	if s.cacheClient != nil && s.cacheClient.IsAvailable() {
+		_ = s.cacheClient.Set(context.Background(), otpKey, otpCode, 5*time.Minute)
+	} else {
+		otpStoreMutex.Lock()
+		otpMemoryStore[email] = otpItem{
+			Code:      otpCode,
+			ExpiresAt: time.Now().Add(5 * time.Minute),
+		}
+		otpStoreMutex.Unlock()
+	}
+
+	// Off-thread Async Queueing via RabbitMQ or Direct Service Call
+	if s.rmqClient != nil && s.rmqClient.IsAvailable() {
+		payload, _ := json.Marshal(queue.EmailOTPPayload{
+			Email:   email,
+			OTPCode: otpCode,
+		})
+		_ = s.rmqClient.Publish(queue.QueueEmailOTP, payload)
+	} else if s.emailService != nil {
+		go func() {
+			_ = s.emailService.SendOTPEmail(email, otpCode)
+		}()
+	}
+
+	return nil
+}
+
+func (s *authService) VerifyPasswordResetOTP(email string, otpCode string, newPassword string) error {
+	if email == "" || otpCode == "" || newPassword == "" {
+		return errors.New("Email, mã OTP và mật khẩu mới không được để trống")
+	}
+
+	user, err := s.authRepo.GetUserByEmail(email)
+	if err != nil || user == nil {
+		return ErrUserNotFound
+	}
+
+	// Verify OTP Code
+	otpKey := fmt.Sprintf("otp_reset:%s", email)
+	var isValid bool
+
+	if s.cacheClient != nil && s.cacheClient.IsAvailable() {
+		storedVal, err := s.cacheClient.Get(context.Background(), otpKey)
+		if err == nil && storedVal == otpCode {
+			isValid = true
+			_ = s.cacheClient.Delete(context.Background(), otpKey)
+		}
+	} else {
+		otpStoreMutex.Lock()
+		item, exists := otpMemoryStore[email]
+		if exists && item.Code == otpCode && time.Now().Before(item.ExpiresAt) {
+			isValid = true
+			delete(otpMemoryStore, email)
+		}
+		otpStoreMutex.Unlock()
+	}
+
+	if !isValid {
+		return ErrInvalidOTP
+	}
+
+	// Hash new password and unlock account
+	hashedPassword, err := bcrypt.GenerateFromPassword([]byte(newPassword), bcrypt.DefaultCost)
+	if err != nil {
+		return errors.New("Lỗi mã hóa mật khẩu mới")
+	}
+
+	user.Password = string(hashedPassword)
+	user.FailedAttempts = 0
+	user.LockedUntil = nil
+	if user.Status == "suspended" || user.Status == "locked" {
+		user.Status = "approved"
+	}
+
+	return s.authRepo.UpdateUser(user)
+}
+
+func (s *authService) GoogleLogin(req dto.GoogleLoginRequest) (*dto.LoginResponse, error) {
+	if req.Email == "" {
+		return nil, errors.New("Email Google không hợp lệ")
+	}
+
+	user, err := s.authRepo.GetUserByEmail(req.Email)
+	if errors.Is(err, gorm.ErrRecordNotFound) || user == nil {
+		// Auto-register new Google user
+		role := req.Role
+		if role != "business" {
+			role = "student"
+		}
+
+		dummyPassword, _ := bcrypt.GenerateFromPassword([]byte(fmt.Sprintf("google_%d", time.Now().UnixNano())), bcrypt.DefaultCost)
+
+		newUser := &models.User{
+			Email:    req.Email,
+			Password: string(dummyPassword),
+			Role:     role,
+			Status:   "approved",
+			Balance:  0.0,
+		}
+
+		var studentProfile *models.Student
+		var businessProfile *models.Business
+
+		fullName := req.Name
+		if fullName == "" {
+			fullName = strings.Split(req.Email, "@")[0]
+		}
+
+		if role == "student" {
+			studentProfile = &models.Student{
+				FullName:  fullName,
+				AvatarUrl: req.Picture,
+			}
+		} else {
+			businessProfile = &models.Business{
+				CompanyName: fullName,
+				TaxCode:     fmt.Sprintf("GOOG_%d", time.Now().UnixNano()%10000000),
+				LogoUrl:     req.Picture,
+			}
+		}
+
+		if err := s.authRepo.CreateUserWithProfile(newUser, studentProfile, businessProfile); err != nil {
+			return nil, fmt.Errorf("Không thể tạo tài khoản Google: %w", err)
+		}
+		user = newUser
+	}
+
+	if user.Status != "approved" && user.Status != "active" {
+		return nil, &AccountForbiddenError{
+			Message: "Tài khoản của bạn đang bị khóa hoặc ngưng hoạt động",
+			Status:  user.Status,
+		}
+	}
+
+	return s.generateAuthResponse(user, "🚀 Đăng nhập bằng Google thành công!")
+}
+
+func (s *authService) generateAuthResponse(user *models.User, message string) (*dto.LoginResponse, error) {
 	claims := jwt.MapClaims{
 		"user_id": user.ID,
 		"role":    user.Role,
@@ -201,7 +393,7 @@ func (s *authService) Login(req dto.LoginRequest) (*dto.LoginResponse, error) {
 	}
 
 	return &dto.LoginResponse{
-		Message: "🔒 Đăng nhập thành công!",
+		Message: message,
 		Token:   tokenString,
 		User: dto.UserSummaryDTO{
 			ID:    user.ID,

@@ -26,7 +26,7 @@ func RegisterAIRoutes(app *fiber.App, db *gorm.DB) {
 	aiController := controllers.NewAIController(aiService)
 
 	rmqClient := queue.NewRabbitMQClient(config.RabbitMQURL)
-	queue.RegisterWorkers(rmqClient, aiService.ProcessBackgroundCVEvaluation)
+	queue.RegisterWorkers(rmqClient, aiService.ProcessBackgroundCVEvaluation, nil)
 
 	api := app.Group("/api/ai")
 

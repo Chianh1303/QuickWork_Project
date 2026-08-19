@@ -8,6 +8,7 @@ import (
 const (
 	QueueCVParsing     = "cv_parsing_queue"
 	QueueNotifications = "notification_queue"
+	QueueEmailOTP      = "email_otp_queue"
 )
 
 type CVParsingPayload struct {
@@ -21,9 +22,15 @@ type NotificationPayload struct {
 	Message string `json:"message"`
 }
 
-type CVParsingHandler func(userID uint, cvURL string) error
+type EmailOTPPayload struct {
+	Email   string `json:"email"`
+	OTPCode string `json:"otp_code"`
+}
 
-func RegisterWorkers(rmq RabbitMQClient, cvHandler CVParsingHandler) {
+type CVParsingHandler func(userID uint, cvURL string) error
+type EmailOTPHandler func(email string, otpCode string) error
+
+func RegisterWorkers(rmq RabbitMQClient, cvHandler CVParsingHandler, otpHandler EmailOTPHandler) {
 	if rmq == nil || !rmq.IsAvailable() {
 		return
 	}
@@ -52,6 +59,23 @@ func RegisterWorkers(rmq RabbitMQClient, cvHandler CVParsingHandler) {
 			return err
 		}
 		log.Printf("🔔 [Notification Worker]: Gửi thông báo ngầm cho User ID %d - Tiêu đề: '%s' | Nội dung: '%s'", payload.UserID, payload.Title, payload.Message)
+		return nil
+	})
+
+	// 3. Worker xử lý gửi Email OTP ngầm qua RabbitMQ
+	_ = rmq.Consume(QueueEmailOTP, func(body []byte) error {
+		var payload EmailOTPPayload
+		if err := json.Unmarshal(body, &payload); err != nil {
+			return err
+		}
+		log.Printf("📧 [RabbitMQ Email Worker]: Bắt đầu gửi Email OTP ngầm đến %s...", payload.Email)
+		if otpHandler != nil {
+			if err := otpHandler(payload.Email, payload.OTPCode); err != nil {
+				log.Printf("❌ [RabbitMQ Email Error]: %v", err)
+				return err
+			}
+		}
+		log.Printf("✅ [RabbitMQ Email Worker]: Đã gửi xong Email OTP ngầm cho %s!", payload.Email)
 		return nil
 	})
 }

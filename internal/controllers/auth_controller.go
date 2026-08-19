@@ -73,6 +73,68 @@ func (ctrl *AuthController) Login(c *fiber.Ctx) error {
 	return c.JSON(res)
 }
 
+// ForgotPassword POST /api/auth/forgot-password
+func (ctrl *AuthController) ForgotPassword(c *fiber.Ctx) error {
+	var req dto.ForgotPasswordRequest
+	if err := c.BodyParser(&req); err != nil || req.Email == "" {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Vui lòng nhập Email hợp lệ"})
+	}
+
+	err := ctrl.authService.SendPasswordResetOTP(req.Email)
+	if err != nil {
+		if errors.Is(err, services.ErrUserNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "📧 Mã xác thực OTP (6 chữ số) đã được gửi đến Email của bạn! Vui lòng kiểm tra hộp thư (Mã có hiệu lực trong 5 phút).",
+	})
+}
+
+// ResetPassword POST /api/auth/reset-password
+func (ctrl *AuthController) ResetPassword(c *fiber.Ctx) error {
+	var req dto.ResetPasswordRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Dữ liệu không hợp lệ"})
+	}
+
+	err := ctrl.authService.VerifyPasswordResetOTP(req.Email, req.OTPCode, req.NewPassword)
+	if err != nil {
+		if errors.Is(err, services.ErrInvalidOTP) {
+			return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
+		}
+		if errors.Is(err, services.ErrUserNotFound) {
+			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
+		}
+		return c.Status(fiber.StatusInternalServerError).JSON(fiber.Map{"message": err.Error()})
+	}
+
+	return c.JSON(fiber.Map{
+		"message": "🎉 Đặt lại mật khẩu thành công! Bạn có thể đăng nhập bằng Mật khẩu mới ngay bây giờ.",
+	})
+}
+
+// GoogleLogin POST /api/auth/google-login
+func (ctrl *AuthController) GoogleLogin(c *fiber.Ctx) error {
+	var req dto.GoogleLoginRequest
+	if err := c.BodyParser(&req); err != nil {
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Dữ liệu Google không hợp lệ"})
+	}
+
+	res, err := ctrl.authService.GoogleLogin(req)
+	if err != nil {
+		var forbiddenErr *services.AccountForbiddenError
+		if errors.As(err, &forbiddenErr) {
+			return c.Status(fiber.StatusForbidden).JSON(fiber.Map{"message": forbiddenErr.Message})
+		}
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": err.Error()})
+	}
+
+	return c.JSON(res)
+}
+
 // GetMe GET /api/users/me
 func (ctrl *AuthController) GetMe(c *fiber.Ctx) error {
 	userID := c.Locals("user_id")
