@@ -29,13 +29,20 @@ type s3StorageProvider struct {
 }
 
 func NewStorageProvider() StorageProvider {
+	// 1. Ưu tiên kiểm tra kết nối Cloudinary Storage
+	cldProvider := NewCloudinaryStorageProvider()
+	if cldProvider.IsActive() {
+		return cldProvider
+	}
+
+	// 2. Tiếp theo kiểm tra kết nối AWS S3 Storage
 	accessKey := os.Getenv("AWS_ACCESS_KEY_ID")
 	secretKey := os.Getenv("AWS_SECRET_ACCESS_KEY")
 	region := config.GetEnv("AWS_REGION", "ap-southeast-1")
 	bucket := os.Getenv("AWS_S3_BUCKET")
 
 	if accessKey == "" || secretKey == "" || bucket == "" {
-		log.Println("⚠️ [AWS S3 Notice]: Chưa cấu hình AWS S3 credentials. Tự động chuyển sang Local Disk Storage.")
+		log.Println("⚠️ [Storage Notice]: Chưa cấu hình Cloudinary / AWS S3 credentials. Tự động dùng Local Disk Storage.")
 		return &s3StorageProvider{active: false}
 	}
 
