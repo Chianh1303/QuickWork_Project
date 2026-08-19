@@ -293,9 +293,69 @@ const handleLogin = async () => {
 }
 
 const handleGoogleLogin = async () => {
-  const emailPrompt = prompt('Nhập địa chỉ Gmail của bạn để đăng nhập nhanh 1-Click qua Google:', 'demo.user@gmail.com')
-  if (!emailPrompt) return
+  if (process.client && window.google) {
+    window.google.accounts.id.initialize({
+      client_id: '108293847291-demo.apps.googleusercontent.com',
+      callback: async (response: any) => {
+        if (!response.credential) return
+        isLoading.value = true
+        try {
+          const base64Url = response.credential.split('.')[1]
+          const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+          const jsonPayload = decodeURIComponent(atob(base64).split('').map(c => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2)).join(''))
+          const payload = JSON.parse(jsonPayload)
 
+          const res: any = await $fetch('/api/auth/google-login', {
+            method: 'POST',
+            body: {
+              id_token: response.credential,
+              email: payload.email,
+              name: payload.name || payload.email.split('@')[0],
+              picture: payload.picture || 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256',
+              role: 'student'
+            }
+          })
+
+          if (res.token) {
+            localStorage.setItem('token', res.token)
+            localStorage.setItem('user', JSON.stringify(res.user))
+            const authUser = useCookie('user')
+            const authToken = useCookie('token')
+            authUser.value = JSON.stringify(res.user)
+            authToken.value = res.token
+
+            if (res.user.role === 'student') {
+              router.push('/student/dashboard')
+            } else if (res.user.role === 'business') {
+              router.push('/business/dashboard')
+            } else {
+              router.push('/')
+            }
+          }
+        } catch (err: any) {
+          errorMessage.value = err.data?.message || 'Đăng nhập bằng Google không thành công!'
+        } finally {
+          isLoading.value = false
+        }
+      }
+    })
+    window.google.accounts.id.prompt((notification: any) => {
+      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
+        const emailPrompt = prompt('Nhập địa chỉ Gmail của bạn để đăng nhập nhanh qua Google:', 'my.account@gmail.com')
+        if (emailPrompt) {
+          triggerGoogleFallbackLogin(emailPrompt)
+        }
+      }
+    })
+  } else {
+    const emailPrompt = prompt('Nhập địa chỉ Gmail của bạn để đăng nhập nhanh qua Google:', 'my.account@gmail.com')
+    if (emailPrompt) {
+      triggerGoogleFallbackLogin(emailPrompt)
+    }
+  }
+}
+
+const triggerGoogleFallbackLogin = async (email: string) => {
   isLoading.value = true
   errorMessage.value = ''
 
@@ -303,8 +363,8 @@ const handleGoogleLogin = async () => {
     const res: any = await $fetch('/api/auth/google-login', {
       method: 'POST',
       body: {
-        email: emailPrompt,
-        name: emailPrompt.split('@')[0],
+        email: email,
+        name: email.split('@')[0],
         picture: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256',
         role: 'student'
       }
