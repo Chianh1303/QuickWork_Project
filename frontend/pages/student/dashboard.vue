@@ -820,6 +820,7 @@ const handleUpdateProfile = async () => {
     skillsArray.value = parsedSkills
     isEditing.value = false
     avatarFileSelected.value = null
+    avatarPreview.value = null
     cvFileSelected.value = null
   } catch (err: any) {
     feedback.value = {

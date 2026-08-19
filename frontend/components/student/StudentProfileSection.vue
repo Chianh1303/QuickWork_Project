@@ -178,7 +178,7 @@
         <!-- Upload Ảnh Avatar -->
         <div class="flex items-center space-x-6 bg-slate-950/80 p-4 rounded-2xl border border-indigo-500/15">
           <img 
-            :src="avatarPreview || profileForm.avatar_url || 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80'" 
+            :src="avatarPreview || (profileForm.avatar_url ? getMediaUrl(profileForm.avatar_url) : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80')" 
             class="w-20 h-20 rounded-full object-cover border-2 border-indigo-500/30 shadow-md"
           />
           <div>
