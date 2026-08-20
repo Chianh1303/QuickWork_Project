@@ -232,6 +232,15 @@ func (s *authService) SendPasswordResetOTP(email string) error {
 		return ErrUserNotFound
 	}
 
+	// 1. Cooldown Rate Limit (60 seconds)
+	cooldownKey := fmt.Sprintf("otp_cooldown:%s", email)
+	if s.cacheClient != nil && s.cacheClient.IsAvailable() {
+		cooldownVal, err := s.cacheClient.Get(context.Background(), cooldownKey)
+		if err == nil && cooldownVal != "" {
+			return errors.New("Vui lòng đợi 60 giây trước khi yêu cầu gửi lại mã OTP mới!")
+		}
+	}
+
 	// Generate 6-digit random numeric OTP code
 	nBig, err := rand.Int(rand.Reader, big.NewInt(900000))
 	if err != nil {
@@ -241,8 +250,12 @@ func (s *authService) SendPasswordResetOTP(email string) error {
 
 	// Save OTP to Redis (5 min TTL) or In-Memory fallback
 	otpKey := fmt.Sprintf("otp_reset:%s", email)
+	attemptsKey := fmt.Sprintf("otp_attempts:%s", email)
+
 	if s.cacheClient != nil && s.cacheClient.IsAvailable() {
 		_ = s.cacheClient.Set(context.Background(), otpKey, otpCode, 5*time.Minute)
+		_ = s.cacheClient.Set(context.Background(), cooldownKey, "1", 60*time.Second)
+		_ = s.cacheClient.Delete(context.Background(), attemptsKey)
 	} else {
 		otpStoreMutex.Lock()
 		otpMemoryStore[email] = otpItem{
@@ -277,15 +290,37 @@ func (s *authService) VerifyPasswordResetOTP(email string, otpCode string, newPa
 		return ErrUserNotFound
 	}
 
-	// Verify OTP Code
+	// Verify OTP Code & Check Max Attempt Lockout (Max 5 attempts)
 	otpKey := fmt.Sprintf("otp_reset:%s", email)
+	attemptsKey := fmt.Sprintf("otp_attempts:%s", email)
 	var isValid bool
 
 	if s.cacheClient != nil && s.cacheClient.IsAvailable() {
+		attemptsStr, _ := s.cacheClient.Get(context.Background(), attemptsKey)
+		var attempts int
+		if attemptsStr != "" {
+			fmt.Sscanf(attemptsStr, "%d", &attempts)
+		}
+
+		if attempts >= 5 {
+			_ = s.cacheClient.Delete(context.Background(), otpKey)
+			_ = s.cacheClient.Delete(context.Background(), attemptsKey)
+			return errors.New("Bạn đã thử sai mã OTP quá 5 lần. Mã OTP hiện tại đã bị hủy vì lý do bảo mật, vui lòng yêu cầu mã OTP mới!")
+		}
+
 		storedVal, err := s.cacheClient.Get(context.Background(), otpKey)
 		if err == nil && storedVal == otpCode {
 			isValid = true
 			_ = s.cacheClient.Delete(context.Background(), otpKey)
+			_ = s.cacheClient.Delete(context.Background(), attemptsKey)
+		} else {
+			attempts++
+			_ = s.cacheClient.Set(context.Background(), attemptsKey, fmt.Sprintf("%d", attempts), 5*time.Minute)
+			if attempts >= 5 {
+				_ = s.cacheClient.Delete(context.Background(), otpKey)
+				return errors.New("Bạn đã thử sai mã OTP quá 5 lần. Mã OTP hiện tại đã bị hủy vì lý do bảo mật, vui lòng yêu cầu mã OTP mới!")
+			}
+			return fmt.Errorf("Mã OTP không chính xác. Bạn còn %d lần thử!", 5-attempts)
 		}
 	} else {
 		otpStoreMutex.Lock()
@@ -320,6 +355,21 @@ func (s *authService) VerifyPasswordResetOTP(email string, otpCode string, newPa
 func (s *authService) GoogleLogin(req dto.GoogleLoginRequest) (*dto.LoginResponse, error) {
 	if req.Email == "" {
 		return nil, errors.New("Email Google không hợp lệ")
+	}
+
+	// 1. Google Login Rate Limit (Max 10 requests per minute)
+	googleRateKey := fmt.Sprintf("rate_google:%s", req.Email)
+	if s.cacheClient != nil && s.cacheClient.IsAvailable() {
+		countStr, _ := s.cacheClient.Get(context.Background(), googleRateKey)
+		var count int
+		if countStr != "" {
+			fmt.Sscanf(countStr, "%d", &count)
+		}
+		if count >= 10 {
+			return nil, errors.New("Bạn đã yêu cầu đăng nhập Google quá 10 lần trong 1 phút. Vui lòng thử lại sau 1 phút!")
+		}
+		count++
+		_ = s.cacheClient.Set(context.Background(), googleRateKey, fmt.Sprintf("%d", count), 60*time.Second)
 	}
 
 	user, err := s.authRepo.GetUserByEmail(req.Email)
