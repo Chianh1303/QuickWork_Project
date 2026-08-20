@@ -1,10 +1,13 @@
 package parsers
 
 import (
+	"io"
+	"net/http"
 	"os"
 	"path/filepath"
 	"regexp"
 	"strings"
+	"time"
 )
 
 type ParsedCVData struct {
@@ -27,23 +30,48 @@ func NewPDFParser() PDFParser {
 }
 
 func (p *pdfParser) GetCVFileBytesAndInfo(cvURL string) ([]byte, string, int64, bool) {
-	if strings.TrimSpace(cvURL) == "" {
+	trimmedURL := strings.TrimSpace(cvURL)
+	if trimmedURL == "" {
 		return nil, "", 0, false
 	}
+
+	// 1. Trường hợp CV được lưu trên đám mây Cloudinary (HTTP/HTTPS URL)
+	if strings.HasPrefix(trimmedURL, "http://") || strings.HasPrefix(trimmedURL, "https://") {
+		filename := filepath.Base(trimmedURL)
+		client := &http.Client{Timeout: 15 * time.Second}
+		resp, err := client.Get(trimmedURL)
+		if err != nil || resp.StatusCode != http.StatusOK {
+			return nil, filename, 0, false
+		}
+		defer resp.Body.Close()
+
+		fileBytes, err := io.ReadAll(resp.Body)
+		if err != nil || len(fileBytes) == 0 {
+			return nil, filename, 0, false
+		}
+		return fileBytes, filename, int64(len(fileBytes)), true
+	}
+
+	// 2. Trường hợp CV được lưu trên đĩa cứng Local (/uploads/cvs/...)
 	const marker = "/uploads/cvs/"
-	parts := strings.SplitN(cvURL, marker, 2)
-	if len(parts) != 2 {
-		return nil, "", 0, false
+	var filename string
+	if strings.Contains(trimmedURL, marker) {
+		parts := strings.SplitN(trimmedURL, marker, 2)
+		filename = filepath.Base(strings.TrimSpace(parts[1]))
+	} else {
+		filename = filepath.Base(trimmedURL)
 	}
-	filename := filepath.Base(strings.TrimSpace(parts[1]))
+
 	if filename == "." || filename == string(filepath.Separator) || filename == "" {
 		return nil, "", 0, false
 	}
+
 	filePath := filepath.Join("uploads", "cvs", filename)
 	info, err := os.Stat(filePath)
 	if err != nil || info.IsDir() {
 		return nil, filename, 0, false
 	}
+
 	fileBytes, err := os.ReadFile(filePath)
 	if err != nil {
 		return nil, filename, info.Size(), false

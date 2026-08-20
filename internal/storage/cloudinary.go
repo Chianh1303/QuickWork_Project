@@ -61,6 +61,8 @@ func (c *cloudinaryStorageProvider) UploadFile(fileBytes []byte, filename string
 	uniquePublicID := fmt.Sprintf("%d_%s", time.Now().UnixNano(), baseName)
 	resourceType := getCloudinaryResourceType(filename)
 
+	log.Printf("filename=%s | resourceType=%s | publicID=%s", filename, resourceType, uniquePublicID)
+
 	resp, err := c.cld.Upload.Upload(context.Background(), bytes.NewReader(fileBytes), uploader.UploadParams{
 		Folder:       folder,
 		PublicID:     uniquePublicID,
@@ -79,8 +81,8 @@ func (c *cloudinaryStorageProvider) UploadFile(fileBytes []byte, filename string
 		fileURL = fmt.Sprintf("https://res.cloudinary.com/%s/%s/upload/%s", c.cld.Config.Cloud.CloudName, resourceType, resp.PublicID)
 	}
 
-	// Tự động dọn dẹp nếu URL bị Cloudinary gắn lặp trùng đuôi .pdf.pdf
-	if strings.HasSuffix(fileURL, ".pdf.pdf") {
+	// Tự động dọn dẹp nếu bị lặp trùng đuôi .pdf.pdf
+	for strings.HasSuffix(fileURL, ".pdf.pdf") {
 		fileURL = strings.TrimSuffix(fileURL, ".pdf.pdf") + ".pdf"
 	}
 
