@@ -56,13 +56,23 @@ func (c *cloudinaryStorageProvider) UploadFile(fileBytes []byte, filename string
 		return "", fmt.Errorf("Cloudinary không khả dụng")
 	}
 
-	baseName := strings.TrimSuffix(filepath.Base(filename), filepath.Ext(filename))
-	uniquePublicID := fmt.Sprintf("%d_%s", time.Now().UnixNano(), baseName)
+	ext := strings.ToLower(filepath.Ext(filename))
+	baseName := strings.TrimSuffix(filepath.Base(filename), ext)
+
+	// Với file PDF (raw resource), giữ nguyên đuôi mở rộng trong PublicID để Cloudinary nhận dạng chuẩn
+	var uniquePublicID string
+	if ext == ".pdf" {
+		uniquePublicID = fmt.Sprintf("%d_%s.pdf", time.Now().UnixNano(), baseName)
+	} else {
+		uniquePublicID = fmt.Sprintf("%d_%s", time.Now().UnixNano(), baseName)
+	}
+
+	resourceType := getCloudinaryResourceType(filename)
 
 	resp, err := c.cld.Upload.Upload(context.Background(), bytes.NewReader(fileBytes), uploader.UploadParams{
 		Folder:       folder,
 		PublicID:     uniquePublicID,
-		ResourceType: getCloudinaryResourceType(filename),
+		ResourceType: resourceType,
 	})
 	if err != nil {
 		log.Printf("⚠️ [Cloudinary Upload Notice]: Lỗi Cloudinary (%v). Tự động Fallback sang Local Disk Storage...", err)
@@ -74,7 +84,11 @@ func (c *cloudinaryStorageProvider) UploadFile(fileBytes []byte, filename string
 		fileURL = resp.URL
 	}
 	if fileURL == "" && resp.PublicID != "" {
-		fileURL = fmt.Sprintf("https://res.cloudinary.com/%s/image/upload/%s", c.cld.Config.Cloud.CloudName, resp.PublicID)
+		resTypePath := resourceType
+		if resTypePath == "auto" {
+			resTypePath = "image"
+		}
+		fileURL = fmt.Sprintf("https://res.cloudinary.com/%s/%s/upload/%s", c.cld.Config.Cloud.CloudName, resTypePath, resp.PublicID)
 	}
 
 	if fileURL == "" {
@@ -82,7 +96,7 @@ func (c *cloudinaryStorageProvider) UploadFile(fileBytes []byte, filename string
 		return c.saveToLocalDisk(fileBytes, filename, folder)
 	}
 
-	log.Printf("🚀 [Cloudinary Engine]: Upload thành công lên Cloudinary: %s", fileURL)
+	log.Printf("🚀 [Cloudinary Engine]: Upload thành công file (%s) lên Cloudinary: %s", filename, fileURL)
 	return fileURL, nil
 }
 
