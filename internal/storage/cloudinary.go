@@ -58,12 +58,19 @@ func (c *cloudinaryStorageProvider) UploadFile(fileBytes []byte, filename string
 
 	ext := strings.ToLower(filepath.Ext(filename))
 	baseName := strings.TrimSuffix(filepath.Base(filename), ext)
-	uniquePublicID := fmt.Sprintf("%d_%s", time.Now().UnixNano(), baseName)
+
+	resourceType := getCloudinaryResourceType(filename)
+	var uniquePublicID string
+	if resourceType == "raw" {
+		uniquePublicID = fmt.Sprintf("%d_%s%s", time.Now().UnixNano(), baseName, ext)
+	} else {
+		uniquePublicID = fmt.Sprintf("%d_%s", time.Now().UnixNano(), baseName)
+	}
 
 	resp, err := c.cld.Upload.Upload(context.Background(), bytes.NewReader(fileBytes), uploader.UploadParams{
 		Folder:       folder,
 		PublicID:     uniquePublicID,
-		ResourceType: "auto",
+		ResourceType: resourceType,
 	})
 	if err != nil {
 		log.Printf("⚠️ [Cloudinary Upload Notice]: Lỗi Cloudinary (%v). Tự động Fallback sang Local Disk Storage...", err)
@@ -75,7 +82,7 @@ func (c *cloudinaryStorageProvider) UploadFile(fileBytes []byte, filename string
 		fileURL = resp.URL
 	}
 	if fileURL == "" && resp.PublicID != "" {
-		fileURL = fmt.Sprintf("https://res.cloudinary.com/%s/auto/upload/%s", c.cld.Config.Cloud.CloudName, resp.PublicID)
+		fileURL = fmt.Sprintf("https://res.cloudinary.com/%s/%s/upload/%s", c.cld.Config.Cloud.CloudName, resourceType, resp.PublicID)
 	}
 
 	if fileURL == "" {
@@ -101,4 +108,14 @@ func (c *cloudinaryStorageProvider) saveToLocalDisk(fileBytes []byte, filename s
 	publicURL := fmt.Sprintf("/uploads/%s/%s", folder, uniqueName)
 	log.Printf("📁 [Local Storage]: Đã lưu file vào đĩa local: %s", publicURL)
 	return publicURL, nil
+}
+
+func getCloudinaryResourceType(filename string) string {
+	ext := strings.ToLower(filepath.Ext(filename))
+	switch ext {
+	case ".pdf", ".doc", ".docx", ".zip":
+		return "raw"
+	default:
+		return "image"
+	}
 }
