@@ -159,20 +159,30 @@
 
             <template v-else>
               <!-- Guest Links -->
-              <NuxtLink
-                v-if="route.path !== '/login'"
-                to="/login"
-                class="text-sm font-semibold text-slate-200 hover:text-white px-3 py-2"
-              >
-                Đăng nhập
-              </NuxtLink>
-              <NuxtLink
-                v-if="route.path !== '/register'"
-                to="/register"
-                class="inline-flex items-center justify-center py-2 px-4 border border-transparent text-sm font-semibold rounded-lg text-slate-950 bg-cyan-400 hover:bg-cyan-300 shadow-md shadow-cyan-500/10 focus-ring"
-              >
-                Đăng ký
-              </NuxtLink>
+              <div class="flex items-center gap-2.5">
+                <NuxtLink
+                  v-if="route.path !== '/login'"
+                  to="/login"
+                  class="inline-flex items-center justify-center py-2 px-4 rounded-xl text-xs font-extrabold border border-white/15 bg-white/5 hover:bg-white/10 text-slate-200 hover:text-white transition-all shadow-sm leading-normal"
+                >
+                  Đăng nhập
+                </NuxtLink>
+
+                <NuxtLink
+                  v-if="route.path !== '/register'"
+                  to="/register"
+                  class="inline-flex items-center justify-center py-2 px-4.5 rounded-xl text-xs font-extrabold border border-transparent text-slate-950 bg-cyan-400 hover:bg-cyan-300 shadow-md shadow-cyan-500/25 transition-all hover:scale-105 active:scale-95 leading-normal"
+                >
+                  Đăng ký
+                </NuxtLink>
+
+                <NuxtLink
+                  to="/employer-register"
+                  class="hidden lg:inline-flex items-center text-xs font-bold text-slate-300 hover:text-cyan-300 px-3 py-2 transition-colors border-l border-white/10 pl-4 ml-1"
+                >
+                  Đăng tuyển & tìm hồ sơ
+                </NuxtLink>
+              </div>
             </template>
 
             <!-- Mobile menu button -->
@@ -361,10 +371,9 @@ const adminNavItems = [
 ]
 
 const landingNavItems = [
-  { id: 'home', name: 'Trang chủ', href: '#home' },
   { id: 'explore-jobs', name: 'Tìm việc làm', href: '#explore-jobs' },
-  { id: 'about', name: 'Giới thiệu', href: '#about' },
-  { id: 'features', name: 'Tính năng', href: '#features' },
+  { id: 'categories', name: 'Danh mục ngành', href: '#categories' },
+  { id: 'features', name: 'Tính năng & AI', href: '#features' },
   { id: 'contact', name: 'Liên hệ', href: '#contact' }
 ]
 

@@ -35,12 +35,11 @@
             @click="activePill = pill.id"
             :class="[
               activePill === pill.id
-                ? 'bg-cyan-400 text-slate-950 font-extrabold shadow-md shadow-cyan-500/20'
+                ? 'bg-cyan-400 text-slate-950 font-extrabold shadow-md shadow-cyan-500/25'
                 : 'bg-slate-900/90 text-slate-300 hover:bg-slate-800 hover:text-white border border-white/10 font-semibold',
-              'inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs transition-all'
+              'inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs transition-all cursor-pointer'
             ]"
           >
-            <span>{{ pill.icon }}</span>
             <span>{{ pill.label }}</span>
             <span v-if="pill.id === 'saved' && savedJobIds.length > 0" class="rounded-full bg-rose-500 px-1.5 py-0.2 text-[10px] font-black text-white ml-0.5">
               {{ savedJobIds.length }}
@@ -99,8 +98,10 @@
           <div
             v-for="job in paginatedJobs"
             :key="job.id"
-            class="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-white/10 bg-slate-900/85 p-4 shadow-md shadow-slate-950/20 backdrop-blur transition-all duration-200 hover:border-cyan-400/50 hover:bg-slate-900 hover:shadow-xl hover:shadow-cyan-950/30"
+            class="group relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-white/10 bg-slate-900/85 p-4.5 shadow-md shadow-slate-950/20 backdrop-blur transition-all duration-300 hover:border-cyan-400/60 hover:bg-slate-900 hover:shadow-xl hover:shadow-cyan-950/40 hover:-translate-y-1"
           >
+            <!-- Metallic Shine Beam Sweep Overlay -->
+            <div class="pointer-events-none absolute -inset-full top-0 block h-full w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:animate-shine"></div>
             <!-- Left & Middle: Logo + Job details (Clickable to open Detail Modal) -->
             <div @click="openJobDetail(job)" class="flex items-start sm:items-center gap-3.5 min-w-0 flex-1 w-full cursor-pointer">
               <!-- Business Logo -->
@@ -341,12 +342,12 @@ const jobsPage = ref(1)
 const jobsPageSize = 6
 
 const pillFilters = [
-  { id: 'all', label: 'Tất cả việc làm', icon: '⚡' },
-  { id: 'high-salary', label: 'Lương > 5 Triệu', icon: '💰' },
-  { id: 'it', label: 'IT & Phần mềm', icon: '💻' },
-  { id: 'marketing', label: 'Marketing / Media', icon: '📈' },
-  { id: 'design', label: 'Thiết kế', icon: '🎨' },
-  { id: 'saved', label: 'Việc đã lưu', icon: '❤️' }
+  { id: 'all', label: 'Tất cả việc làm' },
+  { id: 'high-salary', label: 'Lương > 5 Triệu' },
+  { id: 'it', label: 'IT & Phần mềm' },
+  { id: 'marketing', label: 'Marketing / Media' },
+  { id: 'design', label: 'Thiết kế' },
+  { id: 'saved', label: 'Việc đã lưu' }
 ]
 
 const openJobDetail = (job: any) => {
@@ -432,4 +433,15 @@ const displayJobTitle = (title: string | null | undefined) => {
 
 onMounted(fetchJobs)
 </script>
+
+<style scoped>
+@keyframes shine {
+  100% {
+    left: 125%;
+  }
+}
+.animate-shine {
+  animation: shine 0.85s cubic-bezier(0.4, 0, 0.2, 1);
+}
+</style>
 
