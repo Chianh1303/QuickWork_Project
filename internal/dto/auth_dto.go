@@ -8,6 +8,10 @@ type RegisterRequest struct {
 	Phone       string `json:"phone"`
 	CompanyName string `json:"company_name"`
 	TaxCode     string `json:"tax_code"`
+	Address     string `json:"address"`
+	Website     string `json:"website"`
+	CompanySize string `json:"company_size"`
+	Description string `json:"description"`
 }
 
 type LoginRequest struct {

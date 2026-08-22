@@ -50,26 +50,11 @@
               </div>
             </div>
             <h2 class="mt-2 text-center text-3xl font-extrabold text-white tracking-tight lg:mt-0">
-              Đăng Ký Sinh Viên
+              Đăng Ký Tài Khoản
             </h2>
             <p class="mt-2 text-center text-sm text-slate-300">
-              Tìm việc làm bán thời gian phù hợp và quản lý mọi đơn ứng tuyển.
+              Tạo tài khoản cá nhân để trải nghiệm hệ sinh thái QuickWork.
             </p>
-          </div>
-
-          <!-- Role Switcher Pills -->
-          <div class="mt-6 flex rounded-2xl bg-slate-950/80 p-1 border border-white/10">
-            <span class="flex-1 py-2 text-xs rounded-xl bg-cyan-400 text-slate-950 font-black shadow-md shadow-cyan-500/20 text-center flex items-center justify-center gap-1.5 cursor-default">
-              <span>🎓</span>
-              <span>Sinh Viên</span>
-            </span>
-            <NuxtLink
-              to="/employer-register"
-              class="flex-1 py-2 text-xs rounded-xl text-slate-400 hover:text-white font-bold text-center flex items-center justify-center gap-1.5 transition-all"
-            >
-              <span>🏢</span>
-              <span>Doanh Nghiệp</span>
-            </NuxtLink>
           </div>
 
           <!-- Success / Error Alert -->
@@ -111,7 +96,7 @@
                   required
                   v-model="form.email"
                   class="appearance-none block w-full px-3 py-3 border border-white/10 placeholder-slate-500 text-white rounded-lg bg-slate-950/70 hover:bg-slate-950 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-transparent transition-all duration-200 sm:text-sm"
-                  placeholder="Ví dụ: sinhvien@viethan.edu.vn"
+                  placeholder="Ví dụ: my.account@domain.com"
                 />
               </div>
 
@@ -142,7 +127,7 @@
                   </svg>
                   <span>Đang tạo tài khoản...</span>
                 </span>
-                <span v-else>Đăng Ký Sinh Viên</span>
+                <span v-else>Đăng Ký</span>
               </button>
             </div>
           </form>
@@ -174,12 +159,6 @@
               Bạn đã có tài khoản?
               <NuxtLink to="/login" class="font-bold text-cyan-300 hover:text-cyan-200 transition-colors duration-150 ml-1">
                 Đăng nhập ngay
-              </NuxtLink>
-            </div>
-            <div class="text-slate-400">
-              Dành cho nhà tuyển dụng?
-              <NuxtLink to="/employer-register" class="font-bold text-cyan-300 hover:text-cyan-200 transition-colors duration-150 ml-1">
-                Đăng ký Doanh nghiệp
               </NuxtLink>
             </div>
           </div>

@@ -64,7 +64,7 @@
 
               <!-- Shared Public Links -->
               <template v-else>
-                <template v-if="isLandingRoute">
+                <template v-if="isLandingRoute || isPublicAuthRoute">
                   <a
                     v-for="item in landingNavItems"
                     :key="item.id"
@@ -245,7 +245,7 @@
         </template>
 
         <template v-else>
-          <template v-if="isLandingRoute">
+          <template v-if="isLandingRoute || isPublicAuthRoute">
             <a
               v-for="item in landingNavItems"
               :key="item.id"
@@ -387,6 +387,7 @@ const showFooter = computed(() => {
 
 const userEmail = computed(() => user.value?.email)
 const isLandingRoute = computed(() => route.path === '/')
+const isPublicAuthRoute = computed(() => ['/login', '/register', '/employer-register'].includes(route.path))
 const isStudentDashboard = computed(() => route.path === '/student/dashboard')
 const isBusinessDashboard = computed(() => route.path === '/business/dashboard')
 const isAdminRoute = computed(() => route.path.startsWith('/admin'))

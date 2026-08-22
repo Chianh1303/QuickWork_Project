@@ -139,9 +139,15 @@ func (s *authService) Register(req dto.RegisterRequest) error {
 			return ErrTaxCodeExists
 		}
 		businessProfile = &models.Business{
-			CompanyName: req.CompanyName,
-			TaxCode:     req.TaxCode,
-			Phone:       req.Phone,
+			CompanyName:  req.CompanyName,
+			TaxCode:      req.TaxCode,
+			Phone:        req.Phone,
+			Address:      req.Address,
+			Website:      req.Website,
+			ContactEmail: req.Email,
+			CompanySize:  req.CompanySize,
+			Description:  req.Description,
+			IsVerified:   false,
 		}
 	}
 

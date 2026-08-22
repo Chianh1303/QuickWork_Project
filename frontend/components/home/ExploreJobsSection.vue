@@ -14,15 +14,15 @@
 
         <div v-else class="mb-8 flex flex-col gap-3 sm:flex-row sm:items-end sm:justify-between">
           <div>
-            <p class="text-sm font-bold uppercase tracking-[0.24em] text-cyan-300">Khám Phá Việc Làm</p>
-            <h2 class="mt-2 text-3xl font-extrabold tracking-tight text-white sm:text-4xl">
-              Ứng tuyển việc làm sinh viên đã xác thực
+            <p class="text-xs font-semibold uppercase tracking-[0.24em] text-brand-300">Cơ hội dành cho bạn</p>
+            <h2 class="mt-2 text-2xl font-bold tracking-tight text-white sm:text-3xl lg:text-[2rem]">
+              Khám phá những vị trí đang tuyển
             </h2>
-            <p class="mt-3 max-w-2xl text-sm font-medium leading-6 text-slate-400 sm:text-base">
-              Tìm kiếm việc làm nhanh chóng với bộ lọc từ khóa, địa điểm và phân trang mượt mà.
+            <p class="mt-3 max-w-2xl text-sm text-slate-400 sm:text-base">
+              và tìm nơi phù hợp với kỹ năng của bạn.
             </p>
           </div>
-          <span class="inline-flex w-fit items-center rounded-full border border-cyan-400/20 bg-cyan-400/10 px-4 py-2 text-sm font-bold text-cyan-100">
+          <span class="inline-flex w-fit items-center rounded-full border border-brand-400/20 bg-brand-400/10 px-4 py-2 text-sm font-semibold text-brand-100">
             {{ filteredJobs.length }} kết quả khả dụng
           </span>
         </div>
@@ -35,35 +35,35 @@
             @click="activePill = pill.id"
             :class="[
               activePill === pill.id
-                ? 'bg-cyan-400 text-slate-950 font-extrabold shadow-md shadow-cyan-500/25'
-                : 'bg-slate-900/90 text-slate-300 hover:bg-slate-800 hover:text-white border border-white/10 font-semibold',
-              'inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs transition-all cursor-pointer'
+                ? 'bg-brand-400 text-slate-950 font-bold shadow-sm shadow-brand-500/20'
+                : 'bg-white/[0.03] text-slate-400 hover:bg-white/[0.06] hover:text-white border border-white/10 font-medium',
+              'inline-flex items-center gap-1.5 rounded-full px-4 py-2 text-xs transition-all'
             ]"
           >
             <span>{{ pill.label }}</span>
-            <span v-if="pill.id === 'saved' && savedJobIds.length > 0" class="rounded-full bg-rose-500 px-1.5 py-0.2 text-[10px] font-black text-white ml-0.5">
+            <span v-if="pill.id === 'saved' && savedJobIds.length > 0" class="rounded-full bg-brand-500 px-1.5 py-0.2 text-[10px] font-bold text-white ml-0.5">
               {{ savedJobIds.length }}
             </span>
           </button>
         </div>
 
-        <div class="mx-auto mb-10 grid max-w-5xl grid-cols-1 gap-4 rounded-2xl border border-cyan-400/15 bg-slate-900/82 p-4 shadow-lg shadow-slate-950/30 backdrop-blur sm:grid-cols-2">
+        <div class="mx-auto mb-10 grid max-w-5xl grid-cols-1 gap-3 rounded-2xl border border-white/10 bg-white/[0.03] p-3 backdrop-blur sm:grid-cols-2">
           <div class="relative">
-            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
-              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
               </svg>
             </span>
             <input
               v-model="searchQuery"
               type="text"
-              class="block w-full rounded-xl border border-white/10 bg-slate-950/70 py-2.5 pl-10 pr-3 text-sm text-slate-100 placeholder-slate-500 transition-all duration-200 focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+              class="block w-full rounded-xl border border-white/10 bg-slate-950/50 py-2.5 pl-10 pr-3 text-sm text-slate-100 placeholder-slate-500 transition-colors focus:border-brand-400/40 focus:outline-none"
               placeholder="Tìm theo tiêu đề hoặc từ khóa công việc..."
             />
           </div>
           <div class="relative">
-            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3 text-slate-500">
-              <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <span class="pointer-events-none absolute inset-y-0 left-0 flex items-center pl-3.5 text-slate-500">
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
                 <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 11a3 3 0 11-6 0 3 3 0 016 0z" />
               </svg>
@@ -71,7 +71,7 @@
             <input
               v-model="locationQuery"
               type="text"
-              class="block w-full rounded-xl border border-white/10 bg-slate-950/70 py-2.5 pl-10 pr-3 text-sm text-slate-100 placeholder-slate-500 transition-all duration-200 focus:border-cyan-300 focus:outline-none focus:ring-2 focus:ring-cyan-400"
+              class="block w-full rounded-xl border border-white/10 bg-slate-950/50 py-2.5 pl-10 pr-3 text-sm text-slate-100 placeholder-slate-500 transition-colors focus:border-brand-400/40 focus:outline-none"
               placeholder="Nhập địa điểm, thành phố..."
             />
           </div>
@@ -88,22 +88,31 @@
         <!-- Skeleton Loading -->
         <JobSkeleton v-if="isLoadingJobs" :count="6" />
 
-        <div v-else-if="filteredJobs.length === 0" class="rounded-2xl border border-white/10 bg-slate-900/82 px-4 py-16 text-center text-slate-400">
-          <span class="text-4xl block mb-2">🔍</span>
-          <p class="font-bold text-slate-100 text-lg">Hiện chưa có bài đăng việc làm nào phù hợp.</p>
-          <p class="text-sm text-slate-400 mt-1">Hãy thử thay đổi từ khóa tìm kiếm hoặc chọn bộ lọc khác.</p>
+        <div v-else-if="filteredJobs.length === 0" class="rounded-2xl border border-white/10 bg-white/[0.02] px-4 py-16 text-center">
+          <span class="flex h-12 w-12 mx-auto items-center justify-center rounded-xl bg-white/[0.04] text-slate-500">
+            <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
+            </svg>
+          </span>
+          <p class="mt-4 font-bold text-slate-200 text-base">Không tìm thấy cơ hội phù hợp.</p>
+          <p class="text-sm text-slate-500 mt-1">Thử thay đổi từ khóa hoặc bộ lọc để khám phá thêm việc làm.</p>
         </div>
 
         <div v-else class="mx-auto grid max-w-6xl grid-cols-1 lg:grid-cols-2 gap-4">
           <div
             v-for="job in paginatedJobs"
             :key="job.id"
-            class="group relative overflow-hidden flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-white/10 bg-slate-900/85 p-4.5 shadow-md shadow-slate-950/20 backdrop-blur transition-all duration-300 hover:border-cyan-400/60 hover:bg-slate-900 hover:shadow-xl hover:shadow-cyan-950/40 hover:-translate-y-1"
+            class="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-white/10 bg-white/[0.02] p-4.5 transition-all duration-300 hover:border-brand-400/30 hover:bg-white/[0.04] hover:-translate-y-0.5 hover:shadow-lg hover:shadow-brand-500/5"
           >
-            <!-- Metallic Shine Beam Sweep Overlay -->
-            <div class="pointer-events-none absolute -inset-full top-0 block h-full w-1/2 -skew-x-12 bg-gradient-to-r from-transparent via-white/10 to-transparent group-hover:animate-shine"></div>
             <!-- Left & Middle: Logo + Job details (Clickable to open Detail Modal) -->
-            <div @click="openJobDetail(job)" class="flex items-start sm:items-center gap-3.5 min-w-0 flex-1 w-full cursor-pointer">
+            <div
+              @click="openJobDetail(job)"
+              @keydown.enter.prevent="openJobDetail(job)"
+              @keydown.space.prevent="openJobDetail(job)"
+              role="button"
+              tabindex="0"
+              class="flex items-start sm:items-center gap-3.5 min-w-0 flex-1 w-full cursor-pointer rounded-xl focus:outline-none focus-visible:ring-2 focus-visible:ring-brand-400/50"
+            >
               <!-- Business Logo -->
               <div class="relative h-14 w-14 sm:h-16 sm:w-16 flex-shrink-0 overflow-hidden rounded-xl border border-white/10 bg-slate-800 shadow-md flex items-center justify-center group-hover:scale-105 transition-transform">
                 <img
@@ -113,7 +122,7 @@
                   class="h-full w-full object-cover relative z-10"
                   @error="handleImgError"
                 />
-                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-indigo-600 via-blue-600 to-cyan-500 text-sm font-black text-white">
+                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-brand-500 to-emerald-500 text-sm font-black text-white">
                   {{ getCompanyInitial(companyName(job)) }}
                 </div>
               </div>
@@ -135,14 +144,14 @@
                   </span>
 
                   <span v-if="job.location" class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400 bg-slate-800/80 border border-slate-700/60 px-2 py-0.5 rounded-md truncate max-w-[130px]" :title="job.location">
-                    <svg class="h-3 w-3 flex-shrink-0 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="h-3 w-3 flex-shrink-0 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.828 0l-4.243-4.243a8 8 0 1111.314 0z" />
                     </svg>
                     <span class="truncate">{{ job.location }}</span>
                   </span>
 
                   <span v-if="job.working_date" class="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-slate-400 bg-slate-800/80 border border-slate-700/60 px-2 py-0.5 rounded-md truncate max-w-[130px]" :title="job.working_date">
-                    <svg class="h-3 w-3 flex-shrink-0 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg class="h-3 w-3 flex-shrink-0 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
                     </svg>
                     <span class="truncate">{{ job.working_date }}</span>
@@ -159,6 +168,7 @@
                   type="button"
                   @click="toggleSaveJob(job)"
                   :title="isJobSaved(job.id) ? 'Bỏ lưu việc làm' : 'Lưu vào mục yêu thích'"
+                  :aria-label="isJobSaved(job.id) ? 'Bỏ lưu việc làm' : 'Lưu vào mục yêu thích'"
                   class="p-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 transition-colors"
                 >
                   <svg
@@ -167,6 +177,7 @@
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
+                    aria-hidden="true"
                   >
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
                   </svg>
@@ -177,9 +188,10 @@
                   type="button"
                   @click="shareJob(job)"
                   title="Sao chép liên kết chia sẻ"
+                  aria-label="Sao chép liên kết chia sẻ"
                   class="p-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-400 hover:text-cyan-300 transition-colors"
                 >
-                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
                   </svg>
                 </button>
@@ -192,7 +204,7 @@
                   class="focus-ring flex items-center justify-center gap-1.5 rounded-xl bg-cyan-400 px-4 py-2 text-xs font-extrabold text-slate-950 shadow-sm transition-all hover:bg-cyan-300 disabled:cursor-not-allowed disabled:opacity-50 whitespace-nowrap"
                 >
                   <span>{{ isApplying === job.id ? 'Đang nộp...' : 'Ứng tuyển' }}</span>
-                  <svg v-if="isApplying !== job.id" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <svg v-if="isApplying !== job.id" class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
                   </svg>
                 </button>
@@ -238,7 +250,7 @@
                 class="h-full w-full object-cover relative z-10"
                 @error="handleImgError"
               />
-              <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-indigo-600 to-cyan-500 text-sm font-black text-white">
+              <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-brand-500 to-emerald-500 text-sm font-black text-white">
                 {{ getCompanyInitial(companyName(selectedJobDetail)) }}
               </div>
             </div>
@@ -312,10 +324,15 @@ import { useSavedJobs } from '~/composables/useSavedJobs'
 import PaginationControls from '~/components/common/PaginationControls.vue'
 import JobSkeleton from '~/components/common/JobSkeleton.vue'
 
-defineProps({
+const props = defineProps({
   showHero: { type: Boolean, default: true },
   standalone: { type: Boolean, default: true },
-  sectionId: { type: String, default: 'explore-jobs' }
+  sectionId: { type: String, default: 'explore-jobs' },
+  // Optional external keyword/location (e.g. from HomeHero's search bar).
+  // ExploreJobsSection remains the single owner of search/filter state and logic;
+  // these props only seed that existing state when the parent pushes a new value.
+  externalKeyword: { type: String, default: '' },
+  externalLocation: { type: String, default: '' }
 })
 
 const api = useApi()
@@ -393,6 +410,15 @@ watch([filteredJobs, activePill], () => {
   jobsPage.value = 1
 })
 
+// Sync external keyword/location (from HomeHero) into the existing search state.
+// Only reacts to actual changes pushed by the parent — does not alter filter logic.
+watch(() => props.externalKeyword, (val) => {
+  searchQuery.value = val
+})
+watch(() => props.externalLocation, (val) => {
+  locationQuery.value = val
+})
+
 const fetchJobs = async () => {
   isLoadingJobs.value = true
   try {
@@ -433,15 +459,4 @@ const displayJobTitle = (title: string | null | undefined) => {
 
 onMounted(fetchJobs)
 </script>
-
-<style scoped>
-@keyframes shine {
-  100% {
-    left: 125%;
-  }
-}
-.animate-shine {
-  animation: shine 0.85s cubic-bezier(0.4, 0, 0.2, 1);
-}
-</style>
 

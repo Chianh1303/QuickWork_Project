@@ -178,15 +178,9 @@
           <!-- Navigation Links -->
           <div class="border-t border-white/10 pt-6 flex flex-col space-y-3 text-center text-sm">
             <div class="text-slate-300">
-              Bạn chưa có tài khoản sinh viên?
+              Bạn chưa có tài khoản?
               <NuxtLink to="/register" class="font-bold text-cyan-300 hover:text-cyan-200 transition-colors duration-150 ml-1">
-                Đăng ký Sinh viên
-              </NuxtLink>
-            </div>
-            <div class="text-slate-400">
-              Dành cho nhà tuyển dụng?
-              <NuxtLink to="/employer-register" class="font-bold text-cyan-300 hover:text-cyan-200 transition-colors duration-150 ml-1">
-                Đăng ký Doanh nghiệp
+                Đăng ký
               </NuxtLink>
             </div>
           </div>
