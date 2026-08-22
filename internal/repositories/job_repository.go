@@ -9,6 +9,10 @@ type JobRepository interface {
 	GetAvailableJobs(search, location, category, jobType, maxSalary string) ([]models.Job, error)
 	GetBusinessAndUserByUserID(userID uint) (*models.Business, *models.User, error)
 	CreateJob(job *models.Job) error
+	GetJobsByBusinessID(businessID uint) ([]models.Job, error)
+	GetJobByID(jobID uint) (*models.Job, error)
+	UpdateJob(job *models.Job) error
+	DeleteJob(jobID uint) error
 }
 
 type jobRepository struct {
@@ -41,7 +45,7 @@ func (r *jobRepository) GetAvailableJobs(search, location, category, jobType, ma
 
 	if err := query.
 		Preload("Business").
-		Where("status = ?", "approved").
+		Where("status IN ?", []string{"approved", "open"}).
 		Order("id DESC").
 		Find(&jobs).Error; err != nil {
 		return nil, err
@@ -64,4 +68,27 @@ func (r *jobRepository) GetBusinessAndUserByUserID(userID uint) (*models.Busines
 
 func (r *jobRepository) CreateJob(job *models.Job) error {
 	return r.db.Create(job).Error
+}
+
+func (r *jobRepository) GetJobsByBusinessID(businessID uint) ([]models.Job, error) {
+	var jobs []models.Job
+	err := r.db.Where("business_id = ?", businessID).Order("id DESC").Find(&jobs).Error
+	return jobs, err
+}
+
+func (r *jobRepository) GetJobByID(jobID uint) (*models.Job, error) {
+	var job models.Job
+	err := r.db.First(&job, jobID).Error
+	if err != nil {
+		return nil, err
+	}
+	return &job, nil
+}
+
+func (r *jobRepository) UpdateJob(job *models.Job) error {
+	return r.db.Save(job).Error
+}
+
+func (r *jobRepository) DeleteJob(jobID uint) error {
+	return r.db.Delete(&models.Job{}, jobID).Error
 }

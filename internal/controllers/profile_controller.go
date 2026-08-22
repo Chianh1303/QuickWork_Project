@@ -144,8 +144,13 @@ func (ctrl *ProfileController) UpdateBusinessProfile(c *fiber.Ctx) error {
 	userID := uint(userIDVal.(float64))
 
 	companyName := c.FormValue("company_name")
+	taxCode := c.FormValue("tax_code")
 	phone := c.FormValue("phone")
 	address := c.FormValue("address")
+	website := c.FormValue("website")
+	contactEmail := c.FormValue("contact_email")
+	companySize := c.FormValue("company_size")
+	description := c.FormValue("description")
 
 	var logoUrl string
 	logoFile, err := c.FormFile("logo")
@@ -163,7 +168,19 @@ func (ctrl *ProfileController) UpdateBusinessProfile(c *fiber.Ctx) error {
 		}
 	}
 
-	business, err := ctrl.profileService.UpdateBusinessProfile(userID, companyName, phone, address, logoUrl)
+	input := services.UpdateBusinessProfileInput{
+		CompanyName:  companyName,
+		TaxCode:      taxCode,
+		Phone:        phone,
+		Address:      address,
+		Website:      website,
+		ContactEmail: contactEmail,
+		CompanySize:  companySize,
+		Description:  description,
+		LogoUrl:      logoUrl,
+	}
+
+	business, err := ctrl.profileService.UpdateBusinessProfile(userID, input)
 	if err != nil {
 		if errors.Is(err, services.ErrBusinessProfileNotFound) {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"success": false, "message": err.Error()})

@@ -17,6 +17,14 @@ type Business struct {
 
 	Address string `gorm:"type:varchar(255)" json:"address"`
 
+	Website string `gorm:"type:varchar(255)" json:"website"`
+
+	ContactEmail string `gorm:"type:varchar(150)" json:"contact_email"`
+
+	CompanySize string `gorm:"type:varchar(50)" json:"company_size"`
+
+	Description string `gorm:"type:text" json:"description"`
+
 	LogoUrl string `gorm:"type:varchar(255)" json:"logo_url"`
 
 	IsVerified bool `gorm:"default:false" json:"is_verified"`

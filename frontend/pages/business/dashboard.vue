@@ -72,7 +72,7 @@
     <!-- Main Content Area -->
     <div class="flex-1 min-w-0">
       <section class="border-b border-indigo-500/15 bg-gradient-to-r from-slate-950 via-indigo-950/40 to-slate-950">
-        <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
+        <div class="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-6">
           <div class="grid gap-5 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
             <div>
               <div class="flex flex-wrap items-center gap-2">
@@ -138,7 +138,7 @@
         </div>
       </section>
 
-      <main class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-8">
+      <main class="w-full max-w-[1600px] mx-auto px-4 sm:px-6 lg:px-10 py-8">
         <BusinessOverviewSection :state="businessDashboardState" />
         <BusinessProfileSection :state="businessDashboardState" />
         <BusinessJobsSection :state="businessDashboardState" />
@@ -443,9 +443,15 @@ const submitReview = async () => {
     const data = res && res.data ? res.data : res
     if (data) {
       profileForm.company_name = data.company_name || ''
+      profileForm.tax_code = data.tax_code || ''
       profileForm.phone = data.phone || ''
       profileForm.address = data.address || ''
+      profileForm.website = data.website || ''
+      profileForm.contact_email = data.contact_email || ''
+      profileForm.company_size = data.company_size || '20-50'
+      profileForm.description = data.description || ''
       profileForm.logo_url = data.logo_url || ''
+      profileForm.is_verified = Boolean(data.is_verified)
       currentBusinessUserId.value = data.user_id || data.id
     }
   } catch (err) {
@@ -464,21 +470,19 @@ const openChatModal = (app: any) => {
   selectedChatApp.value = app
   isChatModalOpen.value = true
 }
+
 // Forms Setup
 const profileForm = reactive({
   company_name: '',
+  tax_code: '',
   phone: '',
   address: '',
-  logo_url: ''
-})
-
-const jobForm = reactive({
-  title: '',
+  website: '',
+  contact_email: '',
+  company_size: '20-50',
   description: '',
-  location: '',
-  salary: 0,
-  slots: 1,
-  working_date: ''
+  logo_url: '',
+  is_verified: false
 })
 
 // Metrics and compute operations
@@ -657,7 +661,7 @@ const formatDate = (dateVal: any): string => {
 const fetchJobs = async () => {
   isLoadingJobs.value = true
   try {
-    const res = await api.get('/api/jobs')
+    const res = await api.get('/api/jobs/business/my-jobs')
     jobs.value = res.data || []
   } catch (err) {
     console.error('Error fetching jobs:', err)
@@ -685,10 +689,14 @@ const handleUpdateProfile = async () => {
   try {
     const formData = new FormData()
     formData.append('company_name', profileForm.company_name)
+    formData.append('tax_code', profileForm.tax_code)
     formData.append('phone', profileForm.phone)
     formData.append('address', profileForm.address)
+    formData.append('website', profileForm.website)
+    formData.append('contact_email', profileForm.contact_email)
+    formData.append('company_size', profileForm.company_size)
+    formData.append('description', profileForm.description)
 
-    // Nếu doanh nghiệp có chọn file logo mới thì đính kèm vào payload
     if (logoFileSelected.value) {
       formData.append('logo', logoFileSelected.value)
     }
@@ -697,16 +705,19 @@ const handleUpdateProfile = async () => {
     
     feedback.value = {
       type: 'success',
-      message: res.message || '🎉 Company profile updated successfully!'
+      message: res.message || '🎉 Hồ sơ công ty đã được cập nhật thành công!'
     }
 
-    // Đồng bộ lại đường dẫn logo mới nhất trả về từ server để hiển thị ngay
     const updatedData = res.data ? res.data : res
     if (updatedData) {
       profileForm.logo_url = updatedData.LogoUrl || updatedData.logo_url || profileForm.logo_url
+      profileForm.tax_code = updatedData.TaxCode || updatedData.tax_code || profileForm.tax_code
+      profileForm.website = updatedData.Website || updatedData.website || profileForm.website
+      profileForm.contact_email = updatedData.ContactEmail || updatedData.contact_email || profileForm.contact_email
+      profileForm.company_size = updatedData.CompanySize || updatedData.company_size || profileForm.company_size
+      profileForm.description = updatedData.Description || updatedData.description || profileForm.description
     }
 
-    // Tắt chế độ sửa, quay về chế độ xem và dọn dẹp file tạm
     isEditing.value = false
     logoFileSelected.value = null
   } catch (err: any) {
@@ -720,44 +731,157 @@ const handleUpdateProfile = async () => {
   }
 }
 
-const handleCreateJob = async () => {
+const jobForm = reactive({
+  id: 0,
+  title: '',
+  description: '',
+  requirements: '',
+  benefits: '',
+  location: '',
+  salary: 0,
+  slots: 1,
+  working_date: '',
+  category: 'it',
+  job_type: 'part_time'
+})
+
+const isEditingJob = ref(false)
+const showDeleteConfirmModal = ref(false)
+const deletingJob = ref<any | null>(null)
+const isDeletingJob = ref(false)
+
+const openCreateJobModal = () => {
+  isEditingJob.value = false
+  jobForm.id = 0
+  jobForm.title = ''
+  jobForm.description = ''
+  jobForm.requirements = ''
+  jobForm.benefits = ''
+  jobForm.location = ''
+  jobForm.salary = 0
+  jobForm.slots = 1
+  jobForm.working_date = ''
+  jobForm.category = 'it'
+  jobForm.job_type = 'part_time'
+  showCreateForm.value = true
+}
+
+const openEditJobModal = (job: any) => {
+  isEditingJob.value = true
+  jobForm.id = job.id
+  jobForm.title = job.title || ''
+  jobForm.location = job.location || ''
+  jobForm.salary = Number(job.salary || 0)
+  jobForm.slots = Number(job.slots || 1)
+  jobForm.working_date = job.working_date || ''
+  jobForm.category = job.category || 'it'
+  jobForm.job_type = job.job_type || 'part_time'
+
+  const rawDesc = job.description || ''
+  if (rawDesc.includes('📌 YÊU CẦU') || rawDesc.includes('🎁 QUYỀN LỢI')) {
+    const parts = rawDesc.split(/📌 YÊU CẦU ỨNG VIÊN:|📌 YÊU CẦU:|🎁 QUYỀN LỢI & ĐÃI NGỘ:|🎁 QUYỀN LỢI:/)
+    jobForm.description = (parts[0] || '').trim()
+    jobForm.requirements = (parts[1] || '').trim()
+    jobForm.benefits = (parts[2] || '').trim()
+  } else {
+    jobForm.description = rawDesc
+    jobForm.requirements = ''
+    jobForm.benefits = ''
+  }
+  showCreateForm.value = true
+}
+
+const handleCreateOrUpdateJob = async () => {
   isCreatingJob.value = true
   feedback.value = null
 
   try {
-    const res = await api.post('/api/jobs', {
+    let fullDescription = jobForm.description
+    if (jobForm.requirements && jobForm.requirements.trim()) {
+      fullDescription += `\n\n📌 YÊU CẦU ỨNG VIÊN:\n${jobForm.requirements.trim()}`
+    }
+    if (jobForm.benefits && jobForm.benefits.trim()) {
+      fullDescription += `\n\n🎁 QUYỀN LỢI & ĐÃI NGỘ:\n${jobForm.benefits.trim()}`
+    }
+
+    const payload = {
       title: jobForm.title,
-      description: jobForm.description,
+      description: fullDescription,
       location: jobForm.location,
       salary: Number(jobForm.salary),
       slots: Number(jobForm.slots),
-      working_date: jobForm.working_date
-    })
-
-    feedback.value = {
-      type: 'success',
-      message: res.message || '🎉 Job opening created successfully!'
+      working_date: jobForm.working_date,
+      category: jobForm.category,
+      job_type: jobForm.job_type
     }
 
-    // Reset Form fields
-    jobForm.title = ''
-    jobForm.description = ''
-    jobForm.location = ''
-    jobForm.salary = 0
-    jobForm.slots = 1
-    jobForm.working_date = ''
+    if (isEditingJob.value && jobForm.id) {
+      const res = await api.put(`/api/jobs/${jobForm.id}`, payload)
+      feedback.value = {
+        type: 'success',
+        message: res.message || '🎉 Cập nhật tin tuyển dụng thành công!'
+      }
+    } else {
+      const res = await api.post('/api/jobs', payload)
+      feedback.value = {
+        type: 'success',
+        message: res.message || '🎉 Đăng tin tuyển dụng mới thành công!'
+      }
+    }
 
-    // Return to main jobs overview
     showCreateForm.value = false
     await fetchJobs()
   } catch (err: any) {
     feedback.value = {
       type: 'error',
-      message: err.response?._data?.message || 'Failed to publish job opening.'
+      message: err.response?._data?.message || 'Không thể lưu bài tuyển dụng.'
     }
   } finally {
     isCreatingJob.value = false
     window.scrollTo({ top: 0, behavior: 'smooth' })
+  }
+}
+
+const toggleJobStatus = async (job: any) => {
+  try {
+    const res = await api.patch(`/api/jobs/${job.id}/status`)
+    feedback.value = {
+      type: 'success',
+      message: res.message || 'Đã cập nhật trạng thái bài tuyển dụng.'
+    }
+    await fetchJobs()
+  } catch (err: any) {
+    feedback.value = {
+      type: 'error',
+      message: err.response?._data?.message || 'Không thể cập nhật trạng thái.'
+    }
+  }
+}
+
+const openDeleteJobModal = (job: any) => {
+  deletingJob.value = job
+  showDeleteConfirmModal.value = true
+}
+
+const handleDeleteJob = async () => {
+  if (!deletingJob.value) return
+  isDeletingJob.value = true
+  try {
+    const res = await api.delete(`/api/jobs/${deletingJob.value.id}`)
+    feedback.value = {
+      type: 'success',
+      message: res.message || '🎉 Đã xóa bài tuyển dụng thành công!'
+    }
+    showDeleteConfirmModal.value = false
+    deletingJob.value = null
+    await fetchJobs()
+  } catch (err: any) {
+    feedback.value = {
+      type: 'error',
+      message: err.response?._data?.message || 'Không thể xóa bài tuyển dụng.'
+    }
+  } finally {
+    isDeletingJob.value = false
   }
 }
 
@@ -834,8 +958,17 @@ const businessDashboardState = reactive({
   handleUpdateProfile,
   showCreateForm,
   jobForm,
-  handleCreateJob,
   isCreatingJob,
+  openCreateJobModal,
+  openEditJobModal,
+  isEditingJob,
+  handleCreateOrUpdateJob,
+  toggleJobStatus,
+  openDeleteJobModal,
+  showDeleteConfirmModal,
+  deletingJob,
+  isDeletingJob,
+  handleDeleteJob,
   isLoadingJobs,
   isLoadingApps,
   paginatedBusinessJobs,

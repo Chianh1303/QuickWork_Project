@@ -7,6 +7,8 @@ type CreateJobInput struct {
 	Salary      float64 `json:"salary"`
 	Slots       int     `json:"slots"`
 	WorkingDate string  `json:"working_date"`
+	Category    string  `json:"category"`
+	JobType     string  `json:"job_type"`
 }
 
 type JobFilterQuery struct {
