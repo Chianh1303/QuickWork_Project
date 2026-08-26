@@ -1,2 +1,10 @@
 .DS_Store
 **/.DS_Store
+
+# Nuxt 4 / Frontend web artifacts
+frontend/.nuxt/
+frontend/.output/
+frontend/node_modules/
+frontend/.env
+uploads/
+.env
