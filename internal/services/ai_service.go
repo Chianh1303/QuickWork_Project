@@ -13,6 +13,7 @@ import (
 
 	"QuickWork/internal/cache"
 	"QuickWork/internal/clients"
+	"QuickWork/internal/config"
 	"QuickWork/internal/dto"
 	"QuickWork/internal/engine"
 	"QuickWork/internal/models"
@@ -71,7 +72,7 @@ func NewAIService(aiRepo repositories.AIRepository, jobRepo repositories.JobRepo
 		pdfParser:      pdfParser,
 		matchingEngine: matchingEngine,
 		cacheClient:    cc,
-		queueClient:    queue.NewRabbitMQClient("amqp://guest:guest@localhost:5672/"),
+		queueClient:    queue.NewRabbitMQClient(config.RabbitMQURL),
 	}
 }
 
