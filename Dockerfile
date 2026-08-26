@@ -1,6 +1,7 @@
 FROM golang:alpine
 
 ENV GOTOOLCHAIN=auto
+ENV PORT=8080
 
 WORKDIR /app
 
