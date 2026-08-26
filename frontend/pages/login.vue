@@ -296,6 +296,7 @@ const handleGoogleLogin = async () => {
       callback: async (response: any) => {
         if (!response.credential) return
         isLoading.value = true
+        errorMessage.value = ''
         try {
           const base64Url = response.credential.split('.')[1]
           const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
@@ -318,35 +319,11 @@ const handleGoogleLogin = async () => {
     })
     window.google.accounts.id.prompt((notification: any) => {
       if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-        const emailPrompt = prompt('Nhập địa chỉ Gmail của bạn để đăng nhập nhanh qua Google:', 'my.account@gmail.com')
-        if (emailPrompt) {
-          triggerGoogleFallbackLogin(emailPrompt)
-        }
+        errorMessage.value = 'Trình duyệt đang chặn Popup Google One-Tap. Vui lòng cho phép Popup trên thanh URL hoặc đăng nhập bằng Email/Mật khẩu!'
       }
     })
   } else {
-    const emailPrompt = prompt('Nhập địa chỉ Gmail của bạn để đăng nhập nhanh qua Google:', 'my.account@gmail.com')
-    if (emailPrompt) {
-      triggerGoogleFallbackLogin(emailPrompt)
-    }
-  }
-}
-
-const triggerGoogleFallbackLogin = async (email: string) => {
-  isLoading.value = true
-  errorMessage.value = ''
-
-  try {
-    await loginWithGoogle({
-      email: email,
-      name: email.split('@')[0],
-      picture: 'https://images.unsplash.com/photo-1534528741775-53994a69daeb?auto=format&fit=crop&q=80&w=256',
-      role: 'student'
-    })
-  } catch (err: any) {
-    errorMessage.value = err.data?.message || err.message || 'Đăng nhập bằng Google không thành công!'
-  } finally {
-    isLoading.value = false
+    errorMessage.value = 'Chưa thể nạp dịch vụ Google. Vui lòng làm mới trang hoặc đăng nhập bằng Email/Mật khẩu!'
   }
 }
 </script>
