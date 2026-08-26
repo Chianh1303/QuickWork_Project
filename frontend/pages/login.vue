@@ -292,6 +292,7 @@ const handleGoogleLogin = async () => {
   if (process.client && window.google) {
     window.google.accounts.id.initialize({
       client_id: googleClientId,
+      use_fedcm_for_prompt: true,
       callback: async (response: any) => {
         if (!response.credential) return
         isLoading.value = true
