@@ -60,15 +60,15 @@ func main() {
 	}
 	fmt.Println("🔌 Kết nối MySQL thành công!")
 
-	// 2. Chạy AutoMigrate để sinh cấu trúc bảng trước
-	err = database.AutoMigrate(DB)
-	if err != nil {
-		log.Fatal("❌ Lỗi cấu trúc Migration: ", err)
-	}
-	fmt.Println("🎉 Đã tự động tạo các bảng dữ liệu thành công dưới MySQL!")
-
-	// 3. Tiến hành Nạp Seed Data thực tế (Chỉ chạy sau khi bảng đã tồn tại an toàn)
-	database.SeedDatabase(DB)
+	// 2. Chạy AutoMigrate và Seed Data không làm nản luồng lắng nghe Cổng Server
+	go func() {
+		if err := database.AutoMigrate(DB); err != nil {
+			log.Println("⚠️ Lỗi cấu trúc Migration: ", err)
+			return
+		}
+		fmt.Println("🎉 Đã tự động tạo các bảng dữ liệu thành công dưới MySQL!")
+		database.SeedDatabase(DB)
+	}()
 
 	// 4. Khởi tạo AWS S3 / Local Storage Engine
 	_ = storage.NewStorageProvider()
