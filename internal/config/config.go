@@ -7,13 +7,20 @@ import (
 
 var (
 	MySQLDSN    = getMySQLDSN()
-	ServerAddr  = GetEnv("SERVER_ADDR", ":3000")
+	ServerAddr  = getServerAddr()
 	UploadDir   = "./uploads"
 	AvatarDir   = "./uploads/avatars"
 	CVDir       = "./uploads/cvs"
-	CORSOrigins = GetEnv("CORS_ORIGINS", "http://localhost:3001,http://127.0.0.1:3001")
+	CORSOrigins = GetEnv("CORS_ORIGINS", "*")
 	RabbitMQURL = GetEnv("RABBITMQ_URL", "amqp://guest:guest@localhost:5672/")
 )
+
+func getServerAddr() string {
+	if port := os.Getenv("PORT"); port != "" {
+		return ":" + port
+	}
+	return GetEnv("SERVER_ADDR", ":3000")
+}
 
 func getMySQLDSN() string {
 	dbUser := GetEnv("DB_USER", "root")
