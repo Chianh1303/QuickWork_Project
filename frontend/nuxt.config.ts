@@ -1,4 +1,4 @@
-import { defineNuxtConfig } from 'nuxt/config'
+const backendTarget = (process.env.BACKEND_URL || process.env.NUXT_PUBLIC_API_BASE_URL || 'https://quickwork-backend-api.onrender.com').replace(/\/$/, '')
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-06-24',
@@ -27,10 +27,10 @@ export default defineNuxtConfig({
     '@pinia/nuxt'
   ],
 
-  // Proxy /api and /uploads requests to the Go Fiber backend running at http://localhost:3000
+  // Proxy /api and /uploads requests dynamically to Backend API URL
   routeRules: {
-    '/api/**': { proxy: 'http://localhost:3000/api/**' },
-    '/uploads/**': { proxy: 'http://localhost:3000/uploads/**' }
+    '/api/**': { proxy: `${backendTarget}/api/**` },
+    '/uploads/**': { proxy: `${backendTarget}/uploads/**` }
   },
 
   // Tailwind configuration options

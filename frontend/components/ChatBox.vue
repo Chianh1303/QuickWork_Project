@@ -131,9 +131,11 @@ const connectSocket = () => {
         return
     }
 
-    socket = new WebSocket(
-        `ws://localhost:3000/api/chat/ws?userId=${props.currentUserId}`
-    )
+    const protocol = window.location.protocol === 'https:' ? 'wss:' : 'ws:'
+    const apiBase = process.env.NUXT_PUBLIC_API_BASE_URL || 'https://quickwork-backend-api.onrender.com'
+    const wsHost = apiBase.replace(/^https?:\/\//, '').replace(/\/$/, '')
+    const wsUrl = `${protocol}//${wsHost}/api/chat/ws?userId=${props.currentUserId}`
+    socket = new WebSocket(wsUrl)
 
     socket.onopen = () => {
         console.log("OPEN", socket)
