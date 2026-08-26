@@ -2,6 +2,8 @@ package controllers
 
 import (
 	"errors"
+	"fmt"
+	"log"
 
 	"QuickWork/internal/dto"
 	"QuickWork/internal/services"
@@ -107,11 +109,13 @@ func (ctrl *ApplicationController) StudentCompleteJob(c *fiber.Ctx) error {
 
 	var input dto.CompleteJobInput
 	if err := c.BodyParser(&input); err != nil || input.ApplicationID == 0 {
-		return c.Status(400).JSON(fiber.Map{"error": "Thiếu application_id"})
+		log.Printf("❌ [StudentCompleteJob Input Error]: BodyParser err=%v, app_id=%d, Body: %s", err, input.ApplicationID, string(c.Body()))
+		return c.Status(400).JSON(fiber.Map{"error": "Thiếu application_id không hợp lệ"})
 	}
 
-	app, err := ctrl.appService.StudentCompleteJob(userID, input.ApplicationID)
+	app, err := ctrl.appService.StudentCompleteJob(userID, input)
 	if err != nil {
+		log.Printf("❌ [StudentCompleteJob Service Error]: %v | UserID=%d, AppID=%d", err, userID, input.ApplicationID)
 		if errors.Is(err, services.ErrStudentAppProfileNotFound) || errors.Is(err, services.ErrAppNotFound) {
 			return c.Status(404).JSON(fiber.Map{"error": err.Error()})
 		}
@@ -160,11 +164,20 @@ func (ctrl *ApplicationController) ReviewApplication(c *fiber.Ctx) error {
 
 	var input dto.ReviewApplicationInput
 	if err := c.BodyParser(&input); err != nil {
-		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "Dữ liệu không hợp lệ"})
+		log.Printf("❌ [ReviewApplication BodyParser Error]: %v | Body: %s", err, string(c.Body()))
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": fmt.Sprintf("Dữ liệu không hợp lệ: %v", err)})
 	}
+
+	if input.ApplicationID == 0 {
+		log.Printf("❌ [ReviewApplication Input Error]: application_id is 0 | Body: %s", string(c.Body()))
+		return c.Status(fiber.StatusBadRequest).JSON(fiber.Map{"message": "application_id không được để trống hoặc bằng 0"})
+	}
+
+	log.Printf("📥 [ReviewApplication Request]: UserID=%d, AppID=%d, Status='%s', OfferSalary='%s'", userID, input.ApplicationID, input.Status, input.OfferSalary)
 
 	app, msg, err := ctrl.appService.ReviewApplication(userID, input)
 	if err != nil {
+		log.Printf("❌ [ReviewApplication Service Error]: %v", err)
 		if errors.Is(err, services.ErrBusinessAppProfileNotFound) || errors.Is(err, services.ErrAppNotFoundForReview) || errors.Is(err, services.ErrJobNotFoundForReview) {
 			return c.Status(fiber.StatusNotFound).JSON(fiber.Map{"message": err.Error()})
 		}

@@ -2,7 +2,7 @@
   <AdminShell>
     <div class="space-y-6">
       <!-- Hero Banner -->
-      <section class="overflow-hidden rounded-3xl border border-indigo-500/20 bg-slate-950/80 p-6 sm:p-8 shadow-2xl shadow-slate-950/40 backdrop-blur-xl">
+      <section class="overflow-hidden rounded-3xl border border-cyan-500/20 bg-slate-950/80 p-6 sm:p-8 shadow-2xl shadow-slate-950/40 backdrop-blur-xl">
         <div class="flex flex-col md:flex-row md:items-center md:justify-between gap-6">
           <div class="space-y-2">
             <span class="inline-flex rounded-full bg-amber-400/10 px-3.5 py-1 text-xs font-black uppercase tracking-wider text-amber-300 ring-1 ring-amber-400/30">
@@ -17,8 +17,8 @@
           </div>
 
           <div class="flex items-center gap-3">
-            <div class="rounded-2xl border border-indigo-500/20 bg-indigo-500/10 px-5 py-3.5 text-center">
-              <p class="text-[10px] font-black uppercase tracking-wider text-indigo-300">Đang chờ duyệt</p>
+            <div class="rounded-2xl border border-cyan-500/20 bg-cyan-500/10 px-5 py-3.5 text-center">
+              <p class="text-[10px] font-black uppercase tracking-wider text-cyan-300">Đang chờ duyệt</p>
               <p class="text-3xl font-black text-white mt-0.5">{{ pagination.total }} ca</p>
             </div>
           </div>
@@ -26,7 +26,7 @@
       </section>
 
       <!-- Search & Filter Controls -->
-      <section class="rounded-3xl border border-indigo-500/20 bg-slate-900/90 p-4 shadow-xl backdrop-blur-xl">
+      <section class="rounded-3xl border border-cyan-500/20 bg-slate-900/90 p-4 shadow-xl backdrop-blur-xl">
         <div class="relative">
           <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
             <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -37,20 +37,20 @@
             v-model="searchQuery"
             type="text"
             @input="handleSearch"
-            class="block w-full pl-10 pr-4 py-2.5 border border-indigo-500/20 rounded-xl text-xs bg-slate-950/80 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 font-medium transition-all"
+            class="block w-full pl-10 pr-4 py-2.5 border border-cyan-500/20 rounded-xl text-xs bg-slate-950/80 text-white placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 font-medium transition-all"
             placeholder="Tìm theo tên bài tuyển dụng, tên công ty hoặc địa điểm làm việc..."
           />
         </div>
       </section>
 
       <!-- Loading State -->
-      <div v-if="isLoading" class="p-12 text-center text-xs font-black text-slate-400 animate-pulse bg-slate-900/90 rounded-3xl border border-indigo-500/15">
+      <div v-if="isLoading" class="p-12 text-center text-xs font-black text-slate-400 animate-pulse bg-slate-900/90 rounded-3xl border border-cyan-500/15">
         ⏳ Đang tải danh sách bài tuyển dụng chờ duyệt...
       </div>
 
       <!-- Empty State -->
-      <div v-else-if="jobs.length === 0" class="rounded-3xl border border-indigo-500/15 bg-slate-900/90 p-12 text-center shadow-xl space-y-3">
-        <div class="inline-flex p-4 rounded-2xl bg-indigo-500/10 border border-indigo-500/20 text-indigo-300">
+      <div v-else-if="jobs.length === 0" class="rounded-3xl border border-cyan-500/15 bg-slate-900/90 p-12 text-center shadow-xl space-y-3">
+        <div class="inline-flex p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300">
           <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -66,11 +66,11 @@
         <div
           v-for="job in jobs"
           :key="job.id"
-          class="rounded-3xl border border-indigo-500/20 bg-slate-900/90 p-6 shadow-xl space-y-4 hover:border-indigo-500/40 transition-all backdrop-blur-xl"
+          class="rounded-3xl border border-cyan-500/20 bg-slate-900/90 p-6 shadow-xl space-y-4 hover:border-cyan-500/40 transition-all backdrop-blur-xl"
         >
-          <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-indigo-500/10 pb-4">
+          <div class="flex flex-col sm:flex-row sm:items-start justify-between gap-4 border-b border-cyan-500/10 pb-4">
             <div class="flex items-start space-x-3.5">
-              <div class="h-12 w-12 rounded-2xl bg-gradient-to-tr from-indigo-500 via-blue-600 to-emerald-400 flex items-center justify-center text-white font-black text-lg shadow-md shadow-indigo-500/20 flex-shrink-0">
+              <div class="h-12 w-12 rounded-2xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-emerald-400 flex items-center justify-center text-white font-black text-lg shadow-md shadow-cyan-500/20 flex-shrink-0">
                 {{ job.company_name ? job.company_name.substring(0, 2).toUpperCase() : 'DN' }}
               </div>
               <div>
@@ -80,7 +80,7 @@
                     Chờ Admin Duyệt
                   </span>
                 </div>
-                <p class="text-xs font-bold text-indigo-300 mt-0.5">
+                <p class="text-xs font-bold text-cyan-300 mt-0.5">
                   Công ty: <strong class="text-white">{{ job.company_name || 'Doanh nghiệp chưa xác định' }}</strong> (MST: {{ job.tax_code || 'N/A' }})
                 </p>
               </div>
@@ -108,14 +108,14 @@
             </div>
             <div>
               <span class="text-slate-400 block text-[10px] uppercase font-black">Ngành nghề:</span>
-              <span class="text-indigo-200 font-bold bg-indigo-500/10 px-2 py-0.5 rounded-lg border border-indigo-500/20 inline-block mt-0.5">
+              <span class="text-cyan-200 font-bold bg-cyan-500/10 px-2 py-0.5 rounded-lg border border-cyan-500/20 inline-block mt-0.5">
                 {{ job.category || 'Công nghệ thông tin' }}
               </span>
             </div>
           </div>
 
-          <div class="bg-slate-950/60 p-3.5 rounded-2xl border border-indigo-500/10 text-xs text-slate-300 leading-relaxed">
-            <span class="text-[10px] font-black uppercase text-indigo-400 block mb-1">Mô tả công việc:</span>
+          <div class="bg-slate-950/60 p-3.5 rounded-2xl border border-cyan-500/10 text-xs text-slate-300 leading-relaxed">
+            <span class="text-[10px] font-black uppercase text-cyan-400 block mb-1">Mô tả công việc:</span>
             {{ job.description }}
           </div>
 
@@ -132,7 +132,7 @@
             <button
               @click="handleReview(job.id, 'approved')"
               :disabled="processingId === job.id"
-              class="px-5 py-2.5 rounded-xl text-xs font-black text-white bg-gradient-to-r from-indigo-500 via-blue-600 to-emerald-500 hover:from-indigo-400 hover:to-emerald-400 shadow-md shadow-indigo-500/20 transition-all disabled:opacity-50"
+              class="px-5 py-2.5 rounded-xl text-xs font-black text-white bg-gradient-to-r from-cyan-500 via-blue-600 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 shadow-md shadow-cyan-500/20 transition-all disabled:opacity-50"
             >
               🟢 Phê Duyệt Bài Đăng
             </button>

@@ -47,6 +47,7 @@ export const useApi = () => {
     get: <T = any>(url: string, options?: FetchOptions) => request<T>(url, { method: 'GET', ...options }),
     post: <T = any>(url: string, body?: any, options?: FetchOptions) => request<T>(url, { method: 'POST', body, ...options }),
     put: <T = any>(url: string, body?: any, options?: FetchOptions) => request<T>(url, { method: 'PUT', body, ...options }),
+    patch: <T = any>(url: string, body?: any, options?: FetchOptions) => request<T>(url, { method: 'PATCH', body, ...options }),
     delete: <T = any>(url: string, options?: FetchOptions) => request<T>(url, { method: 'DELETE', ...options })
   }
 }

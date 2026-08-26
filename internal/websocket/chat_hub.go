@@ -102,6 +102,41 @@ func HandleWS(conn *websocket.Conn) {
 			continue
 		}
 
+		// Tạo Notification cho người nhận khi có tin nhắn mới
+		if message.ReceiverID > 0 {
+			senderName := "Người dùng"
+			var student models.Student
+			if err := GlobalChatHub.DB.Where("user_id = ?", message.SenderID).First(&student).Error; err == nil && student.FullName != "" {
+				senderName = student.FullName
+			} else {
+				var business models.Business
+				if err := GlobalChatHub.DB.Where("user_id = ?", message.SenderID).First(&business).Error; err == nil && business.CompanyName != "" {
+					senderName = business.CompanyName
+				}
+			}
+
+			notifMessage := message.MessageText
+			if len(notifMessage) > 100 {
+				notifMessage = notifMessage[:97] + "..."
+			}
+
+			notif := models.Notification{
+				UserID:      message.ReceiverID,
+				Title:       "💬 Tin nhắn mới từ " + senderName,
+				Message:     notifMessage,
+				Type:        "chat",
+				ReferenceID: message.ApplicationID,
+				IsRead:      false,
+				CreatedAt:   time.Now(),
+			}
+
+			if err := GlobalChatHub.DB.Create(&notif).Error; err != nil {
+				log.Println("Failed to create chat notification:", err)
+			} else {
+				log.Printf("🔔 [Chat Notification Created]: Sent to Receiver UserID=%d from %s (AppID=%d)", message.ReceiverID, senderName, message.ApplicationID)
+			}
+		}
+
 		messageJSON, _ := json.Marshal(message)
 
 		GlobalChatHub.Mu.RLock()

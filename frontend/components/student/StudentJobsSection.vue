@@ -2,34 +2,15 @@
       <!-- Section 1: Dashboard (Explore Jobs) -->
       <div v-if="activeSection === 'jobs'" class="space-y-6">
         <!-- AI Recommended Jobs Section -->
-        <StudentAiRecommendedJobs @apply="handleAiApply" />
+        <StudentAiRecommendedJobs :applications="state.applications" @apply="handleAiApply" />
 
-        <!-- Feedback Banner -->
-        <div v-if="feedback" :class="[
-          feedback.type === 'success' ? 'bg-emerald-50 border-emerald-300 text-emerald-800' : 'bg-red-50 border-red-300 text-red-800',
-          'border-l-4 p-4 rounded-r-lg flex justify-between items-start transition-all duration-300 shadow-sm'
-        ]">
-          <div class="flex items-center space-x-3">
-            <svg v-if="feedback.type === 'success'" class="h-5 w-5 text-emerald-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <svg v-else class="h-5 w-5 text-red-500 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M10 14l2-2m0 0l2-2m-2 2l-2-2m2 2l2 2m7-2a9 9 0 11-18 0 9 9 0 0118 0z" />
-            </svg>
-            <span class="text-sm font-semibold">{{ feedback.message }}</span>
-          </div>
-          <button @click="feedback = null" class="text-slate-400 hover:text-slate-600">
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
-            </svg>
-          </button>
-        </div>
+
 
        <!-- Filters -->
-       <div class="bg-slate-900/90 p-4 rounded-2xl border border-indigo-500/20 shadow-xl shadow-indigo-950/30 backdrop-blur-xl">
+       <div class="bg-slate-900/90 p-4 rounded-2xl border border-cyan-500/20 shadow-xl shadow-cyan-950/30 backdrop-blur-xl">
           <div class="mb-3.5 flex items-center justify-between gap-3">
-            <span class="text-xs font-black uppercase tracking-wider text-indigo-300">Bộ Lọc Tìm Kiếm Việc Làm Enterprise</span>
-            <span class="inline-flex items-center rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-extrabold text-indigo-200 ring-1 ring-indigo-500/20">
+            <span class="text-xs font-black uppercase tracking-wider text-cyan-300">Bộ Lọc Tìm Kiếm Việc Làm Enterprise</span>
+            <span class="inline-flex items-center rounded-full bg-cyan-500/10 px-3 py-1 text-xs font-extrabold text-cyan-200 ring-1 ring-cyan-500/20">
               {{ filteredJobs.length }} công việc khả dụng
             </span>
           </div>
@@ -41,7 +22,7 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-5.2-5.2m0 0A7.2 7.2 0 105.6 5.6a7.2 7.2 0 0010.2 10.2z" />
                   </svg>
                 </span>
-                <input v-model="jobsSearchQuery" type="text" class="block w-full pl-10 pr-3.5 py-2.5 border border-indigo-500/20 rounded-xl text-sm bg-slate-950/80 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 font-medium" placeholder="Tìm theo vị trí tuyển dụng, từ khóa kỹ năng..." />
+                <input v-model="jobsSearchQuery" type="text" class="block w-full pl-10 pr-3.5 py-2.5 border border-cyan-500/20 rounded-xl text-sm bg-slate-950/80 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 font-medium" placeholder="Tìm theo vị trí tuyển dụng, từ khóa kỹ năng..." />
               </div>
 
               <div class="relative">
@@ -51,13 +32,13 @@
                     <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 10.5h.01" />
                   </svg>
                 </span>
-                <input v-model="jobsLocationQuery" type="text" class="block w-full pl-10 pr-3.5 py-2.5 border border-indigo-500/20 rounded-xl text-sm bg-slate-950/80 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-indigo-400 focus:border-indigo-400 font-medium" placeholder="Thành phố, địa điểm làm việc..." />
+                <input v-model="jobsLocationQuery" type="text" class="block w-full pl-10 pr-3.5 py-2.5 border border-cyan-500/20 rounded-xl text-sm bg-slate-950/80 text-slate-100 placeholder-slate-500 focus:outline-none focus:ring-2 focus:ring-cyan-400 focus:border-cyan-400 font-medium" placeholder="Thành phố, địa điểm làm việc..." />
               </div>
             </div>
 
             <div class="grid grid-cols-1 sm:grid-cols-2 xl:grid-cols-[1fr_1fr_1fr_1fr_auto] gap-3">
               <div>
-                <select v-model="filterCategory" class="block w-full px-3 py-2.5 border border-indigo-500/20 rounded-xl text-xs bg-slate-950/80 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 font-medium">
+                <select v-model="filterCategory" class="block w-full px-3 py-2.5 border border-cyan-500/20 rounded-xl text-xs bg-slate-950/80 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 font-medium">
                   <option value="all">Tất cả ngành nghề</option>
                   <option value="it">Công nghệ thông tin</option>
                   <option value="marketing">Marketing / Truyền thông</option>
@@ -66,7 +47,7 @@
               </div>
 
               <div>
-                <select v-model="filterJobType" class="block w-full px-3 py-2.5 border border-indigo-500/20 rounded-xl text-xs bg-slate-950/80 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 font-medium">
+                <select v-model="filterJobType" class="block w-full px-3 py-2.5 border border-cyan-500/20 rounded-xl text-xs bg-slate-950/80 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 font-medium">
                   <option value="all">Tất cả hình thức</option>
                   <option value="full-time">Toàn thời gian</option>
                   <option value="part-time">Bán thời gian</option>
@@ -75,7 +56,7 @@
               </div>
 
               <div>
-                <select v-model="filterMinSalary" class="block w-full px-3 py-2.5 border border-indigo-500/20 rounded-xl text-xs bg-slate-950/80 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 font-medium">
+                <select v-model="filterMinSalary" class="block w-full px-3 py-2.5 border border-cyan-500/20 rounded-xl text-xs bg-slate-950/80 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 font-medium">
                   <option value="">Mức lương bất kỳ</option>
                   <option value="2000000">Từ 2.000.000 VNĐ</option>
                   <option value="5000000">Từ 5.000.000 VNĐ</option>
@@ -84,7 +65,7 @@
               </div>
 
               <div>
-                <select v-model="filterApplyStatus" class="block w-full px-3 py-2.5 border border-indigo-500/20 rounded-xl text-xs bg-slate-950/80 text-slate-100 focus:outline-none focus:ring-2 focus:ring-indigo-400 font-bold">
+                <select v-model="filterApplyStatus" class="block w-full px-3 py-2.5 border border-cyan-500/20 rounded-xl text-xs bg-slate-950/80 text-slate-100 focus:outline-none focus:ring-2 focus:ring-cyan-400 font-bold">
                   <option value="all">Tất cả (Ưu tiên chưa nộp)</option>
                   <option value="unapplied">⚡ Chỉ việc CHƯA nộp</option>
                   <option value="applied">✓ Việc ĐÃ nộp đơn</option>
@@ -95,7 +76,7 @@
                 <button type="button" @click="resetFilters" class="px-3.5 py-2.5 border border-white/10 text-xs font-bold rounded-xl text-slate-300 bg-white/5 hover:bg-white/10 transition-all focus-ring">
                   Xóa lọc
                 </button>
-                <button type="submit" class="px-4 py-2.5 text-xs font-extrabold rounded-xl text-white bg-gradient-to-r from-indigo-500 via-blue-600 to-emerald-500 hover:from-indigo-400 hover:to-emerald-400 shadow-md shadow-indigo-500/20 transition-all focus-ring">
+                <button type="submit" class="px-4 py-2.5 text-xs font-extrabold rounded-xl text-white bg-gradient-to-r from-cyan-500 via-blue-600 to-emerald-500 hover:from-cyan-400 hover:to-emerald-400 shadow-md shadow-cyan-500/20 transition-all focus-ring">
                   Lọc ngay
                 </button>
               </div>
@@ -105,7 +86,7 @@
 
         <!-- Skeleton / Loading -->
         <div v-if="isLoadingJobs" class="grid grid-cols-1 lg:grid-cols-2 gap-4">
-          <div v-for="n in 6" :key="n" class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 bg-slate-900/90 rounded-2xl border border-indigo-500/10 p-4 shadow-md animate-pulse">
+          <div v-for="n in 6" :key="n" class="flex flex-col sm:flex-row items-start sm:items-center justify-between gap-3.5 bg-slate-900/90 rounded-2xl border border-cyan-500/10 p-4 shadow-md animate-pulse">
             <div class="flex items-start sm:items-center gap-3.5 min-w-0 flex-1 w-full">
               <div class="h-14 w-14 sm:h-16 sm:w-16 rounded-xl bg-slate-800 flex-shrink-0"></div>
               <div class="min-w-0 flex-1 space-y-2">
@@ -124,7 +105,7 @@
         </div>
 
         <!-- Jobs Grid -->
-        <div v-else-if="filteredJobs.length === 0" class="bg-slate-900/90 text-center py-16 px-4 rounded-2xl border border-indigo-500/15 text-slate-400">
+        <div v-else-if="filteredJobs.length === 0" class="bg-slate-900/90 text-center py-16 px-4 rounded-2xl border border-cyan-500/15 text-slate-400">
           <svg class="mx-auto h-12 w-12 text-slate-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M9.172 16.172a4 4 0 015.656 0M9 10h.01M15 10h.01M21 12a9 9 0 11-18 0 9 9 0 0118 0z" />
           </svg>
@@ -136,12 +117,12 @@
           <div
             v-for="job in paginatedJobs"
             :key="job.id"
-            class="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-indigo-500/15 bg-slate-900/90 p-4 shadow-md shadow-indigo-950/20 backdrop-blur-xl transition-all duration-200 hover:border-indigo-400/50 hover:bg-slate-900 hover:shadow-xl hover:shadow-indigo-500/10"
+            class="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-cyan-500/15 bg-slate-900/90 p-4 shadow-md shadow-cyan-950/20 backdrop-blur-xl transition-all duration-200 hover:border-cyan-400/50 hover:bg-slate-900 hover:shadow-xl hover:shadow-cyan-500/10"
           >
             <!-- Left & Middle: Logo + Job details (Clickable to view details) -->
             <div @click="handleApply(job)" class="flex items-start sm:items-center gap-3.5 min-w-0 flex-1 w-full cursor-pointer">
               <!-- Business Logo -->
-              <div class="relative h-14 w-14 sm:h-16 sm:w-16 flex-shrink-0 overflow-hidden rounded-xl border border-indigo-500/20 bg-slate-800 shadow-md flex items-center justify-center group-hover:scale-105 transition-transform">
+              <div class="relative h-14 w-14 sm:h-16 sm:w-16 flex-shrink-0 overflow-hidden rounded-xl border border-cyan-500/20 bg-slate-800 shadow-md flex items-center justify-center group-hover:scale-105 transition-transform">
                 <img
                   v-if="job.business?.logo_url"
                   :src="getMediaUrl(job.business.logo_url)"
@@ -149,14 +130,14 @@
                   class="h-full w-full object-cover relative z-10"
                   @error="handleImgError"
                 />
-                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-indigo-600 via-blue-600 to-emerald-500 text-sm font-black text-white">
+                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-cyan-600 via-blue-600 to-emerald-500 text-sm font-black text-white">
                   {{ getCompanyInitial(companyNameLookup(job)) }}
                 </div>
               </div>
 
               <!-- Main Details -->
               <div class="min-w-0 flex-1 space-y-1">
-                <h3 class="text-sm sm:text-base font-extrabold text-white group-hover:text-indigo-300 transition-colors truncate" :title="displayJobTitle(job.title)">
+                <h3 class="text-sm sm:text-base font-extrabold text-white group-hover:text-cyan-300 transition-colors truncate" :title="displayJobTitle(job.title)">
                   {{ displayJobTitle(job.title) }}
                 </h3>
 
@@ -277,6 +258,7 @@ const {
   activeSection,
   navItems,
   feedback,
+  applications,
   jobsSearchQuery,
   jobsLocationQuery,
   filterCategory,

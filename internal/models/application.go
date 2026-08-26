@@ -13,11 +13,14 @@ type Application struct {
 	OfferSalary       string     `json:"offer_salary"`     // Mức lương offer cho sinh viên
 	OfferStartDate    string     `json:"offer_start_date"` // Ngày bắt đầu làm việc
 	OfferMessage      string     `json:"offer_message"`
-	StudentCompleted  bool       `gorm:"default:false" json:"student_completed"`
-	BusinessCompleted bool       `gorm:"default:false" json:"business_completed"`
-	CompletedAt       *time.Time `json:"completed_at"`
-	PaidAt            *time.Time `json:"paid_at"`
-	PaymentStatus     string     `gorm:"type:varchar(20);default:'unpaid'" json:"payment_status"`
+	StudentCompleted   bool       `gorm:"default:false" json:"student_completed"`
+	BusinessCompleted  bool       `gorm:"default:false" json:"business_completed"`
+	CompletionNote     string     `gorm:"type:text" json:"completion_note"`
+	CompletionProofUrl string     `gorm:"type:varchar(500)" json:"completion_proof_url"`
+	SubmittedAt        *time.Time `json:"submitted_at"`
+	CompletedAt        *time.Time `json:"completed_at"`
+	PaidAt             *time.Time `json:"paid_at"`
+	PaymentStatus      string     `gorm:"type:varchar(20);default:'unpaid'" json:"payment_status"`
 }
 
 // Struct bóc tách dữ liệu body gửi lên

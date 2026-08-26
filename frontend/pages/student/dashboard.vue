@@ -1,133 +1,38 @@
 <template>
   <div class="dashboard-body min-h-screen bg-slate-950 text-slate-100 lg:flex font-sans">
-    <!-- Sidebar navigation (desktop) -->
-    <aside class="hidden lg:flex lg:w-64 lg:flex-shrink-0 lg:flex-col lg:border-r lg:border-indigo-500/15 lg:bg-slate-950/90 lg:px-4 lg:py-6 backdrop-blur-xl sticky top-0 h-screen overflow-y-auto z-30">
-      <!-- Enterprise Platform Logo Badge -->
-      <div class="px-3 pb-6 border-b border-indigo-500/10 mb-4">
-        <button @click="activeSection = 'jobs'" class="flex items-center gap-2.5 group text-left w-full">
-          <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 to-emerald-400 flex items-center justify-center text-slate-950 font-black text-lg shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform">
-            QW
-          </div>
-          <div>
-            <span class="text-[10px] font-black uppercase tracking-wider text-indigo-400">Enterprise AI</span>
-            <p class="text-sm font-extrabold text-white tracking-tight group-hover:text-indigo-300 transition-colors">QuickWork Portal</p>
-          </div>
-        </button>
-      </div>
-
-      <nav class="flex flex-1 flex-col gap-1.5">
-        <button
-          v-for="item in navItems"
-          :key="item.id"
-          @click="activeSection = item.id"
-          :class="[
-            activeSection === item.id
-              ? 'bg-gradient-to-r from-indigo-500/20 to-emerald-500/10 text-indigo-200 border-l-4 border-indigo-400 shadow-md shadow-indigo-500/10 font-extrabold'
-              : 'text-slate-400 hover:bg-white/[0.04] hover:text-white font-medium',
-            'flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm transition-all text-left'
-          ]"
-        >
-          <svg v-if="item.id === 'jobs'" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
-          </svg>
-          <svg v-else-if="item.id === 'profile'" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
-          </svg>
-          <svg v-else-if="item.id === 'applications'" class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
-          </svg>
-          <svg v-else class="h-4 w-4 flex-shrink-0" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 9V7a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2h10a2 2 0 002-2v-2m0-6h4v6h-4a3 3 0 010-6z" />
-          </svg>
-          <div class="flex items-center justify-between w-full">
-            <span>{{ item.name }}</span>
-            <span
-              v-if="item.id === 'applications' && filteredApps.length > 0"
-              class="rounded-full bg-indigo-500/20 px-2 py-0.5 text-[10px] font-black text-indigo-300 ring-1 ring-indigo-500/30"
-            >
-              {{ filteredApps.length }}
-            </span>
-            <span
-              v-else-if="item.id === 'jobs' && filteredJobs.length > 0"
-              class="rounded-full bg-emerald-500/15 px-2 py-0.5 text-[10px] font-black text-emerald-300 ring-1 ring-emerald-500/30"
-            >
-              {{ filteredJobs.length }}
-            </span>
-          </div>
-        </button>
-      </nav>
-
-      <!-- Bottom Profile & Logout Box -->
-      <div class="mt-auto space-y-3 pt-4 border-t border-indigo-500/10">
-        <div class="rounded-2xl border border-indigo-500/20 bg-gradient-to-b from-indigo-950/40 to-slate-900/60 p-3.5 ring-1 ring-indigo-500/10">
-          <div class="flex items-center justify-between mb-2">
-            <p class="truncate text-xs font-bold text-white max-w-[130px]">{{ profileForm.full_name || 'Hồ sơ Sinh viên' }}</p>
-            <span class="rounded-full bg-emerald-400/10 px-2 py-0.5 text-[10px] font-extrabold text-emerald-300 ring-1 ring-emerald-400/30">
-              {{ profileReadiness }}% ATS
-            </span>
-          </div>
-          <div class="h-1.5 w-full overflow-hidden rounded-full bg-slate-800">
-            <div
-              class="h-full rounded-full bg-gradient-to-r from-indigo-500 to-emerald-400 transition-all duration-500"
-              :style="{ width: profileReadiness + '%' }"
-            ></div>
-          </div>
-        </div>
-
-        <!-- Integrated Logout Button -->
-        <button
-          @click="handleLogout"
-          class="w-full flex items-center justify-center gap-2 rounded-xl border border-rose-500/20 bg-rose-500/10 px-4 py-2.5 text-xs font-extrabold text-rose-300 hover:bg-rose-500/20 hover:text-rose-200 transition-all"
-        >
-          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-            <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
-          </svg>
-          <span>Đăng xuất tài khoản</span>
-        </button>
-      </div>
-    </aside>
+    <!-- Sidebar navigation (desktop aside + mobile top bar/drawer) -->
+    <StudentSidebar :state="studentDashboardState" @logout="handleLogout" />
 
     <div class="min-w-0 flex-1">
-      <!-- Section switcher (mobile / tablet) -->
-      <div class="flex gap-2 overflow-x-auto border-b border-indigo-500/15 bg-slate-950/80 px-4 py-3 lg:hidden">
-        <button
-          v-for="item in navItems"
-          :key="item.id"
-          @click="activeSection = item.id"
-          :class="[
-            activeSection === item.id ? 'bg-gradient-to-r from-indigo-500 to-emerald-500 text-white font-extrabold shadow-lg shadow-indigo-500/20' : 'bg-white/5 text-slate-300',
-            'flex-shrink-0 rounded-xl px-4 py-2 text-xs font-semibold transition-colors'
-          ]"
-        >
-          {{ item.name }}
-        </button>
-      </div>
 
-      <!-- Hero Header Banner -->
-      <section class="border-b border-indigo-500/15 bg-gradient-to-r from-slate-950 via-indigo-950/40 to-slate-950">
+      <!-- Dashboard Header -->
+      <section class="border-b border-white/10 bg-slate-950">
         <div class="w-full px-4 py-6 sm:px-6 lg:px-8">
           <div class="grid gap-6 lg:grid-cols-[1.1fr_0.9fr] lg:items-center">
             <div>
-              <span class="inline-flex rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-black uppercase tracking-wider text-indigo-300 ring-1 ring-indigo-500/30">
-                Enterprise AI Student Portal
-              </span>
-              <h1 class="mt-3 text-2xl font-extrabold tracking-tight text-white sm:text-3xl lg:text-4xl">
+              <div class="flex items-center justify-between gap-4">
+                <p class="text-sm font-medium text-slate-400">
+                  {{ profileForm.full_name ? `Chào mừng trở lại, ${profileForm.full_name} 👋` : 'Chào mừng bạn trở lại 👋' }}
+                </p>
+                <NotificationBell align="right" />
+              </div>
+              <h1 class="mt-1.5 text-2xl font-bold tracking-tight text-white sm:text-3xl">
                 {{ studentHero.title }}
               </h1>
-              <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-300 font-medium">
+              <p class="mt-2 max-w-2xl text-sm leading-relaxed text-slate-400">
                 {{ studentHero.description }}
               </p>
               <div class="mt-5 flex flex-wrap gap-3">
                 <button
                   @click="handleStudentHeroAction"
-                  class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 via-blue-600 to-emerald-500 px-5 py-2.5 text-sm font-extrabold text-white shadow-xl shadow-indigo-500/25 transition-all hover:from-indigo-400 hover:to-emerald-400 focus-ring"
+                  class="inline-flex items-center justify-center rounded-xl bg-brand-400 px-5 py-2.5 text-sm font-bold text-slate-950 transition-colors hover:bg-brand-300 focus-ring"
                 >
                   {{ studentHero.cta }}
                 </button>
                 <button
                   v-if="activeSection !== 'profile'"
                   @click="activeSection = 'profile'"
-                  class="inline-flex items-center justify-center rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-5 py-2.5 text-sm font-bold text-indigo-200 transition-all hover:bg-indigo-500/20 hover:text-white focus-ring"
+                  class="inline-flex items-center justify-center rounded-xl border border-white/10 px-5 py-2.5 text-sm font-semibold text-slate-300 transition-colors hover:bg-white/5 hover:text-white focus-ring"
                 >
                   Cập nhật hồ sơ
                 </button>
@@ -139,25 +44,25 @@
               <div
                 v-for="stat in studentHeroStats"
                 :key="stat.label"
-                class="rounded-2xl border border-indigo-500/20 bg-slate-900/80 p-4 shadow-xl shadow-indigo-950/30 backdrop-blur-md transition-all hover:border-indigo-500/40"
+                class="rounded-2xl border border-white/10 bg-white/[0.02] p-4 transition-colors hover:border-white/20"
               >
                 <div class="flex items-start justify-between gap-2">
                   <div class="min-w-0">
-                    <p class="truncate text-[11px] font-extrabold uppercase tracking-wider text-indigo-300/80">{{ stat.label }}</p>
-                    <p class="mt-1.5 text-2xl font-black text-white tracking-tight">{{ stat.value }}</p>
-                    <p class="mt-1 truncate text-xs font-semibold text-slate-400">{{ stat.caption }}</p>
+                    <p class="truncate text-[11px] font-semibold uppercase tracking-wider text-slate-500">{{ stat.label }}</p>
+                    <p class="mt-1.5 text-2xl font-bold text-white tracking-tight">{{ stat.value }}</p>
+                    <p class="mt-1 truncate text-xs font-medium text-slate-500">{{ stat.caption }}</p>
                   </div>
-                  <span :class="[stat.iconClass, 'inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-300 ring-1 ring-indigo-500/20']">
-                    <svg v-if="stat.icon === 'jobs'" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <span :class="[stat.iconClass, 'inline-flex h-8 w-8 flex-shrink-0 items-center justify-center rounded-xl']">
+                    <svg v-if="stat.icon === 'jobs'" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 13.255A23.931 23.931 0 0112 15c-3.183 0-6.22-.62-9-1.745M16 6V4a2 2 0 00-2-2h-4a2 2 0 00-2 2v2m4 6h.01M5 20h14a2 2 0 002-2V8a2 2 0 00-2-2H5a2 2 0 00-2 2v10a2 2 0 002 2z" />
                     </svg>
-                    <svg v-else-if="stat.icon === 'apps'" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg v-else-if="stat.icon === 'apps'" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
-                    <svg v-else-if="stat.icon === 'accepted'" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg v-else-if="stat.icon === 'accepted'" class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12l2 2 4-4m6 2a9 9 0 11-18 0 9 9 0 0118 0z" />
                     </svg>
-                    <svg v-else class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <svg v-else class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor" aria-hidden="true">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M16 7a4 4 0 11-8 0 4 4 0 018 0zM12 14a7 7 0 00-7 7h14a7 7 0 00-7-7z" />
                     </svg>
                   </span>
@@ -177,7 +82,11 @@
     </div>
   </div>
 
-  <StudentDashboardModals :state="studentDashboardState" />
+  <StudentDashboardModals
+    :state="studentDashboardState"
+    @upload-evidence="handleUploadEvidence"
+    @upload-completion-proof="handleUploadCompletionProof"
+  />
 </template>
 
 <script setup lang="ts">
@@ -187,6 +96,8 @@ import StudentProfileSection from '~/components/student/StudentProfileSection.vu
 import StudentApplicationsSection from '~/components/student/StudentApplicationsSection.vue'
 import StudentDashboardModals from '~/components/student/StudentDashboardModals.vue'
 import StudentWalletSection from '~/components/student/StudentWalletSection.vue'
+import StudentSidebar from '~/components/student/StudentSidebar.vue'
+import NotificationBell from '~/components/common/NotificationBell.vue'
 
 const { logout, user } = useAuth()
 const handleLogout = () => {
@@ -569,28 +480,28 @@ const studentHeroStats = computed(() => [
     value: jobs.value.length,
     caption: 'Đang tuyển dụng',
     icon: 'jobs',
-    iconClass: 'bg-brand-50 text-brand-700'
+    iconClass: 'bg-brand-400/10 text-brand-300'
   },
   {
     label: 'Đơn ứng tuyển',
     value: applications.value.length,
     caption: 'Tổng số đã nộp',
     icon: 'apps',
-    iconClass: 'bg-sky-50 text-sky-700'
+    iconClass: 'bg-white/10 text-slate-300'
   },
   {
     label: 'Đã nhận việc',
     value: acceptedApplicationsCount.value,
     caption: `${pendingApplicationsCount.value} đơn chờ duyệt`,
     icon: 'accepted',
-    iconClass: 'bg-emerald-50 text-emerald-700'
+    iconClass: 'bg-emerald-400/10 text-emerald-300'
   },
   {
     label: 'Hồ sơ cá nhân',
     value: `${profileReadiness.value}%`,
     caption: 'Mức độ hoàn thiện',
     icon: 'profile',
-    iconClass: 'bg-amber-50 text-amber-700'
+    iconClass: 'bg-amber-400/10 text-amber-300'
   }
 ])
 
@@ -605,7 +516,9 @@ const handleStudentHeroAction = () => {
 
 // API Operations
 const fetchJobs = async () => {
-  isLoadingJobs.value = true
+  if (jobs.value.length === 0) {
+    isLoadingJobs.value = true
+  }
   try {
     const queryParams: Record<string, string> = {}
     if (jobsSearchQuery.value && jobsSearchQuery.value.trim()) {
@@ -626,20 +539,43 @@ const fetchJobs = async () => {
 
     const res = await api.get('/api/jobs', { params: queryParams })
     jobs.value = res.data || []
-} catch (err) {
+  } catch (err) {
     console.error('Error fetching filtered jobs:', err)
-  } finally {  // Đã xóa chữ gõ nhầm
+  } finally {
     isLoadingJobs.value = false
   }
 }
 
+const targetAppId = useState<number | null>('targetAppIdFromNotification', () => null)
+
+const checkAndOpenTargetNotifApp = () => {
+  if (targetAppId.value && applications.value.length > 0) {
+    const foundApp = applications.value.find(a => Number(a.id) === Number(targetAppId.value))
+    if (foundApp) {
+      selectedManagedApplication.value = foundApp
+    }
+    targetAppId.value = null
+  }
+}
+
+watch(applications, () => {
+  checkAndOpenTargetNotifApp()
+}, { deep: true, immediate: true })
+
+watch(targetAppId, () => {
+  checkAndOpenTargetNotifApp()
+})
+
 const fetchApplications = async () => {
-  isLoadingApps.value = true
+  if (applications.value.length === 0) {
+    isLoadingApps.value = true
+  }
   try {
     const res = await api.get('/api/applications/my-applications')
     applications.value = Array.isArray(res)
       ? res
       : (res && Array.isArray(res.data) ? res.data : [])
+    checkAndOpenTargetNotifApp()
   } catch (err: any) {
     console.error('Error fetching student applications:', err)
   } finally {
@@ -647,7 +583,9 @@ const fetchApplications = async () => {
   }
 }
 const fetchWallet = async () => {
-  isLoadingWallet.value = true
+  if (!wallet.value) {
+    isLoadingWallet.value = true
+  }
 
   try {
     const res = await api.get('/api/wallet/me')
@@ -715,20 +653,27 @@ const submitApplication = async () => {
       cover_note: coverNoteText.value.trim()
     })
 
+    const msg = res.message || '🎉 Nộp đơn ứng tuyển thành công! Hồ sơ CV của bạn đã được chuyển tới Nhà tuyển dụng.'
     feedback.value = {
       type: 'success',
-      message: res.message || '🚀 Applied successfully!'
+      message: msg
     }
+    showToast(msg, 'success')
     selectedJobForApply.value = null
-    await fetchApplications()
+    await Promise.all([
+      fetchApplications(),
+      fetchJobs(),
+      fetchMyTickets()
+    ])
   } catch (err: any) {
+    const errMsg = err.response?._data?.message || err.message || 'Có lỗi xảy ra khi gửi đơn ứng tuyển.'
     feedback.value = {
       type: 'error',
-      message: err.response?._data?.message || 'Failed to submit application.'
+      message: errMsg
     }
+    showToast(errMsg, 'error')
   } finally {
     isSubmittingApply.value = false
-    window.scrollTo({ top: 0, behavior: 'smooth' })
   }
 }
 
@@ -851,12 +796,18 @@ const handleOfferResponse = async (responseType: 'accept' | 'decline') => {
       response: responseType
     }
 
-    await api.post('/api/applications/respond-offer', payload)
-    await fetchApplications()
+    const res = await api.post('/api/applications/respond-offer', payload)
+    showToast(res.message || (responseType === 'accept' ? '🎉 Đã chấp nhận Offer thành công!' : '❌ Đã từ chối Offer.'))
     selectedOffer.value = null
-  } catch (err) {
+    await Promise.all([
+      fetchApplications(),
+      fetchJobs(),
+      fetchWallet(),
+      fetchMyTickets()
+    ])
+  } catch (err: any) {
     console.error('Lỗi khi gửi phản hồi Offer:', err)
-    alert('Không thể gửi phản hồi lúc này, vui lòng thử lại!')
+    showToast(err.response?._data?.message || err.message || 'Không thể gửi phản hồi lúc này, vui lòng thử lại!', 'error')
   } finally {
     isResponding.value = false
   }
@@ -919,34 +870,75 @@ const handleCheckIn = async (jobId: number) => {
   }
 }
 
-const handleCheckOut = async (jobId: number) => {
-  if (!confirm('Bạn có chắc chắn muốn kết thúc ca làm việc?')) return
+const showCheckOutConfirmModal = ref(false)
+const checkOutJobIdTarget = ref<number | null>(null)
+const isSubmittingCheckOut = ref(false)
+
+const triggerCheckOutConfirm = (jobId: number) => {
+  checkOutJobIdTarget.value = jobId
+  showCheckOutConfirmModal.value = true
+}
+
+const executeCheckOut = async () => {
+  if (!checkOutJobIdTarget.value) return
+  const jobId = checkOutJobIdTarget.value
+  isSubmittingCheckOut.value = true
+
   try {
     const res = await api.post('/api/attendance/check-out', { job_id: Number(jobId) })
 
     delete activeAttendance.value[jobId]
     delete timers.value[jobId]
-    // 🌟 Xóa khỏi localStorage khi ra ca
     localStorage.removeItem(`active_work_${jobId}`)
 
-    showToast(res?.message || '🛑 Check-out thành công!')
+    showToast(res?.message || '🛑 Check-out kết thúc ca thành công!')
+    showCheckOutConfirmModal.value = false
+    checkOutJobIdTarget.value = null
   } catch (error: any) {
     showToast(error.response?._data?.error || 'Không thể check-out', 'error')
+  } finally {
+    isSubmittingCheckOut.value = false
   }
 }
-const handleStudentComplete = async (applicationId: number) => {
+const selectedCompletionAppForReport = ref<any | null>(null)
+const completionForm = reactive({
+  note: '',
+  proofUrl: ''
+})
+const isSubmittingCompletion = ref(false)
+
+const openStudentCompletionModal = (app: any) => {
+  let targetApp = app
+  if (typeof app !== 'object') {
+    targetApp = applications.value.find(a => Number(a.id) === Number(app)) || { id: app }
+  }
+  selectedCompletionAppForReport.value = targetApp
+  completionForm.note = targetApp.completion_note || targetApp.CompletionNote || ''
+  completionForm.proofUrl = targetApp.completion_proof_url || targetApp.CompletionProofUrl || ''
+}
+
+const submitStudentCompletionReport = async () => {
+  if (!selectedCompletionAppForReport.value) return
+  if (!completionForm.note.trim()) {
+    showToast('Vui lòng nhập nội dung báo cáo kết quả công việc', 'error')
+    return
+  }
+
+  isSubmittingCompletion.value = true
   try {
     const res = await api.post('/api/applications/student-complete', {
-      application_id: applicationId
+      application_id: selectedCompletionAppForReport.value.id,
+      completion_note: completionForm.note,
+      completion_proof_url: completionForm.proofUrl
     })
 
-    showToast(res?.message || 'Bạn đã xác nhận hoàn thành công việc.')
+    showToast(res?.message || '🎉 Đã nộp báo cáo hoàn thành công việc! Đang chờ doanh nghiệp đối soát giải ngân.')
+    selectedCompletionAppForReport.value = null
 
     await fetchApplications()
     await fetchWallet()
   } catch (error: any) {
     console.error('Student complete error:', error)
-
     showToast(
       error.data?.error ||
       error.response?._data?.error ||
@@ -954,12 +946,191 @@ const handleStudentComplete = async (applicationId: number) => {
       'Không thể xác nhận hoàn thành.',
       'error'
     )
+  } finally {
+    isSubmittingCompletion.value = false
+  }
+}
+
+const isUploadingCompletionProof = ref(false)
+
+const handleUploadCompletionProof = async (event: any) => {
+  const file = event.target.files?.[0]
+  if (!file) return
+
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('File bài nộp không được vượt quá 10MB', 'error')
+    return
+  }
+
+  isUploadingCompletionProof.value = true
+  try {
+    const formData = new FormData()
+    formData.append('evidence', file)
+    const res = await api.post('/api/tickets/upload-evidence', formData)
+    if (res.url) {
+      completionForm.proofUrl = res.url
+      showToast('🎉 Tải file bài nộp hoàn thành thành công!')
+    }
+  } catch (err: any) {
+    const errMsg = err.response?._data?.message || err.message || 'Không thể tải file bài nộp'
+    showToast(errMsg, 'error')
+  } finally {
+    isUploadingCompletionProof.value = false
+  }
+}
+
+const isDisputeModalOpen = ref(false)
+const disputeTargetApp = ref<any | null>(null)
+const isSubmittingDispute = ref(false)
+const disputeForm = reactive({
+  reason: '',
+  description: '',
+  requested_action: '',
+  evidence_url: ''
+})
+
+const isUploadingEvidence = ref(false)
+
+const handleUploadEvidence = async (event: any) => {
+  const file = event.target.files?.[0]
+  if (!file) return
+
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('File bằng chứng không được vượt quá 10MB', 'error')
+    return
+  }
+
+  isUploadingEvidence.value = true
+  try {
+    const formData = new FormData()
+    formData.append('evidence', file)
+    const res = await api.post('/api/tickets/upload-evidence', formData)
+    if (res.url) {
+      disputeForm.evidence_url = res.url
+      showToast('🎉 Tải file bằng chứng thành công!')
+    }
+  } catch (err: any) {
+    const errMsg = err.response?._data?.message || err.message || 'Không thể tải file bằng chứng'
+    showToast(errMsg, 'error')
+  } finally {
+    isUploadingEvidence.value = false
+  }
+}
+
+const openDisputeModal = (app: any) => {
+  disputeTargetApp.value = app
+  disputeForm.reason = ''
+  disputeForm.description = ''
+  disputeForm.requested_action = ''
+  disputeForm.evidence_url = ''
+  isDisputeModalOpen.value = true
+}
+
+const showDisputeErrorModal = ref(false)
+const disputeErrorMsg = ref('')
+
+const openDisputeError = (msg: string) => {
+  disputeErrorMsg.value = msg
+  showDisputeErrorModal.value = true
+}
+
+const myTickets = ref<any[]>([])
+const isLoadingTickets = ref(false)
+const showReappealModal = ref(false)
+const selectedTicketForView = ref<any | null>(null)
+const isSubmittingReappeal = ref(false)
+const reappealForm = reactive({
+  reason: ''
+})
+
+const fetchMyTickets = async () => {
+  if (myTickets.value.length === 0) {
+    isLoadingTickets.value = true
+  }
+  try {
+    const res = await api.get('/api/tickets/my-tickets')
+    myTickets.value = res.data || []
+  } catch (err) {
+    console.error('Fetch tickets error:', err)
+  } finally {
+    isLoadingTickets.value = false
+  }
+}
+
+const openReappealModal = (ticket: any) => {
+  selectedTicketForView.value = ticket
+  reappealForm.reason = ''
+  showReappealModal.value = true
+}
+
+const submitReappealTicket = async () => {
+  if (!selectedTicketForView.value || !reappealForm.reason.trim()) {
+    showToast('Vui lòng nhập lý do yêu cầu tái xem xét phán quyết', 'error')
+    return
+  }
+  if (reappealForm.reason.trim().length < 10) {
+    showToast('Lý do yêu cầu tái xem xét phải có ít nhất 10 ký tự', 'error')
+    return
+  }
+  isSubmittingReappeal.value = true
+  try {
+    const ticketId = selectedTicketForView.value.id || selectedTicketForView.value.ticket_id || selectedTicketForView.value.ID
+    const res = await api.post(`/api/tickets/${ticketId}/reappeal`, {
+      reason: reappealForm.reason.trim()
+    })
+    showToast(res.message || '🎉 Đã gửi yêu cầu tái xem xét thành công!')
+    showReappealModal.value = false
+    await fetchMyTickets()
+  } catch (err: any) {
+    const errMsg = err.response?._data?.message || err.message || 'Không thể gửi yêu cầu tái xem xét'
+    showToast(errMsg, 'error')
+  } finally {
+    isSubmittingReappeal.value = false
+  }
+}
+
+const submitDisputeTicket = async () => {
+  if (!disputeTargetApp.value || !disputeForm.reason || !disputeForm.description.trim()) {
+    openDisputeError('Vui lòng chọn lý do và nhập mô tả chi tiết khiếu nại.')
+    return
+  }
+  isSubmittingDispute.value = true
+
+  try {
+    const res = await api.post('/api/tickets', {
+      application_id: Number(disputeTargetApp.value.id),
+      reason: disputeForm.reason,
+      description: disputeForm.description.trim(),
+      requested_action: disputeForm.requested_action.trim(),
+      evidence_url: disputeForm.evidence_url.trim()
+    })
+
+    showToast(res.message || '🎉 Gửi khiếu nại thành công!')
+    isDisputeModalOpen.value = false
+    disputeTargetApp.value = null
+    await fetchMyTickets()
+  } catch (err: any) {
+    const errMsg = err.response?._data?.message || err.message || 'Không thể gửi khiếu nại'
+    showToast(errMsg, 'error')
+    openDisputeError(errMsg)
+  } finally {
+    isSubmittingDispute.value = false
+  }
+}
+
+const handleStudentComplete = async (app: any) => {
+  if (typeof app === 'object' && app?.id) {
+    openStudentCompletionModal(app)
+  } else {
+    openStudentCompletionModal({ id: app })
   }
 }
 // Vòng đời Hook duy nhất bọc toàn bộ logic
 const studentDashboardState = reactive({
   activeSection,
   navItems,
+  handleLogout,
+  profileReadiness,
   feedback,
   jobsSearchQuery,
   jobsLocationQuery,
@@ -988,6 +1159,7 @@ const studentDashboardState = reactive({
   isSavingProfile,
   handleUpdateProfile,
   isLoadingApps,
+  applications,
   filteredApps,
   paginatedApps,
   applicationsPage,
@@ -1003,7 +1175,10 @@ const studentDashboardState = reactive({
   isWorking,
   getTimer,
   handleCheckIn,
-  handleCheckOut,
+  triggerCheckOutConfirm,
+  executeCheckOut,
+  showCheckOutConfirmModal,
+  isSubmittingCheckOut,
   selectedJobForApply,
   coverNoteText,
   submitApplication,
@@ -1016,6 +1191,30 @@ const studentDashboardState = reactive({
   isResponding,
   isChatModalOpen,
   handleStudentComplete,
+  selectedCompletionAppForReport,
+  completionForm,
+  isSubmittingCompletion,
+  isUploadingCompletionProof,
+  openStudentCompletionModal,
+  submitStudentCompletionReport,
+  isDisputeModalOpen,
+  disputeTargetApp,
+  isSubmittingDispute,
+  disputeForm,
+  isUploadingEvidence,
+  myTickets,
+  isLoadingTickets,
+  showReappealModal,
+  selectedTicketForView,
+  isSubmittingReappeal,
+  reappealForm,
+  openReappealModal,
+  submitReappealTicket,
+  fetchMyTickets,
+  openDisputeModal,
+  submitDisputeTicket,
+  showDisputeErrorModal,
+  disputeErrorMsg,
   selectedChatApp,
   toast,
   wallet,
@@ -1043,16 +1242,42 @@ const studentDashboardState = reactive({
 })
 
 
+let autoSyncStudentInterval: any = null
+
+const syncStudentDashboardData = async () => {
+  try {
+    await Promise.all([
+      fetchJobs(),
+      fetchApplications(),
+      fetchProfile(),
+      fetchWallet(),
+      fetchMyTickets()
+    ])
+  } catch (e) {
+    // silent background sync
+  }
+}
+
+const handleStudentVisibilityChange = () => {
+  if (document.visibilityState === 'visible') {
+    syncStudentDashboardData()
+  }
+}
+
 onUnmounted(() => {
   if (timerInterval) clearInterval(timerInterval)
+  if (autoSyncStudentInterval) clearInterval(autoSyncStudentInterval)
+  if (import.meta.client) {
+    document.removeEventListener('visibilitychange', handleStudentVisibilityChange)
+  }
 })
+
 onMounted(async () => {
-  await fetchJobs()
-  await fetchApplications()
-  await fetchProfile()
-  await fetchWallet()
+  await syncStudentDashboardData()
 
   if (import.meta.client) {
+    document.addEventListener('visibilitychange', handleStudentVisibilityChange)
+
     applications.value.forEach(app => {
       if (app.job_id) {
         const savedTime = localStorage.getItem(`active_work_${app.job_id}`)

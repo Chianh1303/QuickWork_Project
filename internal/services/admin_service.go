@@ -2,6 +2,7 @@ package services
 
 import (
 	"errors"
+	"fmt"
 	"math"
 	"strings"
 
@@ -46,11 +47,19 @@ type AdminService interface {
 }
 
 type adminService struct {
-	adminRepo repositories.AdminRepository
+	adminRepo    repositories.AdminRepository
+	notifService NotificationService
 }
 
-func NewAdminService(adminRepo repositories.AdminRepository) AdminService {
-	return &adminService{adminRepo: adminRepo}
+func NewAdminService(adminRepo repositories.AdminRepository, notifService ...NotificationService) AdminService {
+	var ns NotificationService
+	if len(notifService) > 0 {
+		ns = notifService[0]
+	}
+	return &adminService{
+		adminRepo:    adminRepo,
+		notifService: ns,
+	}
 }
 
 func (s *adminService) GetDashboardStats() (*dto.AdminDashboardStats, error) {
@@ -288,17 +297,55 @@ func (s *adminService) GetTicketDetail(ticketID int) (*dto.AdminTicketItem, erro
 
 func (s *adminService) ResolveTicket(ticketID int, adminID uint, req dto.ResolveTicketRequest) error {
 	if ticketID < 1 {
-		return errors.New("ticket id is invalid")
+		return errors.New("Mã khiếu nại không hợp lệ")
 	}
 	verdict := strings.TrimSpace(req.Verdict)
-	if len([]rune(verdict)) < 5 {
-		return errors.New("Phán quyết của Admin phải có ít nhất 5 ký tự")
+	runes := []rune(verdict)
+	if len(runes) < 5 || len(runes) > 1000 {
+		return errors.New("Phán quyết của Admin phải từ 5 đến 1000 ký tự")
 	}
 	status := strings.TrimSpace(req.Status)
 	if status != "resolved" && status != "rejected" {
-		status = "resolved"
+		return errors.New("Trạng thái xử lý không hợp lệ, chỉ chấp nhận resolved hoặc rejected")
 	}
-	return s.adminRepo.ResolveTicket(ticketID, adminID, verdict, status)
+
+	detail, _ := s.adminRepo.GetTicketDetail(ticketID)
+
+	rowsAffected, err := s.adminRepo.ResolveTicket(ticketID, adminID, verdict, status)
+	if err != nil {
+		return err
+	}
+	if rowsAffected == 0 {
+		return errors.New("Khiếu nại không tồn tại hoặc đã được xử lý trước đó")
+	}
+
+	// Send Notifications to Reporter and Target User
+	if detail != nil && s.notifService != nil {
+		statusText := "đã được chấp nhận"
+		if status == "rejected" {
+			statusText = "đã bị bác bỏ"
+		}
+
+		// 1. Notify Reporter
+		_ = s.notifService.CreateNotification(
+			detail.ReporterID,
+			"⚖️ Phán quyết khiếu nại từ Ban quản trị",
+			fmt.Sprintf("Khiếu nại của bạn cho đơn ứng tuyển #%d %s. Phán quyết: %s", detail.ApplicationID, statusText, verdict),
+			"ticket",
+			uint(ticketID),
+		)
+
+		// 2. Notify Target User
+		_ = s.notifService.CreateNotification(
+			detail.TargetID,
+			"⚖️ Thông báo phán quyết khiếu nại liên quan",
+			fmt.Sprintf("Ban quản trị đã đưa ra phán quyết về khiếu nại đơn ứng tuyển #%d (%s). Phán quyết: %s", detail.ApplicationID, statusText, verdict),
+			"ticket",
+			uint(ticketID),
+		)
+	}
+
+	return nil
 }
 
 func (s *adminService) GetCategories() ([]models.Category, error) {

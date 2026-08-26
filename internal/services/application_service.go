@@ -2,6 +2,9 @@ package services
 
 import (
 	"errors"
+	"fmt"
+	"log"
+	"time"
 
 	"QuickWork/internal/dto"
 	"QuickWork/internal/models"
@@ -35,7 +38,7 @@ type ApplicationService interface {
 	GetStudentApplications(userID uint) ([]models.Application, error)
 	ApplyJob(userID uint, input dto.ApplyJobInput) (*models.Application, error)
 	CancelApplication(userID uint, appID int) error
-	StudentCompleteJob(userID uint, appID uint) (*models.Application, error)
+	StudentCompleteJob(userID uint, input dto.CompleteJobInput) (*models.Application, error)
 	GetEmployerApplications(userID uint) ([]models.Application, error)
 	ReviewApplication(userID uint, input dto.ReviewApplicationInput) (*models.Application, string, error)
 	BusinessCompleteJob(userID uint, appID uint) (*models.Application, error)
@@ -43,11 +46,19 @@ type ApplicationService interface {
 }
 
 type applicationService struct {
-	appRepo repositories.ApplicationRepository
+	appRepo      repositories.ApplicationRepository
+	notifService NotificationService
 }
 
-func NewApplicationService(appRepo repositories.ApplicationRepository) ApplicationService {
-	return &applicationService{appRepo: appRepo}
+func NewApplicationService(appRepo repositories.ApplicationRepository, notifService ...NotificationService) ApplicationService {
+	var ns NotificationService
+	if len(notifService) > 0 {
+		ns = notifService[0]
+	}
+	return &applicationService{
+		appRepo:      appRepo,
+		notifService: ns,
+	}
 }
 
 func (s *applicationService) GetStudentApplications(userID uint) ([]models.Application, error) {
@@ -80,6 +91,38 @@ func (s *applicationService) ApplyJob(userID uint, input dto.ApplyJobInput) (*mo
 
 	existApp, err := s.appRepo.GetApplicationByJobAndStudent(input.JobID, student.ID)
 	if err == nil && existApp != nil {
+		if existApp.Status == "rejected" || existApp.Status == "offer_declined" {
+			// 🌟 NÂNG CẤP CHUẨN NGHIỆP VỤ: Cho phép ứng viên nộp lại đơn nếu trước đó bị từ chối
+			existApp.Status = "pending"
+			existApp.CoverNote = input.CoverNote
+			existApp.OfferSalary = ""
+			existApp.OfferStartDate = ""
+			existApp.OfferMessage = ""
+			existApp.StudentCompleted = false
+			existApp.CompletionNote = ""
+			existApp.CompletionProofUrl = ""
+
+			if errSave := s.appRepo.SaveApplication(existApp); errSave != nil {
+				return nil, errSave
+			}
+
+			if s.notifService != nil {
+				job, _ := s.appRepo.GetJobByID(input.JobID)
+				if job != nil && job.Business.UserID != 0 {
+					errNotif := s.notifService.CreateNotification(
+						job.Business.UserID,
+						"📄 Đơn ứng tuyển mới (Nộp lại)",
+						fmt.Sprintf("Ứng viên %s vừa nộp lại đơn ứng tuyển cho vị trí '%s'.", student.FullName, job.Title),
+						"application",
+						existApp.ID,
+					)
+					log.Printf("🔔 [Re-ApplyJob Notification]: Gửi thông báo cho Business UserID=%d, error=%v", job.Business.UserID, errNotif)
+				}
+			}
+
+			return existApp, nil
+		}
+
 		return nil, ErrAlreadyApplied
 	}
 
@@ -93,6 +136,23 @@ func (s *applicationService) ApplyJob(userID uint, input dto.ApplyJobInput) (*mo
 	if err := s.appRepo.CreateApplication(newApp); err != nil {
 		return nil, err
 	}
+
+	if s.notifService != nil {
+		job, _ := s.appRepo.GetJobByID(input.JobID)
+		if job != nil && job.Business.UserID != 0 {
+			errNotif := s.notifService.CreateNotification(
+				job.Business.UserID,
+				"📄 Đơn ứng tuyển mới",
+				fmt.Sprintf("Ứng viên %s vừa nộp đơn ứng tuyển vị trí '%s'.", student.FullName, job.Title),
+				"application",
+				newApp.ID,
+			)
+			log.Printf("🔔 [ApplyJob Notification]: Gửi thông báo cho Business UserID=%d, error=%v", job.Business.UserID, errNotif)
+		} else if job != nil {
+			log.Printf("⚠️ [ApplyJob Notification Warning]: job.Business.UserID is 0! BusinessID=%d", job.BusinessID)
+		}
+	}
+
 	return newApp, nil
 }
 
@@ -120,7 +180,7 @@ func (s *applicationService) CancelApplication(userID uint, appID int) error {
 	return s.appRepo.DeleteApplication(app)
 }
 
-func (s *applicationService) StudentCompleteJob(userID uint, appID uint) (*models.Application, error) {
+func (s *applicationService) StudentCompleteJob(userID uint, input dto.CompleteJobInput) (*models.Application, error) {
 	student, err := s.appRepo.GetStudentByUserID(userID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
@@ -129,7 +189,7 @@ func (s *applicationService) StudentCompleteJob(userID uint, appID uint) (*model
 		return nil, err
 	}
 
-	app, err := s.appRepo.GetApplicationByIDAndStudent(appID, student.ID)
+	app, err := s.appRepo.GetApplicationByIDAndStudent(input.ApplicationID, student.ID)
 	if err != nil {
 		if errors.Is(err, gorm.ErrRecordNotFound) {
 			return nil, ErrAppNotFound
@@ -137,13 +197,33 @@ func (s *applicationService) StudentCompleteJob(userID uint, appID uint) (*model
 		return nil, err
 	}
 
-	if app.Status != "offer_accepted" {
+	if app.Status != "offer_accepted" && app.Status != "approved" && app.Status != "student_completed" {
 		return nil, ErrMustBeOfferAcceptedToComplete
 	}
 
+	now := time.Now()
 	app.Status = "student_completed"
+	app.StudentCompleted = true
+	app.CompletionNote = input.CompletionNote
+	app.CompletionProofUrl = input.CompletionProofUrl
+	app.SubmittedAt = &now
+
 	if err := s.appRepo.SaveApplication(app); err != nil {
 		return nil, err
+	}
+
+	if s.notifService != nil {
+		job, _ := s.appRepo.GetJobByID(app.JobID)
+		if job != nil && job.Business.UserID != 0 {
+			errNotif := s.notifService.CreateNotification(
+				job.Business.UserID,
+				"📝 Báo cáo hoàn thành công việc",
+				fmt.Sprintf("Sinh viên %s đã nộp báo cáo hoàn thành cho vị trí '%s'.", student.FullName, job.Title),
+				"escrow",
+				app.ID,
+			)
+			log.Printf("🔔 [StudentCompleteJob Notification]: Gửi thông báo cho Business UserID=%d, error=%v", job.Business.UserID, errNotif)
+		}
 	}
 
 	return app, nil
@@ -170,7 +250,7 @@ func (s *applicationService) ReviewApplication(userID uint, input dto.ReviewAppl
 		return nil, "", err
 	}
 
-	if input.Status != "approved" && input.Status != "rejected" {
+	if input.Status != "approved" && input.Status != "rejected" && input.Status != "pending" {
 		return nil, "", ErrInvalidStatus
 	}
 
@@ -205,6 +285,37 @@ func (s *applicationService) ReviewApplication(userID uint, input dto.ReviewAppl
 		return nil, "", err
 	}
 
+	if s.notifService != nil && (input.Status == "approved" || input.Status == "rejected") {
+		var targetUserID uint
+		if app.Student.UserID != 0 {
+			targetUserID = app.Student.UserID
+		} else {
+			studentObj, errSt := s.appRepo.GetStudentByID(app.StudentID)
+			if errSt == nil && studentObj != nil {
+				targetUserID = studentObj.UserID
+			}
+		}
+
+		if targetUserID != 0 {
+			title := "🎉 Bạn nhận được Offer công việc mới!"
+			msgText := fmt.Sprintf("Doanh nghiệp %s đã duyệt hồ sơ và gửi kèm Offer công việc cho vị trí '%s'.", business.CompanyName, job.Title)
+			if input.Status == "rejected" {
+				title = "❌ Cập nhật trạng thái đơn ứng tuyển"
+				msgText = fmt.Sprintf("Doanh nghiệp %s đã phản hồi từ chối đơn ứng tuyển cho vị trí '%s'.", business.CompanyName, job.Title)
+			}
+			errNotif := s.notifService.CreateNotification(
+				targetUserID,
+				title,
+				msgText,
+				"offer",
+				app.ID,
+			)
+			log.Printf("🔔 [ReviewApplication Notification Sent]: Target UserID=%d, AppID=%d, Status='%s', err=%v", targetUserID, app.ID, input.Status, errNotif)
+		} else {
+			log.Printf("⚠️ [ReviewApplication Notification FAILED]: targetUserID is 0 for AppID=%d, StudentID=%d", app.ID, app.StudentID)
+		}
+	}
+
 	msg := "🎉 Chấp nhận hồ sơ ứng viên và gửi kèm thông tin Offer thành công!"
 	if input.Status == "rejected" {
 		msg = "❌ Đã từ chối đơn ứng tuyển thành công."
@@ -234,6 +345,22 @@ func (s *applicationService) BusinessCompleteJob(userID uint, appID uint) (*mode
 			return nil, ErrAppNotFoundForReview
 		}
 		return nil, err
+	}
+
+	if s.notifService != nil && app != nil {
+		if app.Student.UserID != 0 {
+			jobTitle := "công việc"
+			if app.Job.Title != "" {
+				jobTitle = app.Job.Title
+			}
+			_ = s.notifService.CreateNotification(
+				app.Student.UserID,
+				"💰 Giải ngân tiền lương Escrow",
+				fmt.Sprintf("Doanh nghiệp đã xác nhận hoàn thành & giải ngân lương cho vị trí '%s'.", jobTitle),
+				"escrow",
+				app.ID,
+			)
+		}
 	}
 
 	return app, nil
@@ -270,6 +397,26 @@ func (s *applicationService) RespondToOffer(userID uint, input dto.RespondOfferI
 
 	if err := s.appRepo.SaveApplication(app); err != nil {
 		return nil, "", err
+	}
+
+	if s.notifService != nil {
+		job, _ := s.appRepo.GetJobByID(app.JobID)
+		if job != nil && job.Business.UserID != 0 {
+			title := "🎉 Ứng viên đã chấp nhận Offer!"
+			msgText := fmt.Sprintf("Ứng viên %s đã đồng ý nhận Offer cho vị trí '%s'.", student.FullName, job.Title)
+			if input.Response == "decline" {
+				title = "❌ Ứng viên đã từ chối Offer"
+				msgText = fmt.Sprintf("Ứng viên %s đã từ chối Offer cho vị trí '%s'.", student.FullName, job.Title)
+			}
+			errNotif := s.notifService.CreateNotification(
+				job.Business.UserID,
+				title,
+				msgText,
+				"offer",
+				app.ID,
+			)
+			log.Printf("🔔 [RespondToOffer Notification]: Gửi thông báo cho Business UserID=%d, error=%v", job.Business.UserID, errNotif)
+		}
 	}
 
 	msg := "🎉 Bạn đã đồng ý nhận offer công việc thành công!"

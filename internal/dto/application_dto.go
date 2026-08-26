@@ -19,5 +19,7 @@ type RespondOfferInput struct {
 }
 
 type CompleteJobInput struct {
-	ApplicationID uint `json:"application_id"`
+	ApplicationID      uint   `json:"application_id"`
+	CompletionNote     string `json:"completion_note"`
+	CompletionProofUrl string `json:"completion_proof_url"`
 }

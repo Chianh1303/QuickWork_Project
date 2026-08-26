@@ -20,6 +20,7 @@ type ApplicationRepository interface {
 	GetBusinessByUserID(userID uint) (*models.Business, error)
 	GetEmployerApplications(businessID uint) ([]models.Application, error)
 	GetApplicationByID(appID uint) (*models.Application, error)
+	GetStudentByID(studentID uint) (*models.Student, error)
 	SaveApplication(app *models.Application) error
 	BusinessCompleteJobAndPay(appID, businessID uint) (*models.Application, error)
 }
@@ -55,7 +56,7 @@ func (r *applicationRepository) GetStudentApplications(studentID uint) ([]models
 
 func (r *applicationRepository) GetJobByID(jobID uint) (*models.Job, error) {
 	var job models.Job
-	if err := r.db.First(&job, jobID).Error; err != nil {
+	if err := r.db.Preload("Business").First(&job, jobID).Error; err != nil {
 		return nil, err
 	}
 	return &job, nil
@@ -116,6 +117,14 @@ func (r *applicationRepository) GetApplicationByID(appID uint) (*models.Applicat
 		return nil, err
 	}
 	return &app, nil
+}
+
+func (r *applicationRepository) GetStudentByID(studentID uint) (*models.Student, error) {
+	var student models.Student
+	if err := r.db.First(&student, studentID).Error; err != nil {
+		return nil, err
+	}
+	return &student, nil
 }
 
 func (r *applicationRepository) SaveApplication(app *models.Application) error {

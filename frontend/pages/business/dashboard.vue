@@ -1,16 +1,16 @@
 <template>
   <div class="dashboard-body min-h-screen bg-slate-950 text-slate-100 lg:flex font-sans">
     <!-- Sidebar navigation (desktop) -->
-    <aside class="hidden lg:flex lg:w-64 lg:flex-shrink-0 lg:flex-col lg:border-r lg:border-indigo-500/15 lg:bg-slate-950/90 lg:px-4 lg:py-6 backdrop-blur-xl sticky top-0 h-screen overflow-y-auto z-30">
+    <aside class="hidden lg:flex lg:w-64 lg:flex-shrink-0 lg:flex-col lg:border-r lg:border-cyan-500/15 lg:bg-slate-950/90 lg:px-4 lg:py-6 backdrop-blur-xl sticky top-0 h-screen overflow-y-auto z-30">
       <!-- Enterprise Platform Logo Badge -->
-      <div class="px-3 pb-6 border-b border-indigo-500/10 mb-4">
+      <div class="px-3 pb-6 border-b border-cyan-500/10 mb-4">
         <button @click="activeSection = 'dashboard'" class="flex items-center gap-2.5 group text-left w-full">
-          <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-blue-600 via-indigo-500 to-emerald-400 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform">
+          <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-blue-600 via-cyan-500 to-emerald-400 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-cyan-500/30 group-hover:scale-105 transition-transform">
             QW
           </div>
           <div>
-            <span class="text-[10px] font-black uppercase tracking-wider text-indigo-400">Business SaaS</span>
-            <p class="text-sm font-extrabold text-white tracking-tight group-hover:text-indigo-300 transition-colors">QuickWork Portal</p>
+            <span class="text-[10px] font-black uppercase tracking-wider text-cyan-400">Business SaaS</span>
+            <p class="text-sm font-extrabold text-white tracking-tight group-hover:text-cyan-300 transition-colors">QuickWork Portal</p>
           </div>
         </button>
       </div>
@@ -22,7 +22,7 @@
           @click="activeSection = item.id"
           :class="[
             activeSection === item.id
-              ? 'bg-gradient-to-r from-indigo-500/20 to-emerald-500/10 text-indigo-200 border-l-4 border-indigo-400 shadow-md shadow-indigo-500/10 font-extrabold'
+              ? 'bg-gradient-to-r from-cyan-500/20 to-emerald-500/10 text-cyan-200 border-l-4 border-cyan-400 shadow-md shadow-cyan-500/10 font-extrabold'
               : 'text-slate-400 hover:bg-white/[0.04] hover:text-white font-medium',
             'flex items-center gap-3 rounded-xl px-3.5 py-3 text-sm transition-all text-left'
           ]"
@@ -45,15 +45,30 @@
       </nav>
 
       <!-- Bottom Profile & Logout Box -->
-      <div class="mt-auto space-y-3 pt-4 border-t border-indigo-500/10">
-        <div class="rounded-2xl border border-indigo-500/20 bg-gradient-to-b from-indigo-950/40 to-slate-900/60 p-3.5 ring-1 ring-indigo-500/10">
-          <div class="flex items-center justify-between mb-1">
-            <p class="truncate text-xs font-bold text-white max-w-[130px]">{{ profileForm.company_name || 'Doanh Nghiệp' }}</p>
-            <span class="rounded-full bg-emerald-400/10 px-2 py-0.5 text-[10px] font-extrabold text-emerald-300 ring-1 ring-emerald-400/30">
-              Đã Duyệt
-            </span>
+      <div class="mt-auto space-y-3 pt-4 border-t border-cyan-500/10">
+        <div class="rounded-2xl border border-cyan-500/20 bg-gradient-to-b from-cyan-950/40 to-slate-900/60 p-3.5 ring-1 ring-cyan-500/10">
+          <div class="flex items-center gap-3">
+            <div class="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl border border-cyan-500/30 bg-slate-800 shadow-md">
+              <img
+                v-if="profileForm.logo_url"
+                :src="getMediaUrl(profileForm.logo_url)"
+                :alt="profileForm.company_name"
+                class="h-full w-full object-cover"
+              />
+              <div v-else class="flex h-full w-full items-center justify-center bg-cyan-600 text-xs font-black text-white uppercase">
+                {{ (profileForm.company_name || 'DN').substring(0, 2) }}
+              </div>
+            </div>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-1 mb-0.5">
+                <p class="truncate text-xs font-bold text-white max-w-[95px]">{{ profileForm.company_name || 'Doanh Nghiệp' }}</p>
+                <span class="rounded-full bg-emerald-400/10 px-1.5 py-0.5 text-[9px] font-extrabold text-emerald-300 ring-1 ring-emerald-400/30 shrink-0">
+                  Đã Duyệt
+                </span>
+              </div>
+              <p class="text-[10px] font-medium text-slate-400 truncate">MST: {{ profileForm.tax_code || 'Đã xác minh' }}</p>
+            </div>
           </div>
-          <p class="text-[11px] font-medium text-slate-400 truncate">MST: {{ profileForm.tax_code || 'Đã xác minh' }}</p>
         </div>
 
         <!-- Integrated Logout Button -->
@@ -71,15 +86,18 @@
 
     <!-- Main Content Area -->
     <div class="flex-1 min-w-0">
-      <section class="border-b border-indigo-500/15 bg-gradient-to-r from-slate-950 via-indigo-950/40 to-slate-950">
+      <section class="border-b border-cyan-500/15 bg-gradient-to-r from-slate-950 via-cyan-950/40 to-slate-950">
         <div class="w-full max-w-7xl mx-auto px-4 sm:px-6 lg:px-8 py-6">
           <div class="grid gap-5 lg:grid-cols-[0.95fr_1.05fr] lg:items-center">
             <div>
-              <div class="flex flex-wrap items-center gap-2">
-                <span class="inline-flex items-center rounded-full bg-indigo-500/10 px-3 py-1 text-xs font-black uppercase tracking-wide text-indigo-300 ring-1 ring-indigo-500/30">
-                  Không gian Doanh nghiệp
-                </span>
-                <span class="text-xs font-semibold text-slate-400">Trung tâm quản lý tuyển dụng & Smart Escrow</span>
+              <div class="flex items-center justify-between gap-4">
+                <div class="flex flex-wrap items-center gap-2">
+                  <span class="inline-flex items-center rounded-full bg-cyan-500/10 px-3 py-1 text-xs font-black uppercase tracking-wide text-cyan-300 ring-1 ring-cyan-500/30">
+                    Không gian Doanh nghiệp
+                  </span>
+                  <span class="text-xs font-semibold text-slate-400">Trung tâm quản lý tuyển dụng & Smart Escrow</span>
+                </div>
+                <NotificationBell align="right" />
               </div>
               <h1 class="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
                 {{ businessHero.title }}
@@ -90,14 +108,14 @@
               <div class="mt-4 flex flex-wrap gap-3">
                 <button
                   @click="handleBusinessHeroAction"
-                  class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-indigo-500 via-blue-600 to-emerald-500 px-5 py-2.5 text-xs font-black text-white shadow-lg shadow-indigo-500/25 transition-all hover:from-indigo-400 hover:to-emerald-400 focus-ring"
+                  class="inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-emerald-500 px-5 py-2.5 text-xs font-black text-white shadow-lg shadow-cyan-500/25 transition-all hover:from-cyan-400 hover:to-emerald-400 focus-ring"
                 >
                   {{ businessHero.cta }}
                 </button>
                 <button
                   v-if="activeSection !== 'applicants'"
                   @click="activeSection = 'applicants'"
-                  class="inline-flex items-center justify-center rounded-xl border border-indigo-500/30 bg-indigo-500/10 px-5 py-2.5 text-xs font-black text-indigo-200 hover:bg-indigo-500/20 hover:text-white transition-all focus-ring"
+                  class="inline-flex items-center justify-center rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-5 py-2.5 text-xs font-black text-cyan-200 hover:bg-cyan-500/20 hover:text-white transition-all focus-ring"
                 >
                   Xem danh sách ứng viên
                 </button>
@@ -108,15 +126,15 @@
               <div
                 v-for="stat in businessHeroStats"
                 :key="stat.label"
-                class="rounded-2xl border border-indigo-500/20 bg-slate-900/80 px-4 py-3.5 shadow-xl shadow-indigo-950/30 backdrop-blur"
+                class="rounded-2xl border border-cyan-500/20 bg-slate-900/80 px-4 py-3.5 shadow-xl shadow-cyan-950/30 backdrop-blur"
               >
                 <div class="flex items-start justify-between gap-3">
                   <div>
-                    <p class="text-[10px] font-black uppercase tracking-wider text-indigo-300">{{ stat.label }}</p>
+                    <p class="text-[10px] font-black uppercase tracking-wider text-cyan-300">{{ stat.label }}</p>
                     <p class="mt-1 text-2xl font-black text-white">{{ stat.value }}</p>
                     <p class="mt-1 text-[11px] font-semibold text-slate-400">{{ stat.caption }}</p>
                   </div>
-                  <span :class="[stat.iconClass, 'inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-indigo-500/10 text-indigo-300 ring-1 ring-indigo-500/20']">
+                  <span :class="[stat.iconClass, 'inline-flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-300 ring-1 ring-cyan-500/20']">
                     <svg v-if="stat.icon === 'jobs'" class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                       <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M9 12h6m-6 4h6m2 5H7a2 2 0 01-2-2V5a2 2 0 012-2h5.586a1 1 0 01.707.293l5.414 5.414a1 1 0 01.293.707V19a2 2 0 01-2 2z" />
                     </svg>
@@ -147,22 +165,26 @@
     </div>
   </div>
 
-  <BusinessDashboardModals :state="businessDashboardState" />
+  <BusinessDashboardModals :state="businessDashboardState" @upload-evidence="handleUploadBusinessEvidence" />
 </template>
 
 <script setup lang="ts">
-import { ref, reactive, computed, onMounted, watch } from 'vue'
+import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import BusinessOverviewSection from '~/components/business/BusinessOverviewSection.vue'
 import BusinessProfileSection from '~/components/business/BusinessProfileSection.vue'
 import BusinessJobsSection from '~/components/business/BusinessJobsSection.vue'
 import BusinessApplicantsSection from '~/components/business/BusinessApplicantsSection.vue'
 import BusinessDashboardModals from '~/components/business/BusinessDashboardModals.vue'
+import NotificationBell from '~/components/common/NotificationBell.vue'
 import { useApi } from '~/composables/useApi'
 import { useAuth } from '~/composables/useAuth'
+import { useMedia } from '~/composables/useMedia'
 
 definePageMeta({
   middleware: 'auth'
 })
+
+const { getMediaUrl } = useMedia()
 
 const { logout } = useAuth()
 const handleLogout = () => {
@@ -238,7 +260,7 @@ const offerForm = ref({
 })
 const openReviewModal = (app: any) => {
   selectedApp.value = app
-  reviewStatus.value = app.status === 'pending' ? 'approved' : app.status // Mặc định mở ra chọn luôn approved cho tiện
+  reviewStatus.value = app.status === 'rejected' ? 'rejected' : 'approved'
   offerForm.value = {
     salary: app.offer_salary || '',
     startDate: app.offer_start_date || '',
@@ -395,19 +417,25 @@ const submitBusinessCompletion = async () => {
 const submitReview = async () => {
   if (!selectedApp.value || !reviewStatus.value) return
 
+  const appId = Number(selectedApp.value.id || selectedApp.value.application_id || 0)
+  if (!appId) {
+    alert('Không tìm thấy ID đơn ứng tuyển.')
+    return
+  }
+
   isSubmitting.value = true
   try {
     const payload = {
-      application_id: selectedApp.value.id,
-      status: reviewStatus.value,
-      offer_salary: reviewStatus.value === 'approved' ? offerForm.value.salary : '',
-      offer_start_date: reviewStatus.value === 'approved' ? offerForm.value.startDate : '',
-      offer_message: reviewStatus.value === 'approved' ? offerForm.value.message : ''
+      application_id: appId,
+      status: reviewStatus.value === 'rejected' ? 'rejected' : 'approved',
+      offer_salary: reviewStatus.value === 'approved' ? String(offerForm.value.salary || '') : '',
+      offer_start_date: reviewStatus.value === 'approved' ? String(offerForm.value.startDate || '') : '',
+      offer_message: reviewStatus.value === 'approved' ? String(offerForm.value.message || '') : ''
     }
 
-    await api.put('/api/jobs/review-application', payload)
+    const res = await api.put('/api/jobs/review-application', payload)
     
-    // 🌟 TỰ ĐỘNG ĐỒNG BỘ: Quét và gọi đúng tên hàm fetch hiện có trong file của Chanh
+    // 🌟 TỰ ĐỘNG ĐỒNG BỘ: Quét và gọi đúng tên hàm fetch hiện có
     const anyWindow = window as any
     if (typeof anyWindow.fetchApplications === 'function') {
       await anyWindow.fetchApplications()
@@ -415,17 +443,160 @@ const submitReview = async () => {
       await anyWindow.fetchApplicants()
     } else if (typeof anyWindow.fetchEmployerApplications === 'function') {
       await anyWindow.fetchEmployerApplications()
+    } else if (typeof fetchApplications === 'function') {
+      await fetchApplications()
     } else {
-      // Giải pháp an toàn cuối cùng nếu không tìm thấy hàm nào: Reload lại trang
       window.location.reload()
     }
     
     closeModal()
-  } catch (err) {
+  } catch (err: any) {
     console.error('Lỗi khi cập nhật trạng thái hoặc gửi offer:', err)
-    alert('Có lỗi xảy ra khi phê duyệt.')
+    const errMsg = err?.data?.message || err?.response?._data?.message || err?.message || 'Có lỗi xảy ra khi phê duyệt.'
+    alert(errMsg)
   } finally {
     isSubmitting.value = false
+  }
+}
+
+const isBusinessDisputeModalOpen = ref(false)
+const businessDisputeTargetApp = ref<any | null>(null)
+const isSubmittingBusinessDispute = ref(false)
+const businessDisputeForm = reactive({
+  reason: '',
+  description: '',
+  requested_action: '',
+  evidence_url: ''
+})
+
+const showDisputeSuccessModal = ref(false)
+const disputeSuccessMsg = ref('')
+const showDisputeErrorModal = ref(false)
+const disputeErrorMsg = ref('')
+
+const openDisputeError = (msg: string) => {
+  disputeErrorMsg.value = msg
+  showDisputeErrorModal.value = true
+}
+
+const isUploadingBusinessEvidence = ref(false)
+
+const handleUploadBusinessEvidence = async (event: any) => {
+  const file = event.target.files?.[0]
+  if (!file) return
+
+  if (file.size > 10 * 1024 * 1024) {
+    showToast('File bằng chứng không được vượt quá 10MB', 'error')
+    return
+  }
+
+  isUploadingBusinessEvidence.value = true
+  try {
+    const formData = new FormData()
+    formData.append('evidence', file)
+    const res = await api.post('/api/tickets/upload-evidence', formData)
+    if (res.url) {
+      businessDisputeForm.evidence_url = res.url
+      showToast('🎉 Tải file bằng chứng thành công!')
+    }
+  } catch (err: any) {
+    const errMsg = err.response?._data?.message || err.message || 'Không thể tải file bằng chứng'
+    showToast(errMsg, 'error')
+  } finally {
+    isUploadingBusinessEvidence.value = false
+  }
+}
+
+const openBusinessDisputeModal = (app: any) => {
+  businessDisputeTargetApp.value = app
+  businessDisputeForm.reason = ''
+  businessDisputeForm.description = ''
+  businessDisputeForm.requested_action = ''
+  businessDisputeForm.evidence_url = ''
+  isBusinessDisputeModalOpen.value = true
+}
+
+const myBusinessTickets = ref<any[]>([])
+const isLoadingBusinessTickets = ref(false)
+const showBusinessReappealModal = ref(false)
+const selectedBusinessTicketForView = ref<any | null>(null)
+const isSubmittingBusinessReappeal = ref(false)
+const businessReappealForm = reactive({
+  reason: ''
+})
+
+const fetchMyBusinessTickets = async () => {
+  if (myBusinessTickets.value.length === 0) {
+    isLoadingBusinessTickets.value = true
+  }
+  try {
+    const res = await api.get('/api/tickets/my-tickets')
+    myBusinessTickets.value = res.data || []
+  } catch (err) {
+    console.error('Fetch business tickets error:', err)
+  } finally {
+    isLoadingBusinessTickets.value = false
+  }
+}
+
+const openBusinessReappealModal = (ticket: any) => {
+  selectedBusinessTicketForView.value = ticket
+  businessReappealForm.reason = ''
+  showBusinessReappealModal.value = true
+}
+
+const submitBusinessReappealTicket = async () => {
+  if (!selectedBusinessTicketForView.value || !businessReappealForm.reason.trim()) {
+    showToast('Vui lòng nhập lý do yêu cầu tái xem xét phán quyết', 'error')
+    return
+  }
+  if (businessReappealForm.reason.trim().length < 10) {
+    showToast('Lý do yêu cầu tái xem xét phải có ít nhất 10 ký tự', 'error')
+    return
+  }
+  isSubmittingBusinessReappeal.value = true
+  try {
+    const ticketId = selectedBusinessTicketForView.value.id || selectedBusinessTicketForView.value.ticket_id || selectedBusinessTicketForView.value.ID
+    const res = await api.post(`/api/tickets/${ticketId}/reappeal`, {
+      reason: businessReappealForm.reason.trim()
+    })
+    showToast(res.message || '🎉 Đã gửi yêu cầu tái xem xét thành công!')
+    showBusinessReappealModal.value = false
+    await fetchMyBusinessTickets()
+  } catch (err: any) {
+    const errMsg = err.response?._data?.message || err.message || 'Không thể gửi yêu cầu tái xem xét'
+    showToast(errMsg, 'error')
+  } finally {
+    isSubmittingBusinessReappeal.value = false
+  }
+}
+
+const submitBusinessDisputeTicket = async () => {
+  if (!businessDisputeTargetApp.value || !businessDisputeForm.reason || !businessDisputeForm.description.trim()) {
+    openDisputeError('Vui lòng chọn lý do và nhập mô tả chi tiết khiếu nại.')
+    return
+  }
+  isSubmittingBusinessDispute.value = true
+
+  try {
+    const res = await api.post('/api/tickets', {
+      application_id: Number(businessDisputeTargetApp.value.id),
+      reason: businessDisputeForm.reason,
+      description: businessDisputeForm.description.trim(),
+      requested_action: businessDisputeForm.requested_action.trim(),
+      evidence_url: businessDisputeForm.evidence_url.trim()
+    })
+
+    disputeSuccessMsg.value = res.message || '🎉 Gửi khiếu nại thành công! Ban quản trị QuickWork sẽ tiến hành đối soát và xử lý.'
+    showDisputeSuccessModal.value = true
+    isBusinessDisputeModalOpen.value = false
+    businessDisputeTargetApp.value = null
+    await fetchMyBusinessTickets()
+  } catch (err: any) {
+    const errMsg = err.response?._data?.message || err.message || 'Không thể gửi khiếu nại'
+    openDisputeError(errMsg)
+  } finally {
+    isSubmittingBusinessDispute.value = false
   }
 }
 
@@ -606,19 +777,39 @@ const handleBusinessHeroAction = () => {
   showCreateForm.value = true
 }
 
+const applicantTab = ref<'active' | 'closed'>('active')
+
+const activeAppsCount = computed(() => {
+  return applications.value.filter(app => {
+    const status = app.status?.toLowerCase() || 'pending'
+    return status !== 'paid' && status !== 'rejected'
+  }).length
+})
+
+const closedAppsCount = computed(() => {
+  return applications.value.filter(app => {
+    const status = app.status?.toLowerCase() || 'pending'
+    return status === 'paid' || status === 'rejected'
+  }).length
+})
+
 const filteredApps = computed(() => {
   return applications.value.filter(app => {
     const studentName = app.student?.full_name?.toLowerCase() || ''
     const jobTitle = jobTitleLookup(app.job_id).toLowerCase()
+    const appStatus = app.status?.toLowerCase() || 'pending'
 
     const matchesSearch = !applicantSearchQuery.value ||
       studentName.includes(applicantSearchQuery.value.toLowerCase()) ||
       jobTitle.includes(applicantSearchQuery.value.toLowerCase())
 
-    const matchesStatus = applicantStatusFilter.value === 'all' ||
-      app.status?.toLowerCase() === applicantStatusFilter.value.toLowerCase()
+    const isClosed = appStatus === 'paid' || appStatus === 'rejected'
+    const matchesTab = applicantTab.value === 'closed' ? isClosed : !isClosed
 
-    return matchesSearch && matchesStatus
+    const matchesStatus = applicantStatusFilter.value === 'all' ||
+      appStatus === applicantStatusFilter.value.toLowerCase()
+
+    return matchesSearch && matchesTab && matchesStatus
   })
 })
 
@@ -655,9 +846,11 @@ const formatDate = (dateVal: any): string => {
 
 // API Methods
 const fetchJobs = async () => {
-  isLoadingJobs.value = true
+  if (jobs.value.length === 0) {
+    isLoadingJobs.value = true
+  }
   try {
-    const res = await api.get('/api/jobs')
+    const res = await api.get('/api/jobs/business/my-jobs')
     jobs.value = res.data || []
   } catch (err) {
     console.error('Error fetching jobs:', err)
@@ -666,13 +859,36 @@ const fetchJobs = async () => {
   }
 }
 
+const targetAppId = useState<number | null>('targetAppIdFromNotification', () => null)
+
+const checkAndOpenTargetNotifApp = () => {
+  if (targetAppId.value && applications.value.length > 0) {
+    const foundApp = applications.value.find(a => Number(a.id) === Number(targetAppId.value))
+    if (foundApp) {
+      selectedManagedApplicant.value = foundApp
+    }
+    targetAppId.value = null
+  }
+}
+
+watch(applications, () => {
+  checkAndOpenTargetNotifApp()
+}, { deep: true, immediate: true })
+
+watch(targetAppId, () => {
+  checkAndOpenTargetNotifApp()
+})
+
 const fetchApplications = async () => {
-  isLoadingApps.value = true
+  if (applications.value.length === 0) {
+    isLoadingApps.value = true
+  }
   try {
     const res = await api.get('/api/applications/employer')
     applications.value = res.data || []
+    checkAndOpenTargetNotifApp()
   } catch (err) {
-    console.error('Error fetching employer applications:', err)
+    console.error('Error fetching applications:', err)
   } finally {
     isLoadingApps.value = false
   }
@@ -843,6 +1059,9 @@ const businessDashboardState = reactive({
   businessJobsPageSize,
   applicantSearchQuery,
   applicantStatusFilter,
+  applicantTab,
+  activeAppsCount,
+  closedAppsCount,
   filteredApps,
   paginatedApplicants,
   applicantsPage,
@@ -891,12 +1110,61 @@ const businessDashboardState = reactive({
   submitReview,
   isChatModalOpen,
   selectedChatApp,
-  currentBusinessUserId
+  currentBusinessUserId,
+  isBusinessDisputeModalOpen,
+  businessDisputeTargetApp,
+  isSubmittingBusinessDispute,
+  businessDisputeForm,
+  isUploadingBusinessEvidence,
+  myBusinessTickets,
+  isLoadingBusinessTickets,
+  showBusinessReappealModal,
+  selectedBusinessTicketForView,
+  isSubmittingBusinessReappeal,
+  businessReappealForm,
+  openBusinessReappealModal,
+  submitBusinessReappealTicket,
+  fetchMyBusinessTickets,
+  openBusinessDisputeModal,
+  submitBusinessDisputeTicket,
+  showDisputeSuccessModal,
+  disputeSuccessMsg,
+  showDisputeErrorModal,
+  disputeErrorMsg
+})
+
+let autoSyncBusinessInterval: any = null
+
+const syncBusinessDashboardData = async () => {
+  try {
+    await Promise.all([
+      fetchJobs(),
+      fetchApplications(),
+      fetchProfile(),
+      fetchMyBusinessTickets()
+    ])
+  } catch (e) {
+    // silent background sync
+  }
+}
+
+const handleBusinessVisibilityChange = () => {
+  if (document.visibilityState === 'visible') {
+    syncBusinessDashboardData()
+  }
+}
+
+onUnmounted(() => {
+  if (autoSyncBusinessInterval) clearInterval(autoSyncBusinessInterval)
+  if (import.meta.client) {
+    document.removeEventListener('visibilitychange', handleBusinessVisibilityChange)
+  }
 })
 
 onMounted(() => {
-  fetchJobs()
-  fetchApplications()
-  fetchProfile() // <-- Gọi nạp dữ liệu cũ của Công ty ở đây nha Chanh
+  syncBusinessDashboardData()
+  if (import.meta.client) {
+    document.addEventListener('visibilitychange', handleBusinessVisibilityChange)
+  }
 })
 </script>

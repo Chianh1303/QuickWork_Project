@@ -137,6 +137,75 @@
               >
                 Bảng điều khiển
               </NuxtLink>
+              <!-- Notification Bell Button -->
+              <div class="relative">
+                <button
+                  @click="isNotifDropdownOpen = !isNotifDropdownOpen"
+                  class="relative p-2 rounded-xl border border-white/10 bg-white/5 hover:bg-white/10 text-slate-300 hover:text-white transition-all cursor-pointer"
+                  title="Thông báo"
+                >
+                  <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M15 17h5l-1.405-1.405A2.032 2.032 0 0118 14.158V11a6.002 6.002 0 00-4-5.659V5a2 2 0 10-4 0v.341C7.67 6.165 6 8.388 6 11v3.159c0 .538-.214 1.055-.595 1.436L4 17h5m6 0v1a3 3 0 11-6 0v-1m6 0H9" />
+                  </svg>
+                  <span
+                    v-if="unreadNotifCount > 0"
+                    class="absolute -top-1 -right-1 flex h-4 w-4 items-center justify-center rounded-full bg-rose-500 text-[10px] font-black text-white ring-2 ring-slate-950 animate-pulse"
+                  >
+                    {{ unreadNotifCount > 9 ? '9+' : unreadNotifCount }}
+                  </span>
+                </button>
+
+                <!-- Notification Dropdown Window -->
+                <div
+                  v-if="isNotifDropdownOpen"
+                  class="absolute right-0 mt-2 w-80 sm:w-96 rounded-2xl border border-white/10 bg-slate-900 shadow-2xl shadow-slate-950/80 backdrop-blur-xl z-50 overflow-hidden animate-in fade-in duration-150"
+                >
+                  <div class="p-3.5 border-b border-white/10 bg-slate-950/80 flex items-center justify-between">
+                    <div class="flex items-center gap-2">
+                      <span class="text-xs font-black uppercase tracking-wider text-cyan-300">Thông báo mới</span>
+                      <span v-if="unreadNotifCount > 0" class="px-2 py-0.5 rounded-full text-[10px] font-bold bg-rose-500/20 text-rose-300 border border-rose-500/30">
+                        {{ unreadNotifCount }} chưa đọc
+                      </span>
+                    </div>
+                    <button
+                      v-if="unreadNotifCount > 0"
+                      @click="markAllNotifsAsRead"
+                      class="text-[11px] font-bold text-cyan-300 hover:text-cyan-200 transition-colors cursor-pointer"
+                    >
+                      Đánh dấu tất cả đã đọc
+                    </button>
+                  </div>
+
+                  <div class="max-h-80 overflow-y-auto divide-y divide-white/5 custom-scrollbar">
+                    <div
+                      v-for="notif in notificationsList"
+                      :key="notif.id"
+                      @click="handleNotificationClick(notif)"
+                      :class="[
+                        !notif.is_read ? 'bg-cyan-400/5' : 'bg-transparent',
+                        'p-3.5 hover:bg-white/5 transition-colors cursor-pointer flex items-start gap-3'
+                      ]"
+                    >
+                      <span class="text-base flex-shrink-0">
+                        {{ notifTypeIcon(notif.type) }}
+                      </span>
+                      <div class="min-w-0 flex-1">
+                        <div class="flex items-center justify-between gap-1">
+                          <h4 class="text-xs font-bold text-white truncate">{{ notif.title }}</h4>
+                          <span v-if="!notif.is_read" class="h-2 w-2 rounded-full bg-cyan-400 flex-shrink-0"></span>
+                        </div>
+                        <p class="mt-0.5 text-xs text-slate-300 font-medium line-clamp-2 leading-relaxed">{{ notif.message }}</p>
+                        <span class="mt-1 block text-[10px] text-slate-500 font-semibold">{{ formatNotifTime(notif.created_at) }}</span>
+                      </div>
+                    </div>
+
+                    <div v-if="notificationsList.length === 0" class="p-8 text-center text-xs text-slate-500 font-medium">
+                      Chưa có thông báo nào.
+                    </div>
+                  </div>
+                </div>
+              </div>
+
               <!-- Logged In Status -->
               <div class="hidden sm:flex flex-col text-right">
                 <span class="text-xs font-semibold uppercase tracking-wider text-cyan-300">
@@ -380,9 +449,9 @@ const landingNavItems = [
 const activeLandingSection = ref('home')
 let landingObserver: IntersectionObserver | null = null
 
-// Keep auth pages focused while preserving the global header.
+// Only show footer on the public Landing Page (/) and hide on Dashboards & Auth pages
 const showFooter = computed(() => {
-  return !['/', '/login', '/register', '/employer-register'].includes(route.path)
+  return route.path === '/'
 })
 
 const userEmail = computed(() => user.value?.email)
@@ -487,6 +556,73 @@ const setupLandingObserver = async () => {
   }
 }
 
+// Notifications state & methods
+const isNotifDropdownOpen = ref(false)
+const notificationsList = ref<any[]>([])
+const unreadNotifCount = ref(0)
+let notifPollInterval: any = null
+
+watch(isNotifDropdownOpen, async (newVal) => {
+  if (newVal && unreadNotifCount.value > 0) {
+    await markAllNotifsAsRead()
+  }
+})
+
+const fetchNotifications = async () => {
+  if (!isAuthenticated.value) return
+  try {
+    const res = await api.get('/api/notifications?limit=20')
+    notificationsList.value = res.data || []
+    unreadNotifCount.value = res.unread_count || 0
+  } catch (e) {
+    // Silent polling
+  }
+}
+
+const markAllNotifsAsRead = async () => {
+  try {
+    await api.patch('/api/notifications/read-all')
+    unreadNotifCount.value = 0
+    notificationsList.value.forEach(n => n.is_read = true)
+  } catch (e) {
+    console.error('Failed to mark notifications read:', e)
+  }
+}
+
+const handleNotificationClick = async (notif: any) => {
+  if (!notif.is_read) {
+    try {
+      await api.patch(`/api/notifications/${notif.id}/read`)
+      notif.is_read = true
+      if (unreadNotifCount.value > 0) unreadNotifCount.value--
+    } catch (e) {}
+  }
+
+  isNotifDropdownOpen.value = false
+
+  if (userRole.value === 'business') {
+    await navigateTo('/business/dashboard')
+  } else if (userRole.value === 'student') {
+    await navigateTo('/student/dashboard')
+  }
+}
+
+const notifTypeIcon = (type: string) => {
+  switch (type) {
+    case 'chat': return '💬'
+    case 'offer': return '🎉'
+    case 'application': return '📄'
+    case 'escrow': return '💰'
+    default: return '🔔'
+  }
+}
+
+const formatNotifTime = (timeStr: string) => {
+  if (!timeStr) return ''
+  const d = new Date(timeStr)
+  return d.toLocaleTimeString('vi-VN', { hour: '2-digit', minute: '2-digit' }) + ' ' + d.toLocaleDateString('vi-VN')
+}
+
 // Fetch user profile on layout mounting to ensure session state hydration
 onMounted(async () => {
   try {
@@ -500,14 +636,38 @@ onMounted(async () => {
 
 watch(() => route.fullPath, async () => {
   mobileMenuOpen.value = false
+  isNotifDropdownOpen.value = false
   await setupLandingObserver()
+})
+
+watch(isAuthenticated, async (newVal) => {
+  if (newVal) {
+    await fetchNotifications()
+    if (!notifPollInterval) {
+      notifPollInterval = setInterval(fetchNotifications, 10000)
+    }
+  } else {
+    if (notifPollInterval) {
+      clearInterval(notifPollInterval)
+      notifPollInterval = null
+    }
+    notificationsList.value = []
+    unreadNotifCount.value = 0
+  }
 })
 
 onBeforeUnmount(() => {
   landingObserver?.disconnect()
+  if (notifPollInterval) {
+    clearInterval(notifPollInterval)
+  }
 })
 
 const handleLogout = async () => {
+  if (notifPollInterval) {
+    clearInterval(notifPollInterval)
+    notifPollInterval = null
+  }
   await logout()
 }
 </script>

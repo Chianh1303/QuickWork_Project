@@ -12,7 +12,9 @@ import (
 
 func RegisterAdminRoutes(app *fiber.App, db *gorm.DB) {
 	adminRepo := repositories.NewAdminRepository(db)
-	adminService := services.NewAdminService(adminRepo)
+	notifRepo := repositories.NewNotificationRepository(db)
+	notifService := services.NewNotificationService(notifRepo)
+	adminService := services.NewAdminService(adminRepo, notifService)
 	adminController := controllers.NewAdminController(adminService)
 
 	admin := app.Group("/api/admin", middleware.Protected(), middleware.RequireRole("admin"))

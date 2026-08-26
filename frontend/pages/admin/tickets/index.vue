@@ -87,21 +87,22 @@
                   <span
                     class="inline-flex items-center gap-1.5 rounded-full px-2.5 py-1 text-xs font-bold border"
                     :class="{
-                      'bg-amber-400/10 text-amber-300 border-amber-400/30': t.status === 'pending',
+                      'bg-amber-400/10 text-amber-300 border-amber-400/30': t.status === 'pending' && !t.is_reappealed,
+                      'bg-rose-500/20 text-rose-300 border-rose-500/40 animate-pulse': t.status === 'pending' && t.is_reappealed,
                       'bg-emerald-400/10 text-emerald-300 border-emerald-400/30': t.status === 'resolved',
                       'bg-rose-400/10 text-rose-300 border-rose-400/30': t.status === 'rejected'
                     }"
                   >
-                    <span>{{ getStatusLabel(t.status) }}</span>
+                    <span>{{ t.is_reappealed && t.status === 'pending' ? '⚠️ Tái khiếu nại' : getStatusLabel(t.status) }}</span>
                   </span>
                 </td>
 
                 <td class="px-5 py-4 text-right">
                   <button
                     @click="openResolveModal(t)"
-                    class="rounded-lg bg-cyan-400/20 border border-cyan-400/30 px-3.5 py-1.5 text-xs font-extrabold text-cyan-200 hover:bg-cyan-400 hover:text-slate-950 transition-colors"
+                    class="rounded-lg bg-cyan-400/20 border border-cyan-400/30 px-3.5 py-1.5 text-xs font-extrabold text-cyan-200 hover:bg-cyan-400 hover:text-slate-950 transition-colors cursor-pointer"
                   >
-                    {{ t.status === 'pending' ? '⚖️ Ra phán quyết' : '👁️ Xem chi tiết' }}
+                    {{ t.status === 'pending' ? (t.is_reappealed ? '⚠️ Xử lý Tái khiếu nại' : '⚖️ Ra phán quyết') : 'Xem chi tiết' }}
                   </button>
                 </td>
               </tr>
@@ -113,7 +114,7 @@
 
     <!-- Ticket Resolve Modal -->
     <div v-if="selectedTicket" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-sm">
-      <div class="w-full max-w-xl rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl space-y-4">
+      <div class="w-full max-w-xl rounded-2xl border border-white/10 bg-slate-900 p-6 shadow-2xl space-y-4 max-h-[90vh] overflow-y-auto">
         <div class="flex items-center justify-between border-b border-white/10 pb-3">
           <h3 class="text-lg font-extrabold text-white">Xử lý Ticket Khiếu nại #TK-{{ selectedTicket.ticket_id }}</h3>
           <button @click="selectedTicket = null" class="text-slate-400 hover:text-white text-lg font-bold">✕</button>
@@ -132,7 +133,7 @@
           </div>
 
           <div>
-            <span class="text-xs text-slate-400 block font-bold mb-1">LÝ DO KHIẾU NẠI</span>
+            <span class="text-xs text-slate-400 block font-bold mb-1">LÝ DO KHIẾU NẠI BAN ĐẦU</span>
             <p class="font-bold text-white text-base">{{ selectedTicket.reason }}</p>
           </div>
 
@@ -143,19 +144,74 @@
             </p>
           </div>
 
-          <div v-if="selectedTicket.verdict" class="rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-4">
-            <span class="text-xs font-extrabold uppercase text-emerald-300">Phán quyết đã ban hành của Admin</span>
+          <div v-if="selectedTicket.requested_action">
+            <span class="text-xs text-cyan-300 block font-bold mb-1">ĐỀ XUẤT MONG MUỐN XỬ LÝ</span>
+            <p class="bg-cyan-950/40 p-3 rounded-xl border border-cyan-500/20 text-xs text-cyan-100 font-medium">
+              {{ selectedTicket.requested_action }}
+            </p>
+          </div>
+
+          <div v-if="selectedTicket.evidence_url">
+            <span class="text-xs text-cyan-300 block font-bold mb-1">BẰNG CHỨNG / MINH CHỨNG ĐÍNH KÈM</span>
+            <a
+              :href="selectedTicket.evidence_url"
+              target="_blank"
+              rel="noopener noreferrer"
+              class="inline-flex items-center gap-2 bg-cyan-950/40 hover:bg-cyan-900/60 px-3.5 py-2.5 rounded-xl border border-cyan-500/30 text-xs font-bold text-cyan-200 transition-colors"
+            >
+              🔗 Xem Bằng Chứng Đính Kèm (Link ngoài)
+            </a>
+          </div>
+
+          <!-- Section Yêu cầu Tái xem xét nếu có -->
+          <div v-if="selectedTicket.is_reappealed" class="rounded-xl border border-amber-500/40 bg-amber-950/40 p-4 space-y-2">
+            <div class="flex items-center gap-2 font-extrabold text-amber-300 text-xs uppercase tracking-wider">
+              <span>⚠️ YÊU CẦU TÁI XEM XÉT PHÁN QUYẾT TỪ NGƯỜI DÙNG</span>
+            </div>
+            <p class="text-xs font-semibold text-amber-100 leading-relaxed">
+              <strong>Lý do phản hồi:</strong> {{ selectedTicket.reappeal_reason }}
+            </p>
+            <div v-if="selectedTicket.reappeal_evidence">
+              <a :href="selectedTicket.reappeal_evidence" target="_blank" class="text-xs font-bold text-cyan-300 underline">
+                🔗 Xem Bằng Chứng Bổ Sung Tái Khiếu Nại
+              </a>
+            </div>
+          </div>
+
+          <!-- Previous Verdict Display if already resolved once -->
+          <div v-if="selectedTicket.verdict && selectedTicket.status === 'pending'" class="rounded-xl border border-slate-700 bg-slate-950/80 p-3">
+            <span class="text-xs font-bold text-slate-400">Phán quyết cũ trước đó:</span>
+            <p class="mt-1 text-xs font-medium text-slate-300 italic">{{ selectedTicket.verdict }}</p>
+          </div>
+
+          <!-- Readonly Verdict display if resolved/rejected -->
+          <div v-if="selectedTicket.status !== 'pending' && selectedTicket.verdict" class="rounded-xl border border-emerald-400/30 bg-emerald-400/10 p-4">
+            <span class="text-xs font-extrabold uppercase text-emerald-300">Phán quyết chính thức đã ban hành</span>
             <p class="mt-1 text-sm font-semibold text-white">{{ selectedTicket.verdict }}</p>
           </div>
 
-          <div v-else class="space-y-2 pt-2">
-            <label class="block text-xs font-bold text-slate-300">NHẬP PHÁN QUYẾT XỬ LÝ CỦA ADMIN:</label>
-            <textarea
-              v-model="verdictInput"
-              rows="3"
-              placeholder="Nhập nội dung phán quyết giải quyết tranh chấp (Ví dụ: Chấp nhận giải ngân đền bù cho sinh viên...)"
-              class="w-full rounded-xl border border-white/10 bg-slate-950 p-3 text-xs text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none"
-            />
+          <!-- Form ban hành phán quyết if pending -->
+          <div v-if="selectedTicket.status === 'pending'" class="space-y-3 pt-2 border-t border-white/10">
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">QUYẾT ĐỊNH XỬ LÝ (STATUS):</label>
+              <select
+                v-model="verdictStatusInput"
+                class="w-full rounded-xl border border-white/10 bg-slate-950 p-2.5 text-xs text-white focus:border-cyan-400 focus:outline-none"
+              >
+                <option value="resolved">🟢 Duyệt khiếu nại (Resolved)</option>
+                <option value="rejected">🔴 Bác bỏ khiếu nại (Rejected)</option>
+              </select>
+            </div>
+
+            <div>
+              <label class="block text-xs font-bold text-slate-300 mb-1">NHẬP PHÁN QUYẾT XỬ LÝ CỦA ADMIN:</label>
+              <textarea
+                v-model="verdictInput"
+                rows="3"
+                placeholder="Nhập nội dung phán quyết giải quyết tranh chấp (Ví dụ: Chấp nhận giải ngân đền bù cho sinh viên...)"
+                class="w-full rounded-xl border border-white/10 bg-slate-950 p-3 text-xs text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none"
+              />
+            </div>
           </div>
         </div>
 
@@ -165,9 +221,9 @@
           </button>
 
           <button
-            v-if="!selectedTicket.verdict"
+            v-if="selectedTicket.status === 'pending'"
             @click="submitVerdict"
-            class="rounded-xl bg-cyan-400 px-5 py-2 text-xs font-extrabold text-slate-950 hover:bg-cyan-300 transition-colors"
+            class="rounded-xl bg-cyan-400 px-5 py-2 text-xs font-extrabold text-slate-950 hover:bg-cyan-300 transition-colors cursor-pointer"
           >
             ⚖️ Ban hành Phán quyết
           </button>
@@ -193,8 +249,14 @@ interface TicketItem {
   target_email: string
   reason: string
   description: string
+  requested_action?: string
+  evidence_url?: string
   status: string
   verdict: string
+  is_reappealed?: boolean
+  reappeal_reason?: string
+  reappeal_evidence?: string
+  reappealed_at?: string
   resolved_at?: string
   created_at: string
 }
@@ -207,6 +269,7 @@ const isLoading = ref(false)
 const statusFilter = ref('')
 const selectedTicket = ref<TicketItem | null>(null)
 const verdictInput = ref('')
+const verdictStatusInput = ref<'resolved' | 'rejected'>('resolved')
 
 const fetchTickets = async () => {
   isLoading.value = true
@@ -226,6 +289,7 @@ const fetchTickets = async () => {
 const openResolveModal = (t: TicketItem) => {
   selectedTicket.value = t
   verdictInput.value = t.verdict || ''
+  verdictStatusInput.value = 'resolved'
 }
 
 const submitVerdict = async () => {
@@ -238,15 +302,15 @@ const submitVerdict = async () => {
   try {
     await api.put(`/api/admin/tickets/${selectedTicket.value.ticket_id}/resolve`, {
       verdict: verdictInput.value,
-      status: 'resolved'
+      status: verdictStatusInput.value
     })
     selectedTicket.value.verdict = verdictInput.value
-    selectedTicket.value.status = 'resolved'
+    selectedTicket.value.status = verdictStatusInput.value
     success('Đã ban hành phán quyết xử lý khiếu nại thành công!')
     selectedTicket.value = null
     fetchTickets()
   } catch (err: any) {
-    error('Không thể gửi phán quyết xử lý')
+    error('Không thể gửi phán quyết xử lý: ' + (err.response?._data?.message || err.message))
   }
 }
 

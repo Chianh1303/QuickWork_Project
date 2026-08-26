@@ -1,16 +1,16 @@
 <template>
-  <header class="border-b border-indigo-500/20 bg-slate-950/95 backdrop-blur-xl sticky top-0 z-40 shadow-xl shadow-slate-950/30">
+  <header class="border-b border-cyan-500/20 bg-slate-950/95 backdrop-blur-xl sticky top-0 z-40 shadow-xl shadow-slate-950/30">
     <div class="max-w-7xl mx-auto px-4 sm:px-6 lg:px-8">
       <div class="flex items-center justify-between h-16">
         
         <!-- Logo & Portal Badge -->
         <div class="flex items-center space-x-3">
           <NuxtLink to="/admin/dashboard" class="flex items-center space-x-2.5 group">
-            <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-indigo-500 via-purple-600 to-pink-500 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-indigo-500/30 group-hover:scale-105 transition-transform">
+            <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-emerald-400 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-cyan-500/30 group-hover:scale-105 transition-transform">
               QW
             </div>
             <div>
-              <span class="font-extrabold text-lg tracking-tight text-white group-hover:text-indigo-300 transition-colors">
+              <span class="font-extrabold text-lg tracking-tight text-white group-hover:text-cyan-300 transition-colors">
                 QuickWork
               </span>
               <span class="ml-2 inline-flex items-center rounded-full bg-rose-500/15 px-2.5 py-0.5 text-[10px] font-black uppercase tracking-wider text-rose-300 ring-1 ring-rose-500/30">
@@ -28,8 +28,8 @@
             :to="item.to"
             :class="[
               route.path === item.to
-                ? 'bg-gradient-to-r from-indigo-500 to-emerald-500 text-white font-extrabold shadow-md shadow-indigo-500/20'
-                : 'text-slate-300 hover:bg-indigo-500/10 hover:text-white font-semibold',
+                ? 'bg-gradient-to-r from-cyan-500 via-blue-600 to-emerald-500 text-white font-extrabold shadow-md shadow-cyan-500/20'
+                : 'text-slate-300 hover:bg-cyan-500/10 hover:text-white font-semibold',
               'px-3.5 py-2 rounded-xl text-xs transition-all'
             ]"
           >

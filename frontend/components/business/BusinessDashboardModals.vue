@@ -1,19 +1,19 @@
 <template>
-  <div v-if="selectedApp" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-900/60 backdrop-blur-sm">
-  <div class="bg-white rounded-2xl border border-slate-200 shadow-xl max-w-lg w-full overflow-hidden flex flex-col max-h-[90vh] text-left animate-in fade-in zoom-in-95 duration-150">
+  <div v-if="selectedApp" class="fixed inset-0 z-50 flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+  <div class="bg-slate-900 rounded-3xl border border-cyan-500/20 shadow-2xl shadow-slate-950 max-w-lg w-full overflow-hidden flex flex-col max-h-[90vh] text-left animate-in fade-in zoom-in-95 duration-150">
     
-    <div class="p-6 border-b border-slate-100 flex justify-between items-center bg-slate-50">
+    <div class="p-6 border-b border-cyan-500/15 flex justify-between items-center bg-slate-950/80">
       <div>
-        <h3 class="text-base font-bold text-slate-900">Đánh giá hồ sơ & Gửi Offer</h3>
-        <p class="text-xs text-slate-500 font-medium mt-0.5">Ứng viên: <span class="text-slate-700 font-bold">{{ selectedApp.student?.full_name || 'N/A' }}</span></p>
+        <h3 class="text-base font-extrabold text-white">Đánh giá hồ sơ & Gửi Offer</h3>
+        <p class="text-xs text-slate-400 font-semibold mt-0.5">Ứng viên: <span class="text-cyan-300 font-extrabold">{{ selectedApp.student?.full_name || 'N/A' }}</span></p>
       </div>
-      <button @click="closeModal" class="text-slate-400 hover:text-slate-600 font-bold text-xl">&times;</button>
+      <button @click="closeModal" class="text-slate-400 hover:text-white font-bold text-xl p-1.5 rounded-xl hover:bg-white/10 transition-colors">&times;</button>
     </div>
 
-    <div class="p-6 space-y-4 overflow-y-auto flex-1">
+    <div class="p-6 space-y-4 overflow-y-auto flex-1 custom-scrollbar">
       <div>
-        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1">Lời nhắn từ ứng viên (Cover Note)</label>
-        <div class="p-3 bg-cyan-400/10 border border-cyan-400/20 rounded-xl text-xs font-medium text-slate-200 whitespace-pre-line">
+        <label class="text-xs font-bold text-slate-400 uppercase tracking-wider block mb-1.5">Lời nhắn từ ứng viên (Cover Note)</label>
+        <div class="p-3.5 bg-cyan-500/10 border border-cyan-500/20 rounded-2xl text-xs font-medium text-slate-200 whitespace-pre-line">
           {{ selectedApp.cover_note || 'Ứng viên không để lại lời nhắn.' }}
         </div>
       </div>
@@ -24,68 +24,68 @@
           <button 
             type="button"
             @click="reviewStatus = 'approved'"
-            :class="[reviewStatus === 'approved' ? 'border-emerald-500 bg-emerald-50 text-emerald-700 ring-2 ring-emerald-500/20' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50']"
-            class="py-2 px-4 text-xs font-bold border rounded-xl transition-all flex items-center justify-center space-x-1"
+            :class="[reviewStatus === 'approved' ? 'border-emerald-400 bg-emerald-500/20 text-emerald-300 ring-2 ring-emerald-400/30' : 'border-white/10 bg-slate-950 text-slate-300 hover:bg-white/5']"
+            class="py-2.5 px-4 text-xs font-extrabold border rounded-2xl transition-all flex items-center justify-center space-x-1 cursor-pointer"
           >
             <span>👍 Chấp nhận & Gửi Offer</span>
           </button>
           <button 
             type="button"
             @click="reviewStatus = 'rejected'"
-            :class="[reviewStatus === 'rejected' ? 'border-rose-500 bg-rose-50 text-rose-700 ring-2 ring-rose-500/20' : 'border-slate-200 bg-white text-slate-700 hover:bg-slate-50']"
-            class="py-2 px-4 text-xs font-bold border rounded-xl transition-all flex items-center justify-center space-x-1"
+            :class="[reviewStatus === 'rejected' ? 'border-rose-400 bg-rose-500/20 text-rose-300 ring-2 ring-rose-400/30' : 'border-white/10 bg-slate-950 text-slate-300 hover:bg-white/5']"
+            class="py-2.5 px-4 text-xs font-extrabold border rounded-2xl transition-all flex items-center justify-center space-x-1 cursor-pointer"
           >
             <span>👎 Từ chối đơn</span>
           </button>
         </div>
       </div>
 
-      <div v-if="reviewStatus === 'approved'" class="p-4 bg-emerald-50/30 border border-emerald-100 rounded-xl space-y-3 animate-in fade-in duration-150">
-        <h4 class="text-xs font-bold text-emerald-800">✉️ Chi tiết Offer gửi Sinh viên</h4>
+      <div v-if="reviewStatus === 'approved'" class="p-4 bg-emerald-500/10 border border-emerald-400/20 rounded-2xl space-y-3 animate-in fade-in duration-150">
+        <h4 class="text-xs font-extrabold text-emerald-300">✉️ Chi tiết Offer gửi Sinh viên</h4>
         
         <div class="grid grid-cols-2 gap-3">
           <div>
-            <label class="text-[11px] font-bold text-slate-600 block mb-1">Mức lương Offer</label>
+            <label class="text-[11px] font-bold text-slate-300 block mb-1">Mức lương Offer</label>
             <input 
               v-model="offerForm.salary"
               type="text" 
               placeholder="Ví dụ: 15,000,000 VND"
-              class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:border-emerald-500"
+              class="w-full text-xs px-3 py-2 border border-white/15 rounded-xl bg-slate-950 text-white focus:outline-none focus:border-emerald-400"
             />
           </div>
           <div>
-            <label class="text-[11px] font-bold text-slate-600 block mb-1">Ngày đi làm dự kiến</label>
+            <label class="text-[11px] font-bold text-slate-300 block mb-1">Ngày đi làm dự kiến</label>
             <input 
               v-model="offerForm.startDate"
               type="date" 
-              class="w-full text-xs px-3 py-2 border border-slate-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:border-emerald-500"
+              class="w-full text-xs px-3 py-2 border border-white/15 rounded-xl bg-slate-950 text-white focus:outline-none focus:border-emerald-400"
             />
           </div>
         </div>
 
         <div>
-          <label class="text-[11px] font-bold text-slate-600 block mb-1">Lời nhắn chào mừng từ HR</label>
+          <label class="text-[11px] font-bold text-slate-300 block mb-1">Lời nhắn chào mừng từ HR</label>
           <textarea 
             v-model="offerForm.message"
             rows="2"
             placeholder="Chào mừng bạn gia nhập đội ngũ..."
-            class="w-full text-xs p-2.5 border border-slate-200 rounded-lg bg-white text-slate-800 focus:outline-none focus:border-emerald-500"
+            class="w-full text-xs p-2.5 border border-white/15 rounded-xl bg-slate-950 text-white focus:outline-none focus:border-emerald-400"
           ></textarea>
         </div>
       </div>
     </div>
 
-    <div class="p-4 bg-slate-50 border-t border-slate-100 flex items-center justify-end space-x-2">
+    <div class="p-4 bg-slate-950/80 border-t border-cyan-500/15 flex items-center justify-end space-x-2">
       <button 
         @click="closeModal" 
-        class="px-4 py-2 text-xs font-bold text-slate-600 hover:bg-slate-100 rounded-lg transition-all"
+        class="px-4 py-2 text-xs font-bold text-slate-300 hover:bg-white/10 rounded-xl transition-all"
       >
         Đóng
       </button>
       <button 
         @click="submitReview"
         :disabled="!reviewStatus || isSubmitting"
-        class="px-4 py-2 text-xs font-bold text-slate-950 bg-cyan-400 hover:bg-cyan-300 disabled:opacity-50 rounded-lg shadow-sm transition-all"
+        class="px-5 py-2 text-xs font-extrabold text-slate-950 bg-emerald-400 hover:bg-emerald-300 disabled:opacity-50 rounded-xl shadow-lg shadow-emerald-500/20 transition-all cursor-pointer"
       >
         {{ isSubmitting ? 'Đang gửi...' : 'Xác nhận phản hồi' }}
       </button>
@@ -142,6 +142,39 @@
             <p class="text-xs font-bold uppercase tracking-wider text-cyan-200">Thanh toán Escrow</p>
             <p class="mt-1 text-sm font-extrabold text-white">Giả lập giải ngân</p>
           </div>
+        </div>
+      </div>
+
+      <!-- Section: Work Report & Proof Submission from Student -->
+      <div class="rounded-xl border border-cyan-400/30 bg-slate-900 p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-black uppercase tracking-wider text-cyan-300 bg-cyan-400/10 px-2.5 py-0.5 rounded-full border border-cyan-400/20">
+            Báo Cáo Hoàn Thành Từ Sinh Viên
+          </span>
+          <span v-if="selectedCompletionApp.submitted_at" class="text-[11px] font-semibold text-slate-400">
+            Nộp lúc: {{ formatDate(selectedCompletionApp.submitted_at) }}
+          </span>
+        </div>
+
+        <div>
+          <p class="text-[10px] font-bold uppercase text-slate-400 mb-1">Nội dung báo cáo công việc</p>
+          <div class="p-3 bg-slate-950 border border-white/10 rounded-xl text-xs font-medium text-slate-200 whitespace-pre-line leading-relaxed">
+            {{ selectedCompletionApp.completion_note || 'Sinh viên không để lại ghi chú báo cáo.' }}
+          </div>
+        </div>
+
+        <div v-if="selectedCompletionApp.completion_proof_url">
+          <p class="text-[10px] font-bold uppercase text-slate-400 mb-1">Bằng chứng / File sản phẩm đính kèm</p>
+          <a
+            :href="getMediaUrl(selectedCompletionApp.completion_proof_url)"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-3.5 py-2 text-xs font-extrabold text-cyan-300 hover:bg-cyan-400/20 transition-all shadow-sm"
+          >
+            <span>📄</span>
+            <span>Xem Sản Phẩm / Bằng Chứng Hoàn Thành</span>
+            <span>↗</span>
+          </a>
         </div>
       </div>
 
@@ -290,6 +323,34 @@
         </div>
       </section>
 
+      <section class="rounded-2xl border border-rose-500/20 bg-rose-500/5 p-4">
+        <div class="flex items-center justify-between gap-3">
+          <div>
+            <p class="text-xs font-extrabold uppercase tracking-wider text-rose-300">Hỗ trợ & Khiếu nại (Dispute)</p>
+            <p v-if="state.myBusinessTickets?.find((t: any) => Number(t.application_id) === Number(selectedManagedApplicant.id))" class="mt-1 text-xs font-semibold text-emerald-300">
+              Đã có khiếu nại (Trạng thái: {{ state.myBusinessTickets.find((t: any) => Number(t.application_id) === Number(selectedManagedApplicant.id)).status === 'resolved' ? 'Đã duyệt' : state.myBusinessTickets.find((t: any) => Number(t.application_id) === Number(selectedManagedApplicant.id)).status === 'rejected' ? 'Bị bác bỏ' : 'Đang xử lý' }})
+            </p>
+            <p v-else class="mt-1 text-xs font-medium text-slate-400">Ứng viên vi phạm quy định? Gửi khiếu nại tới Ban quản trị.</p>
+          </div>
+
+          <button
+            v-if="state.myBusinessTickets?.find((t: any) => Number(t.application_id) === Number(selectedManagedApplicant.id))"
+            @click="state.openBusinessReappealModal(state.myBusinessTickets.find((t: any) => Number(t.application_id) === Number(selectedManagedApplicant.id)))"
+            class="rounded-xl border border-emerald-400/30 bg-emerald-500/10 px-3.5 py-2 text-xs font-extrabold text-emerald-300 hover:bg-emerald-500/20 hover:text-white transition-all cursor-pointer flex-shrink-0"
+          >
+            ⚖️ Xem Phán Quyết / Tái Khiếu Nại
+          </button>
+
+          <button
+            v-else
+            @click="openBusinessDisputeModal(selectedManagedApplicant)"
+            class="rounded-xl border border-rose-400/30 bg-rose-500/10 px-3.5 py-2 text-xs font-extrabold text-rose-300 hover:bg-rose-500/20 hover:text-white transition-all cursor-pointer flex-shrink-0"
+          >
+            ⚠️ Khiếu Nại Ứng Viên
+          </button>
+        </div>
+      </section>
+
       <section class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
         <p class="text-xs font-bold uppercase tracking-wider text-slate-500">Thông tin Offer</p>
         <div
@@ -310,6 +371,39 @@
           </div>
         </div>
         <p v-else class="mt-3 text-sm font-medium text-slate-500">Chưa có thông tin offer nào được ghi nhận.</p>
+      </section>
+
+      <!-- Section: Work Report & Proof Submission from Student -->
+      <section v-if="selectedManagedApplicant.completion_note || selectedManagedApplicant.completion_proof_url" class="rounded-2xl border border-cyan-400/30 bg-slate-900 p-4 space-y-3">
+        <div class="flex items-center justify-between">
+          <span class="text-[10px] font-black uppercase tracking-wider text-cyan-300 bg-cyan-400/10 px-2.5 py-0.5 rounded-full border border-cyan-400/20">
+            Báo Cáo Hoàn Thành Từ Sinh Viên
+          </span>
+          <span v-if="selectedManagedApplicant.submitted_at" class="text-[11px] font-semibold text-slate-400">
+            Nộp lúc: {{ formatDate(selectedManagedApplicant.submitted_at) }}
+          </span>
+        </div>
+
+        <div>
+          <p class="text-[10px] font-bold uppercase text-slate-400 mb-1">Nội dung báo cáo công việc</p>
+          <div class="p-3 bg-slate-950 border border-white/10 rounded-xl text-xs font-medium text-slate-200 whitespace-pre-line leading-relaxed">
+            {{ selectedManagedApplicant.completion_note || 'Sinh viên không để lại ghi chú báo cáo.' }}
+          </div>
+        </div>
+
+        <div v-if="selectedManagedApplicant.completion_proof_url">
+          <p class="text-[10px] font-bold uppercase text-slate-400 mb-1">Bằng chứng / File sản phẩm đính kèm</p>
+          <a
+            :href="getMediaUrl(selectedManagedApplicant.completion_proof_url)"
+            target="_blank"
+            rel="noopener noreferrer"
+            class="inline-flex items-center gap-1.5 rounded-xl border border-cyan-400/30 bg-cyan-400/10 px-3.5 py-2 text-xs font-extrabold text-cyan-300 hover:bg-cyan-400/20 transition-all shadow-sm"
+          >
+            <span>📄</span>
+            <span>Xem Sản Phẩm / Bằng Chứng Hoàn Thành</span>
+            <span>↗</span>
+          </a>
+        </div>
       </section>
 
       <section class="rounded-2xl border border-white/10 bg-white/[0.04] p-4">
@@ -561,13 +655,235 @@
 
     </div>
   </div>
+
+  <!-- Business Dispute Ticket Modal -->
+  <div v-if="isBusinessDisputeModalOpen && businessDisputeTargetApp" class="fixed inset-0 z-[10001] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="bg-slate-900 rounded-3xl border border-rose-500/30 shadow-2xl shadow-slate-950 max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div class="p-5 border-b border-indigo-500/15 bg-slate-950/80 flex justify-between items-center">
+        <div>
+          <h3 class="text-base font-extrabold text-white">⚠️ Gửi Khiếu Nại Ứng Viên</h3>
+          <p class="text-xs text-rose-300 font-semibold mt-0.5">Ứng viên: {{ businessDisputeTargetApp.student?.full_name || 'N/A' }} · Mã đơn #{{ businessDisputeTargetApp.id }}</p>
+        </div>
+        <button @click="isBusinessDisputeModalOpen = false" class="text-slate-400 hover:text-white text-xl font-bold p-1 rounded-lg hover:bg-white/10 cursor-pointer">&times;</button>
+      </div>
+
+      <form @submit.prevent="submitBusinessDisputeTicket" class="p-6 space-y-4">
+        <div>
+          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">Lý do khiếu nại <span class="text-rose-400">*</span></label>
+          <select
+            v-model="businessDisputeForm.reason"
+            required
+            class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-white/15 bg-slate-950 text-white focus:outline-none focus:border-rose-400"
+          >
+            <option value="" disabled>-- Chọn lý do khiếu nại --</option>
+            <option value="Ứng viên vắng mặt không báo trước">Ứng viên vắng mặt không báo trước</option>
+            <option value="Nộp báo cáo công việc không đúng thực tế">Nộp báo cáo công việc không đúng thực tế</option>
+            <option value="Thái độ cư xử vi phạm quy định">Thái độ cư xử vi phạm quy định</option>
+            <option value="Khác">Lý do khác</option>
+          </select>
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">Mô tả chi tiết sự việc <span class="text-rose-400">*</span></label>
+          <textarea
+            v-model="businessDisputeForm.description"
+            rows="3"
+            required
+            placeholder="Mô tả cụ thể vi phạm của ứng viên, thời gian diễn ra và yêu cầu Ban quản trị giải quyết..."
+            class="w-full text-xs p-3 rounded-xl border border-white/15 bg-slate-950 text-white placeholder-slate-500 focus:outline-none focus:border-rose-400"
+          ></textarea>
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-slate-300 uppercase tracking-wider block mb-1.5">Đề xuất xử lý với Admin (Tùy chọn)</label>
+          <input
+            v-model="businessDisputeForm.requested_action"
+            type="text"
+            placeholder="VD: Khóa tài khoản ứng viên / Hủy hoàn trả lương..."
+            class="w-full text-xs px-3.5 py-2.5 rounded-xl border border-white/15 bg-slate-950 text-white placeholder-slate-500 focus:outline-none focus:border-rose-400 font-medium"
+          />
+        </div>
+
+        <div>
+          <label class="text-xs font-bold text-cyan-300 uppercase tracking-wider block mb-1.5">File/Ảnh Bằng Chứng (Tùy chọn)</label>
+          <div class="space-y-2">
+            <div class="flex items-center gap-2">
+              <input
+                type="file"
+                ref="businessEvidenceFileInput"
+                @change="$emit('upload-evidence', $event)"
+                accept="image/*,.pdf,.doc,.docx,.zip"
+                class="hidden"
+              />
+              <button
+                type="button"
+                @click="businessEvidenceFileInput?.click()"
+                :disabled="state.isUploadingBusinessEvidence"
+                class="flex-1 px-4 py-2.5 rounded-xl border border-dashed border-cyan-400/40 bg-cyan-950/20 hover:bg-cyan-900/40 text-cyan-300 text-xs font-bold transition-all flex items-center justify-center gap-2 cursor-pointer disabled:opacity-50"
+              >
+                <span>{{ state.isUploadingBusinessEvidence ? '⏳ Đang tải file lên hệ thống...' : '📁 Tải File Bằng Chứng Từ Máy Tính (Ảnh/PDF/Doc/Zip)' }}</span>
+              </button>
+            </div>
+
+            <div v-if="businessDisputeForm.evidence_url" class="flex items-center justify-between p-2.5 rounded-xl bg-cyan-950/60 border border-cyan-400/30 text-xs">
+              <div class="flex items-center gap-2 overflow-hidden pr-2">
+                <span class="text-cyan-400 font-bold">✅ Bằng chứng:</span>
+                <a :href="businessDisputeForm.evidence_url" target="_blank" class="text-cyan-200 underline truncate hover:text-white">{{ businessDisputeForm.evidence_url }}</a>
+              </div>
+              <button type="button" @click="businessDisputeForm.evidence_url = ''" class="text-rose-400 hover:text-rose-300 font-bold px-2 py-1 bg-rose-950/50 rounded-lg shrink-0">
+                ✕ Xóa
+              </button>
+            </div>
+          </div>
+        </div>
+
+        <div class="pt-3 border-t border-indigo-500/15 flex justify-end gap-3">
+          <button
+            type="button"
+            @click="isBusinessDisputeModalOpen = false"
+            class="px-4 py-2 text-xs font-bold text-slate-300 hover:bg-white/10 border border-white/10 rounded-xl transition-all cursor-pointer"
+          >
+            Hủy bỏ
+          </button>
+          <button
+            type="submit"
+            :disabled="isSubmittingBusinessDispute"
+            class="px-5 py-2 text-xs font-extrabold text-white bg-rose-500 hover:bg-rose-400 disabled:opacity-50 rounded-xl shadow-lg shadow-rose-500/20 transition-all cursor-pointer uppercase tracking-wider"
+          >
+            {{ isSubmittingBusinessDispute ? 'Đang gửi...' : '⚠️ Xác Nhận Gửi Khiếu Nại' }}
+          </button>
+        </div>
+      </form>
+    </div>
+  </div>
+
+  <!-- Business Dispute Success Modal -->
+  <div v-if="showDisputeSuccessModal" class="fixed inset-0 z-[10002] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="bg-slate-900 rounded-3xl border border-indigo-500/30 shadow-2xl shadow-slate-950 max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div class="p-6 text-center space-y-4">
+        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-indigo-500/10 border border-indigo-500/30 text-indigo-400 text-3xl shadow-lg shadow-indigo-500/20">
+          🎉
+        </div>
+        <div>
+          <h3 class="text-lg font-extrabold text-white">Gửi Khiếu Nại Thành Công</h3>
+          <p class="mt-2 text-xs font-semibold text-slate-300 leading-relaxed">
+            {{ disputeSuccessMsg }}
+          </p>
+        </div>
+        <div class="pt-2">
+          <button
+            @click="showDisputeSuccessModal = false"
+            class="w-full py-2.5 rounded-xl bg-gradient-to-r from-indigo-500 to-emerald-500 hover:brightness-110 text-white text-xs font-extrabold shadow-lg shadow-indigo-500/30 transition-all cursor-pointer uppercase tracking-wider"
+          >
+            Đã Hiểu / Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Business Dispute Error/Warning Modal -->
+  <div v-if="showDisputeErrorModal" class="fixed inset-0 z-[10003] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="bg-slate-900 rounded-3xl border border-rose-500/30 shadow-2xl shadow-slate-950 max-w-md w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div class="p-6 text-center space-y-4">
+        <div class="mx-auto flex h-16 w-16 items-center justify-center rounded-2xl bg-amber-500/10 border border-amber-500/30 text-amber-400 text-3xl shadow-lg shadow-amber-500/20">
+          ⚠️
+        </div>
+        <div>
+          <h3 class="text-lg font-extrabold text-white">Thông Báo Khiếu Nại</h3>
+          <p class="mt-2 text-xs font-semibold text-slate-300 leading-relaxed">
+            {{ disputeErrorMsg }}
+          </p>
+        </div>
+        <div class="pt-2">
+          <button
+            @click="showDisputeErrorModal = false"
+            class="w-full py-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-white text-xs font-extrabold shadow-lg transition-all cursor-pointer uppercase tracking-wider"
+          >
+            Đã Hiểu / Đóng
+          </button>
+        </div>
+      </div>
+    </div>
+  </div>
+
+  <!-- Business Reappeal / View Verdict Modal -->
+  <div v-if="state.showBusinessReappealModal" class="fixed inset-0 z-[10002] flex items-center justify-center p-4 bg-slate-950/80 backdrop-blur-md">
+    <div class="bg-slate-900 rounded-3xl border border-white/10 shadow-2xl shadow-slate-950 max-w-lg w-full overflow-hidden animate-in fade-in zoom-in-95 duration-200">
+      <div class="p-6 space-y-4">
+        <div class="flex items-center justify-between border-b border-white/10 pb-3">
+          <h3 class="text-sm font-extrabold text-white flex items-center gap-2">
+            <span>⚖️ KẾT QUẢ KHIẾU NẠI & PHÁN QUYẾT ADMIN</span>
+          </h3>
+          <button @click="state.showBusinessReappealModal = false" class="text-slate-400 hover:text-white font-bold text-lg">✕</button>
+        </div>
+
+        <div v-if="state.selectedBusinessTicketForView" class="space-y-3">
+          <div class="bg-slate-950/60 p-3 rounded-xl border border-white/10 space-y-1.5 text-xs">
+            <div class="flex justify-between text-slate-400">
+              <span>Đơn ứng tuyển: <strong class="text-white">#{{ state.selectedBusinessTicketForView.application_id }}</strong></span>
+              <span>Trạng thái: 
+                <span :class="state.selectedBusinessTicketForView.status === 'resolved' ? 'text-emerald-400 font-bold' : state.selectedBusinessTicketForView.status === 'rejected' ? 'text-rose-400 font-bold' : 'text-amber-400 font-bold'">
+                  {{ state.selectedBusinessTicketForView.status === 'resolved' ? 'Đã duyệt' : state.selectedBusinessTicketForView.status === 'rejected' ? 'Bị bác bỏ' : 'Đang xử lý' }}
+                </span>
+              </span>
+            </div>
+            <div><strong class="text-slate-300">Lý do ban đầu:</strong> {{ state.selectedBusinessTicketForView.reason }}</div>
+            <div><strong class="text-slate-300">Mô tả:</strong> {{ state.selectedBusinessTicketForView.description }}</div>
+          </div>
+
+          <div v-if="state.selectedBusinessTicketForView.verdict" class="bg-emerald-950/40 p-4 rounded-xl border border-emerald-500/30 space-y-1">
+            <div class="text-xs font-bold text-emerald-400 uppercase tracking-wider">Phán quyết chính thức từ Admin:</div>
+            <div class="text-sm font-semibold text-white leading-relaxed">{{ state.selectedBusinessTicketForView.verdict }}</div>
+          </div>
+
+          <div v-if="state.selectedBusinessTicketForView.is_reappealed" class="bg-amber-950/40 p-3 rounded-xl border border-amber-500/30 text-xs text-amber-200">
+            <div class="font-bold text-amber-300">⚠️ Đã gửi yêu cầu Tái xem xét phán quyết</div>
+            <div class="mt-1">Lý do phản hồi: {{ state.selectedBusinessTicketForView.reappeal_reason }}</div>
+          </div>
+
+          <!-- Form Reappeal if verdict exists and not reappealed -->
+          <div v-else-if="state.selectedBusinessTicketForView.verdict" class="pt-2 space-y-3 border-t border-white/10">
+            <div class="text-xs font-bold text-rose-300">Bạn thấy phán quyết chưa thỏa đáng? Nộp yêu cầu Tái xem xét:</div>
+            <textarea
+              v-model="state.businessReappealForm.reason"
+              rows="3"
+              placeholder="Nhập lý do chi tiết giải thích vì sao phán quyết chưa công bằng/thỏa đáng..."
+              class="w-full text-xs p-3 rounded-xl border border-white/15 bg-slate-950 text-white placeholder-slate-500 focus:outline-none focus:border-rose-400"
+            ></textarea>
+
+            <div class="flex justify-end gap-3 pt-2">
+              <button
+                type="button"
+                @click="state.showBusinessReappealModal = false"
+                class="px-4 py-2 text-xs font-bold text-slate-300 hover:bg-white/10 border border-white/10 rounded-xl"
+              >
+                Đóng
+              </button>
+              <button
+                type="button"
+                @click="state.submitBusinessReappealTicket()"
+                :disabled="state.isSubmittingBusinessReappeal"
+                class="px-4 py-2 text-xs font-extrabold text-white bg-rose-500 hover:bg-rose-400 disabled:opacity-50 rounded-xl shadow-lg shadow-rose-500/20 uppercase tracking-wider cursor-pointer"
+              >
+                {{ state.isSubmittingBusinessReappeal ? 'Đang gửi...' : '⚠️ Nộp Yêu Cầu Tái Xem Xét' }}
+              </button>
+            </div>
+          </div>
+        </div>
+      </div>
+    </div>
+  </div>
 </template>
 
 <script setup lang="ts">
-import { toRefs } from 'vue'
+import { ref, toRefs } from 'vue'
 import ChatBox from '~/components/ChatBox.vue'
+import { useMedia } from '~/composables/useMedia'
 
+const { getMediaUrl } = useMedia()
 const props = defineProps<{ state: Record<string, any> }>()
+const businessEvidenceFileInput = ref<HTMLInputElement | null>(null)
 const {
   activeSection,
   navItems,
@@ -631,6 +947,20 @@ const {
   submitReview,
   isChatModalOpen,
   selectedChatApp,
-  currentBusinessUserId
+  currentBusinessUserId,
+  isBusinessDisputeModalOpen,
+  businessDisputeTargetApp,
+  isSubmittingBusinessDispute,
+  businessDisputeForm,
+  openBusinessDisputeModal,
+  submitBusinessDisputeTicket,
+  showDisputeSuccessModal,
+  disputeSuccessMsg,
+  showDisputeErrorModal,
+  disputeErrorMsg,
+  myBusinessTickets,
+  showBusinessReappealModal,
+  openBusinessReappealModal,
+  submitBusinessReappealTicket
 } = toRefs(props.state)
 </script>

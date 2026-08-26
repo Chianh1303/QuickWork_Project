@@ -77,13 +77,7 @@
           </div>
         </div>
 
-        <div v-if="feedback" :class="[
-          feedback.type === 'success' ? 'border-emerald-300 bg-emerald-500/10 text-emerald-300' : 'border-rose-300 bg-rose-500/10 text-rose-300',
-          'mx-auto mb-8 flex max-w-4xl items-start justify-between rounded-r-xl border-l-4 p-4 transition-all duration-300'
-        ]">
-          <span class="text-sm font-medium">{{ feedback.message }}</span>
-          <button @click="feedback = null" class="text-slate-400 hover:text-slate-200">✕</button>
-        </div>
+
 
         <!-- Skeleton Loading -->
         <JobSkeleton v-if="isLoadingJobs" :count="6" />

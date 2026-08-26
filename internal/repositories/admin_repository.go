@@ -23,7 +23,7 @@ type AdminRepository interface {
 	UpdateBusinessStatus(businessID int, status string) error
 	GetTickets(page, limit int, status string) ([]dto.AdminTicketItem, int64, error)
 	GetTicketDetail(ticketID int) (*dto.AdminTicketItem, error)
-	ResolveTicket(ticketID int, adminID uint, verdict, status string) error
+	ResolveTicket(ticketID int, adminID uint, verdict, status string) (int64, error)
 	GetCategories() ([]models.Category, error)
 	CreateCategory(category *models.Category) error
 	DeleteCategory(id uint) error
@@ -381,9 +381,15 @@ func (r *adminRepository) GetTickets(page, limit int, status string) ([]dto.Admi
 			u2.email AS target_email,
 			tickets.reason,
 			tickets.description,
+			tickets.requested_action,
+			tickets.evidence_url,
 			tickets.status,
 			tickets.verdict,
 			tickets.resolved_at,
+			tickets.is_reappealed,
+			tickets.reappeal_reason,
+			tickets.reappeal_evidence,
+			tickets.reappealed_at,
 			tickets.created_at
 		`).
 		Joins("LEFT JOIN users u1 ON u1.id = tickets.reporter_id").
@@ -411,9 +417,15 @@ func (r *adminRepository) GetTicketDetail(ticketID int) (*dto.AdminTicketItem, e
 			u2.email AS target_email,
 			tickets.reason,
 			tickets.description,
+			tickets.requested_action,
+			tickets.evidence_url,
 			tickets.status,
 			tickets.verdict,
 			tickets.resolved_at,
+			tickets.is_reappealed,
+			tickets.reappeal_reason,
+			tickets.reappeal_evidence,
+			tickets.reappealed_at,
 			tickets.created_at
 		`).
 		Joins("LEFT JOIN users u1 ON u1.id = tickets.reporter_id").
@@ -429,14 +441,17 @@ func (r *adminRepository) GetTicketDetail(ticketID int) (*dto.AdminTicketItem, e
 	return &detail, nil
 }
 
-func (r *adminRepository) ResolveTicket(ticketID int, adminID uint, verdict, status string) error {
+func (r *adminRepository) ResolveTicket(ticketID int, adminID uint, verdict, status string) (int64, error) {
 	now := time.Now()
-	return r.db.Model(&models.Ticket{}).Where("id = ?", ticketID).Updates(map[string]interface{}{
-		"status":      status,
-		"verdict":     verdict,
-		"resolved_by": adminID,
-		"resolved_at": now,
-	}).Error
+	result := r.db.Model(&models.Ticket{}).
+		Where("id = ? AND status = ?", ticketID, "pending").
+		Updates(map[string]interface{}{
+			"status":      status,
+			"verdict":     verdict,
+			"resolved_by": adminID,
+			"resolved_at": now,
+		})
+	return result.RowsAffected, result.Error
 }
 
 func (r *adminRepository) GetCategories() ([]models.Category, error) {

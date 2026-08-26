@@ -1,8 +1,41 @@
 <template>
   <!-- Section 4: Employer Applicant Management (B6) -->
   <div v-show="activeSection === 'applicants'" class="space-y-6">
+    <!-- Option B Sub-Tabs Bar: Active Applicants vs Archived / Closed History -->
+    <div class="flex flex-wrap items-center gap-3 border-b border-white/10 pb-4">
+      <button
+        @click="applicantTab = 'active'; applicantStatusFilter = 'all'"
+        :class="[
+          applicantTab === 'active'
+            ? 'bg-cyan-400 text-slate-950 font-black shadow-lg shadow-cyan-500/25 ring-2 ring-cyan-400/30'
+            : 'bg-slate-900 text-slate-400 hover:text-white font-bold border border-white/10 hover:bg-slate-800/80',
+          'px-4 py-2.5 text-xs rounded-xl transition-all cursor-pointer flex items-center gap-2'
+        ]"
+      >
+        <span>⚡ Ứng Viên Đang Xử Lý</span>
+        <span :class="[applicantTab === 'active' ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-800 text-cyan-300 border border-cyan-400/20', 'px-2 py-0.5 rounded-full text-[11px] font-black']">
+          {{ activeAppsCount }}
+        </span>
+      </button>
+
+      <button
+        @click="applicantTab = 'closed'; applicantStatusFilter = 'all'"
+        :class="[
+          applicantTab === 'closed'
+            ? 'bg-cyan-400 text-slate-950 font-black shadow-lg shadow-cyan-500/25 ring-2 ring-cyan-400/30'
+            : 'bg-slate-900 text-slate-400 hover:text-white font-bold border border-white/10 hover:bg-slate-800/80',
+          'px-4 py-2.5 text-xs rounded-xl transition-all cursor-pointer flex items-center gap-2'
+        ]"
+      >
+        <span>📜 Lịch Sử & Đơn Đã Đóng</span>
+        <span :class="[applicantTab === 'closed' ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-800 text-slate-400 border border-white/10', 'px-2 py-0.5 rounded-full text-[11px] font-black']">
+          {{ closedAppsCount }}
+        </span>
+      </button>
+    </div>
+
     <!-- Search & Filter Controls -->
-    <div class="bg-white/90 p-4 rounded-xl border border-cyan-100 shadow-sm shadow-slate-950/5 grid grid-cols-1 sm:grid-cols-2 gap-4 backdrop-blur">
+    <div class="bg-slate-900/90 p-4 rounded-2xl border border-white/10 shadow-lg grid grid-cols-1 sm:grid-cols-2 gap-4 backdrop-blur">
       <div class="relative">
         <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
@@ -12,22 +45,26 @@
         <input
           v-model="applicantSearchQuery"
           type="text"
-          class="block w-full pl-10 pr-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white placeholder-slate-400 text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-300 transition-all duration-200"
+          class="block w-full pl-10 pr-3 py-2.5 border border-white/10 rounded-xl text-xs bg-slate-950 placeholder-slate-500 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all font-medium"
           placeholder="Tìm kiếm theo tên sinh viên hoặc vị trí việc làm..."
         />
       </div>
       <div>
         <select
           v-model="applicantStatusFilter"
-          class="block w-full px-3 py-2.5 border border-slate-200 rounded-lg text-sm bg-white text-slate-900 focus:outline-none focus:ring-2 focus:ring-brand-500 focus:border-brand-300 transition-all duration-200 font-medium"
+          class="block w-full px-3 py-2.5 border border-white/10 rounded-xl text-xs bg-slate-950 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all font-semibold cursor-pointer"
         >
-          <option value="all">Tất cả trạng thái</option>
-          <option value="pending">Mới ứng tuyển (Chờ duyệt)</option>
-          <option value="approved">Đã duyệt (Trúng tuyển)</option>
-          <option value="offer_accepted">Đã chấp nhận Offer</option>
-          <option value="student_completed">Chờ Doanh nghiệp xác nhận hoàn thành</option>
-          <option value="paid">Đã hoàn thành & Giải ngân</option>
-          <option value="rejected">Đã từ chối</option>
+          <option value="all">{{ applicantTab === 'active' ? 'Tất cả đơn đang xử lý' : 'Tất cả đơn đã đóng' }}</option>
+          <template v-if="applicantTab === 'active'">
+            <option value="pending">Mới ứng tuyển (Chờ duyệt)</option>
+            <option value="approved">Đã duyệt (Trúng tuyển)</option>
+            <option value="offer_accepted">Đã chấp nhận Offer</option>
+            <option value="student_completed">Chờ xác nhận hoàn thành</option>
+          </template>
+          <template v-else>
+            <option value="paid">Đã hoàn thành & Giải ngân</option>
+            <option value="rejected">Đã từ chối</option>
+          </template>
         </select>
       </div>
     </div>
@@ -239,6 +276,9 @@ const {
   isLoadingApps,
   applicantSearchQuery,
   applicantStatusFilter,
+  applicantTab,
+  activeAppsCount,
+  closedAppsCount,
   filteredApps,
   paginatedApplicants,
   applicantsPage,
