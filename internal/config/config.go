@@ -3,6 +3,7 @@ package config
 import (
 	"fmt"
 	"os"
+	"strings"
 )
 
 var (
@@ -16,10 +17,15 @@ var (
 )
 
 func getServerAddr() string {
-	if port := os.Getenv("PORT"); port != "" {
-		return ":" + port
+	port := os.Getenv("PORT")
+	if port == "" {
+		port = os.Getenv("SERVER_ADDR")
 	}
-	return GetEnv("SERVER_ADDR", ":3000")
+	if port == "" {
+		port = "8080"
+	}
+	port = strings.TrimPrefix(port, ":")
+	return "0.0.0.0:" + port
 }
 
 func getMySQLDSN() string {
