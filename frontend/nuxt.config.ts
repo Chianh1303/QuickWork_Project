@@ -1,4 +1,4 @@
-const backendTarget = (process.env.BACKEND_URL || process.env.NUXT_PUBLIC_API_BASE_URL || 'https://quickwork-backend-api.onrender.com').replace(/\/$/, '')
+const backendTarget = (process.env.BACKEND_URL || process.env.NUXT_PUBLIC_API_BASE_URL || 'https://quickwork-project.onrender.com').replace(/\/$/, '')
 
 export default defineNuxtConfig({
   compatibilityDate: '2026-06-24',
