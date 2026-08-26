@@ -77,14 +77,13 @@ func main() {
 	app := fiber.New()
 	app.Use(logger.New())
 
-	// 5. Cấu hình CORS (BẮT BUỘC để tránh lỗi chặn liên cổng khi Nuxt 3001 gọi sang Go 3000)
+	// 5. Cấu hình CORS (BẮT BUỘC để cho phép Frontend Nuxt gọi API từ bất kỳ tên miền nào)
 	app.Use(cors.New(cors.Config{
-		AllowOrigins: config.CORSOrigins,
-
-		AllowMethods: "GET,POST,PUT,DELETE,OPTIONS",
-
-		AllowHeaders: "Origin,Content-Type,Accept,Authorization",
-
+		AllowOriginsFunc: func(origin string) bool {
+			return true
+		},
+		AllowMethods:     "GET,POST,PUT,DELETE,OPTIONS",
+		AllowHeaders:     "Origin,Content-Type,Accept,Authorization",
 		AllowCredentials: true,
 	}))
 	app.Static("/uploads", config.UploadDir)
