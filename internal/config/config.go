@@ -17,9 +17,9 @@ var (
 )
 
 func getServerAddr() string {
-	port := os.Getenv("PORT")
+	port := os.Getenv("SERVER_ADDR")
 	if port == "" {
-		port = os.Getenv("SERVER_ADDR")
+		port = os.Getenv("PORT")
 	}
 	if port == "" {
 		port = "8080"
