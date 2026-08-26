@@ -28,7 +28,8 @@ func getMySQLDSN() string {
 	dbHost := GetEnv("DB_HOST", "127.0.0.1")
 	dbPort := GetEnv("DB_PORT", "3306")
 	dbName := GetEnv("DB_NAME", "quickwork_db")
-	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?charset=utf8mb4&parseTime=True&loc=Local", dbUser, dbPass, dbHost, dbPort, dbName)
+	dbParams := GetEnv("DB_PARAMS", "charset=utf8mb4&parseTime=True&loc=Local&tls=skip-verify")
+	return fmt.Sprintf("%s:%s@tcp(%s:%s)/%s?%s", dbUser, dbPass, dbHost, dbPort, dbName, dbParams)
 }
 
 func GetEnv(key, fallback string) string {
