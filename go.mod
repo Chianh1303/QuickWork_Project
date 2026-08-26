@@ -1,6 +1,6 @@
 module QuickWork
 
-go 1.25.0
+go 1.23
 
 require (
 	github.com/cloudinary/cloudinary-go/v2 v2.16.0
