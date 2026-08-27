@@ -201,6 +201,7 @@
                   <th class="px-6 py-4 text-left text-xs font-black text-cyan-300 uppercase tracking-wider">Mức lương</th>
                   <th class="px-6 py-4 text-left text-xs font-black text-cyan-300 uppercase tracking-wider">Chỉ tiêu</th>
                   <th class="px-6 py-4 text-left text-xs font-black text-cyan-300 uppercase tracking-wider">Trạng thái</th>
+                  <th class="px-6 py-4 text-right text-xs font-black text-cyan-300 uppercase tracking-wider">Thao tác</th>
                 </tr>
               </thead>
               <tbody class="bg-slate-900/80 divide-y divide-white/10">
@@ -216,6 +217,20 @@
                     ]">
                       {{ job.status === 'approved' ? 'Đã duyệt' : (job.status === 'rejected' ? 'Từ chối' : 'Chờ duyệt') }}
                     </span>
+                  </td>
+                  <td class="px-6 py-4 whitespace-nowrap text-right text-xs space-x-2">
+                    <button
+                      @click="handleEditJob(job)"
+                      class="px-2.5 py-1 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-lg font-extrabold transition-all"
+                    >
+                      ✏️ Sửa
+                    </button>
+                    <button
+                      @click="handleDeleteJob(job.id)"
+                      class="px-2.5 py-1 bg-rose-500/10 hover:bg-rose-500/20 text-rose-300 border border-rose-500/30 rounded-lg font-extrabold transition-all"
+                    >
+                      🗑️ Xóa
+                    </button>
                   </td>
                 </tr>
               </tbody>
@@ -277,6 +292,9 @@ const {
   handleUpdateProfile,
   showCreateForm,
   jobForm,
+  editingJobId,
+  handleEditJob,
+  handleDeleteJob,
   handleCreateJob,
   isCreatingJob,
   isLoadingJobs,
