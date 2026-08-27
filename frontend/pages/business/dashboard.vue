@@ -936,26 +936,58 @@ const handleUpdateProfile = async () => {
   }
 }
 
+const editingJobId = ref<number | null>(null)
+const isDeletingJob = ref(false)
+
+const handleEditJob = (job: any) => {
+  editingJobId.value = job.id || job.ID
+  jobForm.title = job.title || ''
+  jobForm.description = job.description || ''
+  jobForm.location = job.location || ''
+  jobForm.salary = job.salary || 0
+  jobForm.slots = job.slots || 1
+  jobForm.working_date = job.working_date || ''
+  showCreateForm.value = true
+}
+
+const handleDeleteJob = async (jobId: number) => {
+  if (!confirm('⚠️ Bạn có chắc chắn muốn xóa tin tuyển dụng này?')) return
+
+  try {
+    const res = await api.delete(`/api/jobs/${jobId}`)
+    showToast(res.message || '🎉 Xóa tin tuyển dụng thành công!')
+    await fetchJobs()
+  } catch (err: any) {
+    const errMsg = err.response?._data?.message || err.message || 'Không thể xóa tin tuyển dụng'
+    showToast(errMsg, 'error')
+  }
+}
+
 const handleCreateJob = async () => {
   isCreatingJob.value = true
   feedback.value = null
 
   try {
-    const res = await api.post('/api/jobs', {
+    const payload = {
       title: jobForm.title,
       description: jobForm.description,
       location: jobForm.location,
       salary: Number(jobForm.salary),
       slots: Number(jobForm.slots),
       working_date: jobForm.working_date
-    })
+    }
 
-    feedback.value = {
-      type: 'success',
-      message: res.message || '🎉 Job opening created successfully!'
+    let res
+    if (editingJobId.value) {
+      res = await api.put(`/api/jobs/${editingJobId.value}`, payload)
+      showToast(res.message || '🎉 Cập nhật bài đăng tuyển dụng thành công!')
+    } else {
+      res = await api.post('/api/jobs', payload)
+      showToast(res.message || '🎉 Đăng tin tuyển dụng thành công!')
     }
 
     // Reset Form fields
+    editingJobId.value = null
     jobForm.title = ''
     jobForm.description = ''
     jobForm.location = ''
@@ -967,10 +999,8 @@ const handleCreateJob = async () => {
     showCreateForm.value = false
     await fetchJobs()
   } catch (err: any) {
-    feedback.value = {
-      type: 'error',
-      message: err.response?._data?.message || 'Failed to publish job opening.'
-    }
+    const errMsg = err.response?._data?.message || err.message || 'Thao tác đăng tin thất bại'
+    showToast(errMsg, 'error')
   } finally {
     isCreatingJob.value = false
     window.scrollTo({ top: 0, behavior: 'smooth' })
@@ -1050,6 +1080,9 @@ const businessDashboardState = reactive({
   handleUpdateProfile,
   showCreateForm,
   jobForm,
+  editingJobId,
+  handleEditJob,
+  handleDeleteJob,
   handleCreateJob,
   isCreatingJob,
   isLoadingJobs,
