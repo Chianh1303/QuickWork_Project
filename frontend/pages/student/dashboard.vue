@@ -75,6 +75,7 @@
 
       <main class="w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <StudentJobsSection :state="studentDashboardState" />
+        <StudentSavedJobsSection :state="studentDashboardState" @apply="openApplyModal" />
         <StudentProfileSection :state="studentDashboardState" />
         <StudentApplicationsSection :state="studentDashboardState" />
         <StudentWalletSection :state="studentDashboardState" />
@@ -92,6 +93,7 @@
 <script setup lang="ts">
 import { ref, reactive, computed, onMounted, onUnmounted, watch } from 'vue'
 import StudentJobsSection from '~/components/student/StudentJobsSection.vue'
+import StudentSavedJobsSection from '~/components/student/StudentSavedJobsSection.vue'
 import StudentProfileSection from '~/components/student/StudentProfileSection.vue'
 import StudentApplicationsSection from '~/components/student/StudentApplicationsSection.vue'
 import StudentDashboardModals from '~/components/student/StudentDashboardModals.vue'
@@ -108,6 +110,7 @@ const activeSection = useState<string>('studentDashboardActiveSection', () => 'j
 
 const navItems = [
   { id: 'jobs', name: 'Trang chủ tìm việc' },
+  { id: 'saved-jobs', name: 'Việc làm đã lưu' },
   { id: 'profile', name: 'Hồ sơ cá nhân' },
   { id: 'applications', name: 'Đơn ứng tuyển' },
   { id: 'wallet', name: 'Ví thu nhập' }
