@@ -75,7 +75,7 @@
 
       <main class="w-full max-w-7xl px-4 py-6 sm:px-6 lg:px-8">
         <StudentJobsSection :state="studentDashboardState" />
-        <StudentSavedJobsSection :state="studentDashboardState" @apply="openApplyModal" />
+        <StudentSavedJobsSection :state="studentDashboardState" @apply="handleApply" />
         <StudentProfileSection :state="studentDashboardState" />
         <StudentApplicationsSection :state="studentDashboardState" />
         <StudentWalletSection :state="studentDashboardState" />

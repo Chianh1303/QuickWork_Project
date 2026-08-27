@@ -59,7 +59,7 @@
         <div class="space-y-2.5">
           <!-- Top Row: Business Logo + Company Name & Title + Heart Button -->
           <div class="flex items-start justify-between gap-2">
-            <div class="flex items-center gap-2.5 min-w-0 flex-1">
+            <div @click="handleApplyClick(job)" class="flex items-center gap-2.5 min-w-0 flex-1 cursor-pointer">
               <div class="relative h-10 w-10 flex-shrink-0 overflow-hidden rounded-xl border border-cyan-500/20 bg-slate-800 shadow-md flex items-center justify-center">
                 <img
                   v-if="job.business?.logo_url || job.logo_url"
@@ -119,7 +119,7 @@
           </button>
 
           <button
-            @click="$emit('apply', job)"
+            @click="handleApplyClick(job)"
             class="flex-1 py-1.5 px-3 rounded-lg text-xs font-black text-slate-950 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 shadow-md shadow-cyan-500/20 transition-all text-center cursor-pointer"
           >
             Ứng tuyển ngay ⚡
@@ -136,7 +136,7 @@ import { useMedia } from '~/composables/useMedia'
 import { useSavedJobs } from '~/composables/useSavedJobs'
 
 const props = defineProps<{ state: Record<string, any> }>()
-defineEmits<{ (e: 'apply', job: any): void }>()
+const emit = defineEmits<{ (e: 'apply', job: any): void }>()
 
 const { getMediaUrl, getCompanyInitial } = useMedia()
 const { activeSection, jobs } = toRefs(props.state)
@@ -172,6 +172,23 @@ const getCompanyName = (job: any): string => {
 const getJobId = (job: any): number => {
   if (typeof job === 'number') return job
   return Number(job?.id || job?.JobID || job?.job_id || 0)
+}
+
+const handleApplyClick = (job: any) => {
+  if (!job) return
+  const id = getJobId(job)
+  const mappedJob = {
+    id: id,
+    ID: id,
+    job_id: id,
+    title: job.title || job.job_title,
+    company: getCompanyName(job),
+    salary: job.salary,
+    location: job.location,
+    description: job.description,
+    ...job
+  }
+  emit('apply', mappedJob)
 }
 
 const savedJobs = computed(() => {
