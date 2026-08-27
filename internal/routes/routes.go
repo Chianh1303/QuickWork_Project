@@ -23,4 +23,5 @@ func RegisterRoutes(app *fiber.App, db *gorm.DB) {
 	RegisterAIRoutes(app, db)
 	RegisterNotificationRoutes(app, db)
 	RegisterTicketRoutes(app, db)
+	RegisterSavedJobRoutes(app, db)
 }

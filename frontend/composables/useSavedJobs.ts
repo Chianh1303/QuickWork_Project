@@ -4,9 +4,10 @@ import { useToast } from '~/composables/useToast'
 export const useSavedJobs = () => {
   const { success, info } = useToast()
   const savedJobIds = ref<number[]>([])
+  const isSyncing = ref(false)
 
-  // Initialize from localStorage
-  const initSavedJobs = () => {
+  // Read initial cache from localStorage
+  const initSavedJobs = async () => {
     if (import.meta.client) {
       try {
         const stored = localStorage.getItem('qw_saved_jobs')
@@ -15,6 +16,18 @@ export const useSavedJobs = () => {
         }
       } catch (e) {
         console.error('Error reading saved jobs from localStorage', e)
+      }
+
+      // Fetch latest list from backend API
+      try {
+        const api = useApi()
+        const res: any = await api.get('/api/saved-jobs')
+        if (res && Array.isArray(res.saved_ids)) {
+          savedJobIds.value = res.saved_ids.map((id: any) => Number(id))
+          saveToStorage()
+        }
+      } catch (e) {
+        // Guest user or offline, fallback to localStorage
       }
     }
   }
@@ -40,25 +53,37 @@ export const useSavedJobs = () => {
     return savedJobIds.value.includes(id)
   }
 
-  const toggleSaveJob = (job: any) => {
+  const toggleSaveJob = async (job: any) => {
     const id = getJobId(job)
     if (!id) return
 
     const index = savedJobIds.value.indexOf(id)
+    const title = job?.title || job?.job_title || '#' + id
+
+    // Optimistic UI update
     if (index > -1) {
       savedJobIds.value.splice(index, 1)
       saveToStorage()
-      info(`Đã bỏ lưu công việc "${job?.title || job?.job_title || '#' + id}" khỏi danh sách yêu thích.`)
+      info(`Đã bỏ lưu công việc "${title}" khỏi danh sách yêu thích.`)
     } else {
       savedJobIds.value.push(id)
       saveToStorage()
-      success(`❤️ Đã lưu công việc "${job?.title || job?.job_title || '#' + id}" vào mục Yêu thích!`)
+      success(`❤️ Đã lưu công việc "${title}" vào mục Yêu thích!`)
+    }
+
+    // Call Backend API to sync database
+    try {
+      const api = useApi()
+      await api.post(`/api/saved-jobs/${id}`)
+    } catch (err) {
+      console.warn('Backend API sync failed, kept in local state', err)
     }
   }
 
   const shareJob = async (job: any) => {
     if (import.meta.client) {
-      const url = `${window.location.origin}/jobs?jobId=${job?.id || ''}`
+      const id = getJobId(job)
+      const url = `${window.location.origin}/jobs?jobId=${id || ''}`
       try {
         if (navigator.clipboard) {
           await navigator.clipboard.writeText(url)
@@ -78,6 +103,7 @@ export const useSavedJobs = () => {
     savedJobIds,
     isJobSaved,
     toggleSaveJob,
-    shareJob
+    shareJob,
+    fetchSavedJobs: initSavedJobs
   }
 }

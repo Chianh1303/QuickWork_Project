@@ -44,5 +44,6 @@ func AutoMigrate(db *gorm.DB) error {
 		&models.Skill{},
 		&models.CVEvaluation{},
 		&models.Notification{},
+		&models.SavedJob{},
 	)
 }
