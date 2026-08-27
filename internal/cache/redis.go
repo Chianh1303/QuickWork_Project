@@ -5,6 +5,7 @@ import (
 	"fmt"
 	"log"
 	"os"
+	"strings"
 	"time"
 
 	"github.com/redis/go-redis/v9"
@@ -23,7 +24,10 @@ type redisCache struct {
 }
 
 func NewRedisCache() CacheClient {
-	redisURL := os.Getenv("REDIS_URL")
+	redisURL := strings.Trim(os.Getenv("REDIS_URL"), "\"'\t\n\r ")
+	redisURL = strings.TrimPrefix(redisURL, "REDIS_URL=")
+	redisURL = strings.Trim(redisURL, "\"'\t\n\r ")
+
 	redisAddr := os.Getenv("REDIS_ADDR")
 	redisPassword := os.Getenv("REDIS_PASSWORD")
 
@@ -32,11 +36,13 @@ func NewRedisCache() CacheClient {
 	if redisURL != "" {
 		opt, err := redis.ParseURL(redisURL)
 		if err == nil {
-			opt.DialTimeout = 2 * time.Second
-			opt.ReadTimeout = 2 * time.Second
-			opt.WriteTimeout = 2 * time.Second
+			opt.DialTimeout = 3 * time.Second
+			opt.ReadTimeout = 3 * time.Second
+			opt.WriteTimeout = 3 * time.Second
 			rdb = redis.NewClient(opt)
 			redisAddr = opt.Addr
+		} else {
+			log.Printf("⚠️ [Redis URL Parse Error]: %v", err)
 		}
 	}
 
