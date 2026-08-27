@@ -49,12 +49,12 @@
       </button>
     </div>
 
-    <!-- Ultra Compact 3-Column Job Card Grid (Strict md:grid-cols-3) -->
-    <div v-else class="grid grid-cols-1 sm:grid-cols-2 md:grid-cols-3 gap-4 font-sans">
+    <!-- Direct Unconditional 3-Column Grid (grid-cols-3) -->
+    <div v-else class="grid grid-cols-3 gap-4 font-sans">
       <div
         v-for="job in savedJobs"
         :key="getJobId(job)"
-        class="group relative rounded-2xl border border-cyan-500/15 bg-slate-950/90 p-3.5 shadow-lg transition-all duration-200 hover:border-cyan-400/50 hover:bg-slate-900 hover:shadow-xl hover:shadow-cyan-500/10 flex flex-col justify-between min-h-[170px]"
+        class="group relative rounded-2xl border border-cyan-500/15 bg-slate-950/90 p-3.5 shadow-lg transition-all duration-200 hover:border-cyan-400/50 hover:bg-slate-900 hover:shadow-xl hover:shadow-cyan-500/10 flex flex-col justify-between min-h-[160px]"
       >
         <div class="space-y-2.5">
           <!-- Top Row: Business Logo + Company Name & Title + Heart Button -->
