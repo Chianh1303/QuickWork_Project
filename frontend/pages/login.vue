@@ -317,11 +317,7 @@ const handleGoogleLogin = async () => {
         }
       }
     })
-    window.google.accounts.id.prompt((notification: any) => {
-      if (notification.isNotDisplayed() || notification.isSkippedMoment()) {
-        errorMessage.value = 'Trình duyệt đang chặn Popup Google One-Tap. Vui lòng cho phép Popup trên thanh URL hoặc đăng nhập bằng Email/Mật khẩu!'
-      }
-    })
+    window.google.accounts.id.prompt()
   } else {
     errorMessage.value = 'Chưa thể nạp dịch vụ Google. Vui lòng làm mới trang hoặc đăng nhập bằng Email/Mật khẩu!'
   }
