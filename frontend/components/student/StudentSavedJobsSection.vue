@@ -26,88 +26,118 @@
     </div>
 
     <!-- Empty State -->
-    <div v-if="savedJobs.length === 0" class="rounded-3xl border border-cyan-500/15 bg-slate-900/80 p-12 text-center space-y-4 shadow-xl">
-      <div class="h-16 w-16 mx-auto rounded-full bg-slate-800 flex items-center justify-center text-3xl">
-        🤍
-      </div>
-      <div class="space-y-1">
-        <h3 class="text-lg font-extrabold text-white">Chưa Có Việc Làm Yêu Thích Nào</h3>
-        <p class="text-xs text-slate-400 max-w-md mx-auto">
-          Bạn chưa lưu công việc nào. Hãy tìm kiếm công việc phù hợp và bấm biểu tượng ❤️ để lưu lại!
-        </p>
-      </div>
+    <div v-if="savedJobs.length === 0" class="bg-slate-900/90 text-center py-16 px-4 rounded-2xl border border-cyan-500/15 text-slate-400 shadow-xl">
+      <svg class="mx-auto h-12 w-12 text-slate-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+      </svg>
+      <p class="font-bold text-slate-100 text-lg">Chưa có việc làm yêu thích nào</p>
+      <p class="text-sm text-slate-400 mt-1 max-w-md mx-auto">Bạn chưa bấm lưu công việc nào. Hãy tìm kiếm công việc phù hợp và bấm biểu tượng ❤️ để lưu lại!</p>
       <button
         @click="activeSection = 'jobs'"
-        class="px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-emerald-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-cyan-500/20 hover:scale-105 transition-all cursor-pointer"
+        class="mt-4 px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-emerald-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-cyan-500/20 hover:scale-105 transition-all cursor-pointer"
       >
         Khám Phá Việc Làm Ngay ⚡
       </button>
     </div>
 
-    <!-- Saved Jobs Grid -->
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
+    <!-- Saved Jobs List (Identical Card Layout matching StudentJobsSection) -->
+    <div v-else class="grid grid-cols-1 lg:grid-cols-2 gap-4">
       <div
         v-for="job in savedJobs"
-        :key="job.id || job.ID || job.job_id || job.JobID"
-        class="group relative rounded-3xl border border-cyan-500/15 bg-slate-900/90 p-6 shadow-xl hover:border-cyan-400/40 hover:shadow-2xl hover:shadow-cyan-500/10 transition-all duration-300 flex flex-col justify-between"
+        :key="getJobId(job)"
+        class="group relative flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 rounded-2xl border border-cyan-500/15 bg-slate-900/90 p-4 shadow-md shadow-cyan-950/20 backdrop-blur-xl transition-all duration-200 hover:border-cyan-400/50 hover:bg-slate-900 hover:shadow-xl hover:shadow-cyan-500/10"
       >
-        <div class="space-y-4">
-          <!-- Top info -->
-          <div class="flex items-start justify-between gap-3">
-            <div class="flex items-center gap-3">
-              <div class="h-12 w-12 rounded-2xl bg-gradient-to-br from-indigo-600 via-cyan-600 to-emerald-500 flex items-center justify-center text-sm font-black text-white shadow-md flex-shrink-0">
-                {{ (job.title || job.job_title || 'Q').slice(0, 1).toUpperCase() }}
-              </div>
-              <div class="min-w-0">
-                <span class="inline-block text-[11px] font-bold text-cyan-300 bg-cyan-500/10 px-2 py-0.5 rounded-md border border-cyan-500/20 truncate max-w-[180px]">
-                  {{ job.company || job.business?.company_name || 'QuickWork Doanh Nghiệp' }}
-                </span>
-                <h3 class="text-base font-extrabold text-white group-hover:text-cyan-300 transition-colors line-clamp-1 mt-0.5">
-                  {{ job.title || job.job_title }}
-                </h3>
-              </div>
+        <!-- Left & Middle: Business Logo + Main Details (Clickable to Apply/Detail) -->
+        <div @click="$emit('apply', job)" class="flex items-start sm:items-center gap-3.5 min-w-0 flex-1 w-full cursor-pointer">
+          <!-- Business Logo -->
+          <div class="relative h-14 w-14 sm:h-16 sm:w-16 flex-shrink-0 overflow-hidden rounded-xl border border-cyan-500/20 bg-slate-800 shadow-md flex items-center justify-center group-hover:scale-105 transition-transform">
+            <img
+              v-if="job.business?.logo_url || job.logo_url"
+              :src="getMediaUrl(job.business?.logo_url || job.logo_url)"
+              :alt="getCompanyName(job)"
+              class="h-full w-full object-cover relative z-10"
+              @error="handleImgError"
+            />
+            <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-cyan-600 via-blue-600 to-emerald-500 text-sm font-black text-white">
+              {{ getCompanyInitial(getCompanyName(job)) }}
             </div>
-            
+          </div>
+
+          <!-- Main Details -->
+          <div class="min-w-0 flex-1 space-y-1">
+            <h3 class="text-sm sm:text-base font-extrabold text-white group-hover:text-cyan-300 transition-colors truncate" :title="displayJobTitle(job.title || job.job_title)">
+              {{ displayJobTitle(job.title || job.job_title) }}
+            </h3>
+
+            <p class="text-xs font-semibold text-slate-300 truncate" :title="getCompanyName(job)">
+              {{ getCompanyName(job) }}
+            </p>
+
+            <!-- Tags / Badges Row -->
+            <div class="flex flex-wrap items-center gap-1.5 pt-0.5">
+              <span class="inline-flex items-center text-xs font-black text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md whitespace-nowrap">
+                {{ formatCurrency(job.salary) }}
+              </span>
+
+              <span v-if="job.location" class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400 bg-slate-800/80 border border-slate-700/60 px-2 py-0.5 rounded-md truncate max-w-[130px]" :title="job.location">
+                <svg class="h-3 w-3 flex-shrink-0 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z" />
+                </svg>
+                <span class="truncate">{{ job.location }}</span>
+              </span>
+
+              <span v-if="job.working_date" class="hidden sm:inline-flex items-center gap-1 text-[11px] font-medium text-slate-400 bg-slate-800/80 border border-slate-700/60 px-2 py-0.5 rounded-md truncate max-w-[130px]" :title="job.working_date">
+                <svg class="h-3 w-3 flex-shrink-0 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                  <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 7V3m8 4V3m-9 8h10M5 21h14a2 2 0 002-2V7a2 2 0 00-2-2H5a2 2 0 00-2 2v12a2 2 0 002 2z" />
+                </svg>
+                <span class="truncate">{{ job.working_date }}</span>
+              </span>
+            </div>
+          </div>
+        </div>
+
+        <!-- Right Side: Bookmark, Share & Action Button -->
+        <div class="w-full sm:w-auto flex-shrink-0 pt-2 sm:pt-0 border-t sm:border-t-0 border-indigo-500/10 flex items-center justify-between sm:justify-end gap-2">
+          <div class="flex items-center gap-1.5">
+            <!-- Bookmark Heart Button -->
             <button
-              @click="toggleSaveJob(job)"
-              title="Bỏ lưu khỏi danh sách"
-              class="p-2 rounded-xl bg-rose-500/10 hover:bg-rose-500/20 text-rose-400 border border-rose-500/20 transition-all hover:scale-110 cursor-pointer"
+              type="button"
+              @click.stop="toggleSaveJob(job)"
+              title="Bỏ lưu việc làm khỏi mục Yêu thích"
+              class="p-2 rounded-xl border border-indigo-500/20 bg-slate-950/60 hover:bg-slate-950 transition-colors cursor-pointer"
             >
-              ❤️
+              <svg
+                class="h-4 w-4 transition-transform active:scale-125 text-rose-500 fill-rose-500"
+                fill="none"
+                viewBox="0 0 24 24"
+                stroke="currentColor"
+              >
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+              </svg>
+            </button>
+
+            <!-- Share Link Button -->
+            <button
+              type="button"
+              @click.stop="shareJob(job)"
+              title="Sao chép liên kết chia sẻ"
+              class="p-2 rounded-xl border border-indigo-500/20 bg-slate-950/60 hover:bg-slate-950 text-slate-400 hover:text-indigo-300 transition-colors cursor-pointer"
+            >
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
+              </svg>
             </button>
           </div>
 
-          <!-- Location & Salary -->
-          <div class="flex flex-wrap items-center gap-2 text-xs border-t border-cyan-500/10 pt-3">
-            <span class="font-black text-emerald-400 bg-emerald-500/10 px-2.5 py-1 rounded-lg border border-emerald-500/20">
-              💰 {{ (job.salary || 0).toLocaleString('vi-VN') }} VNĐ
-            </span>
-            <span class="text-slate-300 font-medium bg-slate-800/80 px-2.5 py-1 rounded-lg border border-slate-700/50">
-              📍 {{ job.location }}
-            </span>
-          </div>
-
-          <!-- Description preview -->
-          <p class="text-xs text-slate-300 font-medium line-clamp-2 leading-relaxed">
-            {{ job.description }}
-          </p>
-        </div>
-
-        <!-- Action footer -->
-        <div class="mt-5 pt-4 border-t border-cyan-500/10 flex items-center justify-between gap-3">
-          <button
-            @click="shareJob(job)"
-            title="Chia sẻ công việc"
-            class="p-2.5 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all text-xs font-bold cursor-pointer"
-          >
-            🔗
-          </button>
-
+          <!-- Apply Button -->
           <button
             @click="$emit('apply', job)"
-            class="flex-1 py-2.5 px-4 rounded-xl text-xs font-black text-slate-950 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 shadow-lg shadow-cyan-500/20 transition-all text-center cursor-pointer"
+            class="flex-1 sm:flex-initial flex items-center justify-center gap-1.5 py-2 px-4 rounded-xl text-xs font-extrabold bg-gradient-to-r from-indigo-500 to-emerald-500 hover:from-indigo-400 hover:to-emerald-400 text-white shadow-md shadow-indigo-500/20 transition-all cursor-pointer whitespace-nowrap"
           >
-            Ứng Tuyển Ngay ⚡
+            <span>Ứng tuyển</span>
+            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
+            </svg>
           </button>
         </div>
       </div>
@@ -117,13 +147,35 @@
 
 <script setup lang="ts">
 import { computed, toRefs } from 'vue'
+import { useMedia } from '~/composables/useMedia'
 import { useSavedJobs } from '~/composables/useSavedJobs'
 
 const props = defineProps<{ state: Record<string, any> }>()
 defineEmits<{ (e: 'apply', job: any): void }>()
 
+const { getMediaUrl, getCompanyInitial } = useMedia()
 const { activeSection, jobs } = toRefs(props.state)
 const { savedJobIds, savedJobsList, toggleSaveJob, shareJob } = useSavedJobs()
+
+const handleImgError = (event: Event) => {
+  const target = event.target as HTMLImageElement
+  if (target) {
+    target.style.display = 'none'
+  }
+}
+
+const formatCurrency = (value: number | string | null | undefined) => {
+  const amount = Number(value || 0)
+  return `${amount.toLocaleString('vi-VN')} VND`
+}
+
+const displayJobTitle = (title: string | null | undefined) => {
+  return (title || 'Untitled Job').replace(/\bMarketting\b/gi, 'Marketing')
+}
+
+const getCompanyName = (job: any): string => {
+  return job.company || job.business?.company_name || 'Doanh Nghiệp QuickWork'
+}
 
 const getJobId = (job: any): number => {
   if (typeof job === 'number') return job
