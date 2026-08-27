@@ -10,7 +10,7 @@
             applicantTab === 'active'
               ? 'bg-cyan-400 text-slate-950 font-black shadow-lg shadow-cyan-500/25 ring-2 ring-cyan-400/30'
               : 'bg-slate-900 text-slate-400 hover:text-white font-bold border border-white/10 hover:bg-slate-800/80',
-            'px-4 py-2.5 text-xs rounded-xl transition-all cursor-pointer flex items-center gap-2'
+            'px-3.5 py-2.5 sm:px-4 text-xs rounded-xl transition-all cursor-pointer flex items-center gap-2'
           ]"
         >
           <span>⚡ Ứng Viên Đang Xử Lý</span>
@@ -25,7 +25,7 @@
             applicantTab === 'closed'
               ? 'bg-cyan-400 text-slate-950 font-black shadow-lg shadow-cyan-500/25 ring-2 ring-cyan-400/30'
               : 'bg-slate-900 text-slate-400 hover:text-white font-bold border border-white/10 hover:bg-slate-800/80',
-            'px-4 py-2.5 text-xs rounded-xl transition-all cursor-pointer flex items-center gap-2'
+            'px-3.5 py-2.5 sm:px-4 text-xs rounded-xl transition-all cursor-pointer flex items-center gap-2'
           ]"
         >
           <span>📜 Lịch Sử & Đơn Đã Đóng</span>
@@ -72,10 +72,10 @@
     </div>
 
     <!-- Loading state skeleton -->
-    <div v-if="isLoadingApps" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-      <div v-for="n in 3" :key="n" class="rounded-2xl border border-cyan-500/15 bg-slate-900/90 p-5 space-y-4 animate-pulse">
+    <div v-if="isLoadingApps" class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
+      <div v-for="n in 3" :key="n" class="rounded-2xl border border-cyan-500/15 bg-slate-900/90 p-4 sm:p-5 space-y-4 animate-pulse">
         <div class="flex items-center gap-3">
-          <div class="h-12 w-12 bg-slate-800 rounded-2xl"></div>
+          <div class="h-10 w-10 sm:h-12 sm:w-12 bg-slate-800 rounded-2xl"></div>
           <div class="space-y-2 flex-1">
             <div class="h-4 bg-slate-800 rounded w-3/4"></div>
             <div class="h-3 bg-slate-800 rounded w-1/2"></div>
@@ -86,9 +86,9 @@
     </div>
 
     <!-- Empty state -->
-    <div v-else-if="filteredApps.length === 0" class="bg-slate-900/90 text-center py-16 px-4 rounded-3xl border border-cyan-500/15 shadow-xl backdrop-blur">
-      <div class="inline-flex p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 mb-4">
-        <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div v-else-if="filteredApps.length === 0" class="bg-slate-900/90 text-center py-12 sm:py-16 px-4 rounded-3xl border border-cyan-500/15 shadow-xl backdrop-blur">
+      <div class="inline-flex p-3.5 sm:p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 mb-3 sm:mb-4">
+        <svg class="h-8 w-8 sm:h-10 sm:w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
       </div>
@@ -98,35 +98,35 @@
       </p>
     </div>
 
-    <!-- Modern Compact Candidate Grid (3 Cards Per Row on Desktop/Tablet) -->
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+    <!-- Modern Compact Candidate Grid (Responsive Mobile -> Tablet -> Desktop) -->
+    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4 font-sans">
       <div
         v-for="app in paginatedApplicants"
         :key="app.id"
         @click="handleManagedDetail(app)"
-        class="group relative rounded-2xl border border-cyan-500/20 bg-slate-900/90 p-5 shadow-xl hover:border-cyan-400/50 hover:bg-slate-900 hover:shadow-2xl hover:shadow-cyan-500/10 transition-all duration-300 flex flex-col justify-between cursor-pointer backdrop-blur-xl"
+        class="group relative rounded-2xl border border-cyan-500/20 bg-slate-900/90 p-4 sm:p-5 shadow-xl hover:border-cyan-400/50 hover:bg-slate-900 hover:shadow-2xl hover:shadow-cyan-500/10 transition-all duration-300 flex flex-col justify-between cursor-pointer backdrop-blur-xl"
       >
-        <div class="space-y-4">
+        <div class="space-y-3 sm:space-y-4">
           <!-- Top Row: Student Avatar + Name & Status Badge -->
-          <div class="flex items-start justify-between gap-3">
-            <div class="flex items-center gap-3 min-w-0 flex-1">
-              <div class="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-2xl border border-cyan-500/30 bg-slate-800 shadow-md">
+          <div class="flex items-start justify-between gap-2.5">
+            <div class="flex items-center gap-2.5 sm:gap-3 min-w-0 flex-1">
+              <div class="relative h-11 w-11 sm:h-12 sm:w-12 flex-shrink-0 overflow-hidden rounded-2xl border border-cyan-500/30 bg-slate-800 shadow-md">
                 <img
                   v-if="app.student?.avatar_url"
                   :src="app.student.avatar_url"
                   :alt="app.student?.full_name"
                   class="h-full w-full object-cover"
                 />
-                <div v-else class="h-full w-full bg-gradient-to-br from-cyan-600 via-blue-600 to-emerald-500 flex items-center justify-center text-sm font-black text-white">
+                <div v-else class="h-full w-full bg-gradient-to-br from-cyan-600 via-blue-600 to-emerald-500 flex items-center justify-center text-xs font-black text-white">
                   {{ app.student?.full_name?.charAt(0) || 'S' }}
                 </div>
               </div>
 
               <div class="min-w-0 flex-1">
-                <h4 class="text-base font-extrabold text-white group-hover:text-cyan-300 transition-colors truncate">
+                <h4 class="text-sm sm:text-base font-extrabold text-white group-hover:text-cyan-300 transition-colors truncate">
                   {{ app.student?.full_name || 'N/A' }}
                 </h4>
-                <p class="text-xs font-semibold text-cyan-300 truncate mt-0.5">
+                <p class="text-[11px] sm:text-xs font-semibold text-cyan-300 truncate mt-0.5">
                   🎯 {{ app.job?.title || jobTitleLookup(app.job_id) || 'Công việc chưa xác định' }}
                 </p>
               </div>
@@ -135,7 +135,7 @@
             <span
               :class="[
                 statusBadgeClass(app.status),
-                'inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black border uppercase tracking-wider flex-shrink-0 shadow-sm'
+                'inline-flex items-center px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-full text-[10px] sm:text-[11px] font-black border uppercase tracking-wider flex-shrink-0 shadow-sm whitespace-nowrap'
               ]"
             >
               {{ app.status ? app.status.replace('_', ' ') : 'Chờ duyệt' }}
@@ -143,7 +143,7 @@
           </div>
 
           <!-- Candidate Meta Info & CV Link -->
-          <div class="space-y-2 pt-3 border-t border-cyan-500/10 text-xs">
+          <div class="space-y-1.5 sm:space-y-2 pt-2.5 sm:pt-3 border-t border-cyan-500/10 text-xs">
             <div class="flex items-center justify-between text-slate-300 font-medium">
               <span class="text-slate-400">📞 Điện thoại:</span>
               <span class="font-extrabold text-slate-100">{{ app.student?.phone || 'Chưa cập nhật' }}</span>
@@ -155,12 +155,12 @@
             </div>
 
             <!-- Skills & CV Link Row -->
-            <div class="pt-2 flex flex-wrap items-center justify-between gap-2">
+            <div class="pt-1.5 sm:pt-2 flex flex-wrap items-center justify-between gap-2">
               <div class="flex flex-wrap gap-1 max-w-[65%]">
                 <span
                   v-for="(skill, sIdx) in parseSkills(app.student?.skills).slice(0, 3)"
                   :key="sIdx"
-                  class="inline-block bg-cyan-500/10 text-cyan-200 border border-cyan-500/20 text-[10px] font-extrabold px-2 py-0.5 rounded-md"
+                  class="inline-block bg-cyan-500/10 text-cyan-200 border border-cyan-500/20 text-[10px] font-extrabold px-1.5 py-0.5 rounded-md"
                 >
                   {{ skill }}
                 </span>
@@ -174,7 +174,7 @@
                 :href="app.student.cv_url"
                 target="_blank"
                 @click.stop
-                class="inline-flex items-center gap-1 text-[11px] font-black text-rose-300 bg-rose-500/15 hover:bg-rose-500/25 px-2.5 py-1 rounded-lg border border-rose-500/30 transition-all shadow-sm"
+                class="inline-flex items-center gap-1 text-[10px] sm:text-[11px] font-black text-rose-300 bg-rose-500/15 hover:bg-rose-500/25 px-2 py-0.5 sm:px-2.5 sm:py-1 rounded-lg border border-rose-500/30 transition-all shadow-sm"
               >
                 📄 Xem CV
               </a>
@@ -183,13 +183,13 @@
         </div>
 
         <!-- Bottom Action Buttons: Nhắn tin & Quản lý -->
-        <div class="mt-4 pt-3 border-t border-cyan-500/10 grid grid-cols-2 gap-2.5">
+        <div class="mt-3.5 sm:mt-4 pt-2.5 sm:pt-3 border-t border-cyan-500/10 grid grid-cols-2 gap-2 sm:gap-2.5">
           <button
             type="button"
             @click.stop="handleOpenChat(app)"
-            class="py-2.5 px-3 rounded-xl border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-200 hover:text-white font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
+            class="py-2 px-2.5 sm:py-2.5 sm:px-3 rounded-xl border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-200 hover:text-white font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
           >
-            <svg class="h-4 w-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
             </svg>
             <span>Nhắn tin</span>
@@ -198,9 +198,9 @@
           <button
             type="button"
             @click.stop="handleManagedDetail(app)"
-            class="py-2.5 px-3 rounded-xl bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 text-slate-950 font-black text-xs shadow-lg shadow-cyan-500/20 transition-all hover:scale-[1.02] active:scale-98 flex items-center justify-center gap-1.5 cursor-pointer"
+            class="py-2 px-2.5 sm:py-2.5 sm:px-3 rounded-xl bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 text-slate-950 font-black text-xs shadow-lg shadow-cyan-500/20 transition-all hover:scale-[1.02] active:scale-98 flex items-center justify-center gap-1.5 cursor-pointer"
           >
-            <svg class="h-4 w-4 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+            <svg class="h-3.5 w-3.5 sm:h-4 sm:w-4 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor">
               <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
             </svg>
             <span>Quản lý</span>
