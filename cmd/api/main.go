@@ -112,6 +112,24 @@ func main() {
 	// Swagger OpenAPI UI Route
 	app.Get("/swagger/*", swagger.HandlerDefault)
 
+	// Health Check & Root Welcome Endpoints (Render Health Checker & Uptime Monitor)
+	app.Get("/", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"status":  "success",
+			"message": "⚡ QuickWork Backend API Server is running smoothly!",
+			"service": "QuickWork API Core Engine",
+			"time":    time.Now().Format(time.RFC3339),
+		})
+	})
+	app.Head("/", func(c *fiber.Ctx) error {
+		return c.SendStatus(fiber.StatusOK)
+	})
+	app.Get("/health", func(c *fiber.Ctx) error {
+		return c.JSON(fiber.Map{
+			"status": "healthy",
+		})
+	})
+
 	// ==========================================
 	// CÁC ROUTE API HỆ THỐNG
 	// ==========================================
