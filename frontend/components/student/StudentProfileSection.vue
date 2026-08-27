@@ -43,7 +43,7 @@
             @click="isEditing = true"
             class="w-full py-2.5 px-4 rounded-xl text-xs font-extrabold text-cyan-200 border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 hover:text-white transition-all shadow-md"
           >
-            ✏️ Chỉnh sửa Hồ sơ & Tải CV
+            Chỉnh sửa Hồ sơ & Tải CV
           </button>
         </div>
 
@@ -118,7 +118,7 @@
               rel="noopener noreferrer"
               class="px-4 py-2 bg-emerald-400 text-slate-950 font-black text-xs rounded-xl hover:bg-emerald-300 transition-all shadow-md shadow-emerald-500/20 flex items-center gap-1.5"
             >
-              <span>👁️ Xem trước file CV</span>
+              <span>Xem trước file CV</span>
             </a>
           </div>
 
@@ -157,7 +157,7 @@
             @click="openOrRunAiEvaluation(false)"
             class="w-full sm:w-auto px-6 py-3 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-xs rounded-xl transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 flex-shrink-0"
           >
-            <span>📊 Xem Kết Quả Chi Tiết</span>
+            <span>Xem Kết Quả Chi Tiết</span>
           </button>
         </div>
 
