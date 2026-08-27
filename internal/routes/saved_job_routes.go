@@ -16,6 +16,7 @@ func RegisterSavedJobRoutes(app *fiber.App, db *gorm.DB) {
 	savedJobController := controllers.NewSavedJobController(savedJobService)
 
 	saved := app.Group("/api/saved-jobs", middleware.Protected(), middleware.RequireRole("student"))
-	saved.Post("/:jobId", savedJobController.ToggleSaveJob)
+	saved.Get("", savedJobController.GetSavedJobs)
 	saved.Get("/", savedJobController.GetSavedJobs)
+	saved.Post("/:jobId", savedJobController.ToggleSaveJob)
 }

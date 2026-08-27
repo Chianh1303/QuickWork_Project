@@ -5,7 +5,6 @@ import (
 	"strconv"
 
 	"github.com/gofiber/fiber/v2"
-	"github.com/golang-jwt/jwt/v5"
 )
 
 type SavedJobController struct {
@@ -17,15 +16,10 @@ func NewSavedJobController(savedJobService services.SavedJobService) *SavedJobCo
 }
 
 func (ctrl *SavedJobController) ToggleSaveJob(c *fiber.Ctx) error {
-	userToken, ok := c.Locals("user").(*jwt.Token)
-	if !ok {
+	userID, ok := getUserIDFromContext(c)
+	if !ok || userID == 0 {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
 	}
-	claims, ok := userToken.Claims.(jwt.MapClaims)
-	if !ok {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid token claims"})
-	}
-	userID := uint(claims["user_id"].(float64))
 
 	jobIDParam := c.Params("jobId")
 	jobID, err := strconv.ParseUint(jobIDParam, 10, 32)
@@ -51,15 +45,10 @@ func (ctrl *SavedJobController) ToggleSaveJob(c *fiber.Ctx) error {
 }
 
 func (ctrl *SavedJobController) GetSavedJobs(c *fiber.Ctx) error {
-	userToken, ok := c.Locals("user").(*jwt.Token)
-	if !ok {
+	userID, ok := getUserIDFromContext(c)
+	if !ok || userID == 0 {
 		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Unauthorized"})
 	}
-	claims, ok := userToken.Claims.(jwt.MapClaims)
-	if !ok {
-		return c.Status(fiber.StatusUnauthorized).JSON(fiber.Map{"error": "Invalid token claims"})
-	}
-	userID := uint(claims["user_id"].(float64))
 
 	jobs, err := ctrl.savedJobService.GetSavedJobs(userID)
 	if err != nil {
