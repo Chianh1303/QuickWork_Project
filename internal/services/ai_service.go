@@ -810,6 +810,9 @@ func (s *aiService) GetRecommendedJobs(userID uint) (*dto.RecommendedJobsRespons
 			continue
 		}
 		res := s.matchingEngine.Match(normStudentSkills, reqSet)
+		if res.MatchScore <= 0 {
+			continue
+		}
 
 		companyName := job.Business.CompanyName
 		if companyName == "" {
