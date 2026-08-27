@@ -97,7 +97,6 @@
                   </span>
                   <span class="text-xs font-semibold text-slate-400">Trung tâm quản lý tuyển dụng & Smart Escrow</span>
                 </div>
-                <NotificationBell align="right" />
               </div>
               <h1 class="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
                 {{ businessHero.title }}
