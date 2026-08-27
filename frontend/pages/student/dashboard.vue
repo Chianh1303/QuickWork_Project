@@ -14,7 +14,6 @@
                 <p class="text-sm font-medium text-slate-400">
                   {{ profileForm.full_name ? `Chào mừng trở lại, ${profileForm.full_name} 👋` : 'Chào mừng bạn trở lại 👋' }}
                 </p>
-                <NotificationBell align="right" />
               </div>
               <h1 class="mt-1.5 text-2xl font-bold tracking-tight text-white sm:text-3xl">
                 {{ studentHero.title }}
