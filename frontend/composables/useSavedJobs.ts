@@ -1,12 +1,22 @@
 import { ref } from 'vue'
 import { useToast } from '~/composables/useToast'
+import { useAuthStore } from '~/stores/auth'
 
 export const useSavedJobs = () => {
   const { success, info } = useToast()
   const savedJobIds = ref<number[]>([])
-  const isSyncing = ref(false)
 
-  // Read initial cache from localStorage
+  const saveToStorage = () => {
+    if (import.meta.client) {
+      try {
+        localStorage.setItem('qw_saved_jobs', JSON.stringify(savedJobIds.value))
+      } catch (e) {
+        console.error('Error saving to localStorage', e)
+      }
+    }
+  }
+
+  // Read initial cache from localStorage & sync with backend if logged in as student
   const initSavedJobs = async () => {
     if (import.meta.client) {
       try {
@@ -18,7 +28,15 @@ export const useSavedJobs = () => {
         console.error('Error reading saved jobs from localStorage', e)
       }
 
-      // Fetch latest list from backend API
+      // Check if user is logged in as a student before calling API
+      const token = useCookie('auth_token')
+      const authStore = useAuthStore()
+      
+      if (!token.value || (authStore.user && authStore.user.role !== 'student')) {
+        return // Guest user or non-student role -> use localStorage only without triggering 401
+      }
+
+      // Fetch latest list from backend API safely
       try {
         const api = useApi()
         const res: any = await api.get('/api/saved-jobs')
@@ -26,18 +44,8 @@ export const useSavedJobs = () => {
           savedJobIds.value = res.saved_ids.map((id: any) => Number(id))
           saveToStorage()
         }
-      } catch (e) {
-        // Guest user or offline, fallback to localStorage
-      }
-    }
-  }
-
-  const saveToStorage = () => {
-    if (import.meta.client) {
-      try {
-        localStorage.setItem('qw_saved_jobs', JSON.stringify(savedJobIds.value))
-      } catch (e) {
-        console.error('Error saving to localStorage', e)
+      } catch (e: any) {
+        // Silently catch 401/403 to prevent breaking UI for guest/expired sessions
       }
     }
   }
@@ -71,12 +79,17 @@ export const useSavedJobs = () => {
       success(`❤️ Đã lưu công việc "${title}" vào mục Yêu thích!`)
     }
 
-    // Call Backend API to sync database
-    try {
-      const api = useApi()
-      await api.post(`/api/saved-jobs/${id}`)
-    } catch (err) {
-      console.warn('Backend API sync failed, kept in local state', err)
+    // Call Backend API if logged in as student
+    const token = useCookie('auth_token')
+    const authStore = useAuthStore()
+
+    if (token.value && authStore.user?.role === 'student') {
+      try {
+        const api = useApi()
+        await api.post(`/api/saved-jobs/${id}`)
+      } catch (err) {
+        console.warn('Backend API sync failed, kept in local state', err)
+      }
     }
   }
 
