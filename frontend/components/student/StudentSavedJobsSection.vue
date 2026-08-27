@@ -1,23 +1,23 @@
 <template>
-  <div v-show="activeSection === 'saved-jobs'" class="space-y-6 max-w-7xl mx-auto">
+  <div v-show="activeSection === 'saved-jobs'" class="space-y-4 sm:space-y-6 max-w-7xl mx-auto">
     <!-- Header Banner -->
-    <div class="rounded-3xl border border-cyan-500/20 bg-slate-900/90 p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xl backdrop-blur-xl">
-      <div class="flex items-center space-x-4">
-        <div class="h-12 w-12 rounded-2xl bg-gradient-to-tr from-rose-500 via-pink-500 to-amber-400 flex items-center justify-center text-white text-xl shadow-lg shadow-rose-500/25 flex-shrink-0">
+    <div class="rounded-2xl sm:rounded-3xl border border-cyan-500/20 bg-slate-900/90 p-4 sm:p-6 flex flex-col sm:flex-row items-start sm:items-center justify-between gap-4 shadow-2xl backdrop-blur-xl">
+      <div class="flex items-center space-x-3.5 sm:space-x-4">
+        <div class="h-10 w-10 sm:h-12 sm:w-12 rounded-xl sm:rounded-2xl bg-gradient-to-tr from-rose-500 via-pink-500 to-amber-400 flex items-center justify-center text-white text-lg sm:text-xl shadow-lg shadow-rose-500/25 flex-shrink-0">
           ❤️
         </div>
         <div>
           <div class="flex items-center gap-2">
-            <h2 class="text-xl font-extrabold text-white tracking-tight">Danh Sách Việc Làm Đã Lưu</h2>
-            <span class="inline-flex items-center rounded-full bg-rose-500/15 px-3 py-0.5 text-xs font-black text-rose-300 ring-1 ring-rose-500/30 uppercase tracking-wider">
+            <h2 class="text-lg sm:text-xl font-extrabold text-white tracking-tight">Danh Sách Việc Làm Đã Lưu</h2>
+            <span class="inline-flex items-center rounded-full bg-rose-500/15 px-2.5 py-0.5 text-[10px] sm:text-xs font-black text-rose-300 ring-1 ring-rose-500/30 uppercase tracking-wider">
               {{ savedJobs.length }} Việc làm
             </span>
           </div>
-          <p class="text-xs font-medium text-slate-400 mt-0.5">Các công việc bạn đã thả tim lưu lại để theo dõi và ứng tuyển sau</p>
+          <p class="text-[11px] sm:text-xs font-medium text-slate-400 mt-0.5">Các công việc bạn đã thả tim lưu lại để theo dõi và ứng tuyển sau</p>
         </div>
       </div>
 
-      <div class="flex items-center gap-2">
+      <div class="flex items-center gap-2 w-full sm:w-auto justify-end">
         <button
           @click="fetchSavedJobs"
           title="Làm mới danh sách"
@@ -27,7 +27,7 @@
         </button>
         <button
           @click="activeSection = 'jobs'"
-          class="px-4 py-2 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-xl text-xs font-extrabold transition-all cursor-pointer"
+          class="px-3.5 py-2 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-300 border border-cyan-500/30 rounded-xl text-xs font-extrabold transition-all cursor-pointer whitespace-nowrap"
         >
           🔍 Tìm thêm việc làm
         </button>
@@ -35,26 +35,26 @@
     </div>
 
     <!-- Empty State -->
-    <div v-if="savedJobs.length === 0" class="bg-slate-900/90 text-center py-16 px-4 rounded-2xl border border-cyan-500/15 text-slate-400 shadow-xl">
-      <svg class="mx-auto h-12 w-12 text-slate-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div v-if="savedJobs.length === 0" class="bg-slate-900/90 text-center py-12 sm:py-16 px-4 rounded-2xl sm:rounded-3xl border border-cyan-500/15 text-slate-400 shadow-xl">
+      <svg class="mx-auto h-10 w-10 sm:h-12 sm:w-12 text-slate-400 mb-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
       </svg>
-      <p class="font-bold text-slate-100 text-lg">Chưa có việc làm yêu thích nào</p>
-      <p class="text-sm text-slate-400 mt-1 max-w-md mx-auto">Bạn chưa bấm lưu công việc nào. Hãy tìm kiếm công việc phù hợp và bấm biểu tượng ❤️ để lưu lại!</p>
+      <p class="font-bold text-slate-100 text-base sm:text-lg">Chưa có việc làm yêu thích nào</p>
+      <p class="text-xs sm:text-sm text-slate-400 mt-1 max-w-md mx-auto">Bạn chưa bấm lưu công việc nào. Hãy tìm kiếm công việc phù hợp và bấm biểu tượng ❤️ để lưu lại!</p>
       <button
         @click="activeSection = 'jobs'"
-        class="mt-4 px-6 py-2.5 bg-gradient-to-r from-cyan-500 to-emerald-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-cyan-500/20 hover:scale-105 transition-all cursor-pointer"
+        class="mt-4 px-5 py-2.5 bg-gradient-to-r from-cyan-500 to-emerald-400 text-slate-950 font-black text-xs rounded-xl shadow-lg shadow-cyan-500/20 hover:scale-105 transition-all cursor-pointer"
       >
         Khám Phá Việc Làm Ngay ⚡
       </button>
     </div>
 
-    <!-- Guaranteed Scoped 3-Column Grid -->
+    <!-- Guaranteed Responsive Scoped Grid -->
     <div v-else class="saved-jobs-grid font-sans">
       <div
         v-for="job in savedJobs"
         :key="getJobId(job)"
-        class="group relative rounded-2xl border border-cyan-500/15 bg-slate-950/90 p-3.5 shadow-lg transition-all duration-200 hover:border-cyan-400/50 hover:bg-slate-900 hover:shadow-xl hover:shadow-cyan-500/10 flex flex-col justify-between min-h-[160px]"
+        class="group relative rounded-2xl border border-cyan-500/15 bg-slate-950/90 p-3.5 sm:p-4 shadow-lg transition-all duration-200 hover:border-cyan-400/50 hover:bg-slate-900 hover:shadow-xl hover:shadow-cyan-500/10 flex flex-col justify-between min-h-[160px]"
       >
         <div class="space-y-2.5">
           <!-- Top Row: Business Logo + Company Name & Title + Heart Button -->
@@ -101,7 +101,7 @@
             <span class="font-black text-emerald-400 text-xs">
               💰 {{ formatCurrency(job.salary) }}
             </span>
-            <span v-if="job.location" class="text-slate-400 text-[11px] font-medium truncate max-w-[110px]">
+            <span v-if="job.location" class="text-slate-400 text-[11px] font-medium truncate max-w-[160px] sm:max-w-[110px]" :title="job.location">
               📍 {{ job.location }}
             </span>
           </div>
