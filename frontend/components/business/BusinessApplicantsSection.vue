@@ -1,58 +1,60 @@
 <template>
   <!-- Section 4: Employer Applicant Management (B6) -->
-  <div v-show="activeSection === 'applicants'" class="space-y-6">
+  <div v-show="activeSection === 'applicants'" class="space-y-6 max-w-7xl mx-auto">
     <!-- Option B Sub-Tabs Bar: Active Applicants vs Archived / Closed History -->
-    <div class="flex flex-wrap items-center gap-3 border-b border-white/10 pb-4">
-      <button
-        @click="applicantTab = 'active'; applicantStatusFilter = 'all'"
-        :class="[
-          applicantTab === 'active'
-            ? 'bg-cyan-400 text-slate-950 font-black shadow-lg shadow-cyan-500/25 ring-2 ring-cyan-400/30'
-            : 'bg-slate-900 text-slate-400 hover:text-white font-bold border border-white/10 hover:bg-slate-800/80',
-          'px-4 py-2.5 text-xs rounded-xl transition-all cursor-pointer flex items-center gap-2'
-        ]"
-      >
-        <span>⚡ Ứng Viên Đang Xử Lý</span>
-        <span :class="[applicantTab === 'active' ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-800 text-cyan-300 border border-cyan-400/20', 'px-2 py-0.5 rounded-full text-[11px] font-black']">
-          {{ activeAppsCount }}
-        </span>
-      </button>
+    <div class="flex flex-wrap items-center justify-between gap-4 border-b border-white/10 pb-4">
+      <div class="flex flex-wrap items-center gap-3">
+        <button
+          @click="applicantTab = 'active'; applicantStatusFilter = 'all'"
+          :class="[
+            applicantTab === 'active'
+              ? 'bg-cyan-400 text-slate-950 font-black shadow-lg shadow-cyan-500/25 ring-2 ring-cyan-400/30'
+              : 'bg-slate-900 text-slate-400 hover:text-white font-bold border border-white/10 hover:bg-slate-800/80',
+            'px-4 py-2.5 text-xs rounded-xl transition-all cursor-pointer flex items-center gap-2'
+          ]"
+        >
+          <span>⚡ Ứng Viên Đang Xử Lý</span>
+          <span :class="[applicantTab === 'active' ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-800 text-cyan-300 border border-cyan-400/20', 'px-2 py-0.5 rounded-full text-[11px] font-black']">
+            {{ activeAppsCount }}
+          </span>
+        </button>
 
-      <button
-        @click="applicantTab = 'closed'; applicantStatusFilter = 'all'"
-        :class="[
-          applicantTab === 'closed'
-            ? 'bg-cyan-400 text-slate-950 font-black shadow-lg shadow-cyan-500/25 ring-2 ring-cyan-400/30'
-            : 'bg-slate-900 text-slate-400 hover:text-white font-bold border border-white/10 hover:bg-slate-800/80',
-          'px-4 py-2.5 text-xs rounded-xl transition-all cursor-pointer flex items-center gap-2'
-        ]"
-      >
-        <span>📜 Lịch Sử & Đơn Đã Đóng</span>
-        <span :class="[applicantTab === 'closed' ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-800 text-slate-400 border border-white/10', 'px-2 py-0.5 rounded-full text-[11px] font-black']">
-          {{ closedAppsCount }}
-        </span>
-      </button>
+        <button
+          @click="applicantTab = 'closed'; applicantStatusFilter = 'all'"
+          :class="[
+            applicantTab === 'closed'
+              ? 'bg-cyan-400 text-slate-950 font-black shadow-lg shadow-cyan-500/25 ring-2 ring-cyan-400/30'
+              : 'bg-slate-900 text-slate-400 hover:text-white font-bold border border-white/10 hover:bg-slate-800/80',
+            'px-4 py-2.5 text-xs rounded-xl transition-all cursor-pointer flex items-center gap-2'
+          ]"
+        >
+          <span>📜 Lịch Sử & Đơn Đã Đóng</span>
+          <span :class="[applicantTab === 'closed' ? 'bg-slate-950/20 text-slate-950' : 'bg-slate-800 text-slate-400 border border-white/10', 'px-2 py-0.5 rounded-full text-[11px] font-black']">
+            {{ closedAppsCount }}
+          </span>
+        </button>
+      </div>
     </div>
 
     <!-- Search & Filter Controls -->
-    <div class="bg-slate-900/90 p-4 rounded-2xl border border-white/10 shadow-lg grid grid-cols-1 sm:grid-cols-2 gap-4 backdrop-blur">
+    <div class="bg-slate-900/90 p-4 rounded-2xl border border-cyan-500/20 shadow-xl shadow-cyan-950/30 grid grid-cols-1 sm:grid-cols-2 gap-4 backdrop-blur-xl">
       <div class="relative">
-        <span class="absolute inset-y-0 left-0 pl-3 flex items-center pointer-events-none text-slate-400">
-          <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+        <span class="absolute inset-y-0 left-0 pl-3.5 flex items-center pointer-events-none text-slate-500">
+          <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M21 21l-6-6m2-5a7 7 0 11-14 0 7 7 0 0114 0z" />
           </svg>
         </span>
         <input
           v-model="applicantSearchQuery"
           type="text"
-          class="block w-full pl-10 pr-3 py-2.5 border border-white/10 rounded-xl text-xs bg-slate-950 placeholder-slate-500 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all font-medium"
+          class="block w-full pl-10 pr-3.5 py-2.5 border border-cyan-500/20 rounded-xl text-xs bg-slate-950/80 placeholder-slate-500 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all font-medium"
           placeholder="Tìm kiếm theo tên sinh viên hoặc vị trí việc làm..."
         />
       </div>
       <div>
         <select
           v-model="applicantStatusFilter"
-          class="block w-full px-3 py-2.5 border border-white/10 rounded-xl text-xs bg-slate-950 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all font-semibold cursor-pointer"
+          class="block w-full px-3.5 py-2.5 border border-cyan-500/20 rounded-xl text-xs bg-slate-950/80 text-white focus:outline-none focus:ring-2 focus:ring-cyan-400 transition-all font-semibold cursor-pointer"
         >
           <option value="all">{{ applicantTab === 'active' ? 'Tất cả đơn đang xử lý' : 'Tất cả đơn đã đóng' }}</option>
           <template v-if="applicantTab === 'active'">
@@ -70,171 +72,138 @@
     </div>
 
     <!-- Loading state skeleton -->
-    <div v-if="isLoadingApps" class="bg-white/90 rounded-xl border border-slate-200 p-6 space-y-4 animate-pulse">
-      <div class="h-6 bg-slate-200 rounded w-1/4"></div>
-      <div class="space-y-3">
-        <div class="h-10 bg-slate-100 rounded"></div>
-        <div class="h-10 bg-slate-100 rounded"></div>
-        <div class="h-10 bg-slate-100 rounded"></div>
+    <div v-if="isLoadingApps" class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+      <div v-for="n in 3" :key="n" class="rounded-2xl border border-cyan-500/15 bg-slate-900/90 p-5 space-y-4 animate-pulse">
+        <div class="flex items-center gap-3">
+          <div class="h-12 w-12 bg-slate-800 rounded-2xl"></div>
+          <div class="space-y-2 flex-1">
+            <div class="h-4 bg-slate-800 rounded w-3/4"></div>
+            <div class="h-3 bg-slate-800 rounded w-1/2"></div>
+          </div>
+        </div>
+        <div class="h-10 bg-slate-800/60 rounded-xl"></div>
       </div>
     </div>
 
     <!-- Empty state -->
-    <div v-else-if="filteredApps.length === 0" class="bg-white/90 text-center py-16 px-4 rounded-xl border border-slate-200 shadow-sm backdrop-blur">
-      <div class="inline-flex p-4 rounded-full bg-slate-50 border border-slate-100 text-slate-400 mb-4">
-        <svg class="h-12 w-12" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+    <div v-else-if="filteredApps.length === 0" class="bg-slate-900/90 text-center py-16 px-4 rounded-3xl border border-cyan-500/15 shadow-xl backdrop-blur">
+      <div class="inline-flex p-4 rounded-2xl bg-cyan-500/10 border border-cyan-500/20 text-cyan-300 mb-4">
+        <svg class="h-10 w-10" fill="none" viewBox="0 0 24 24" stroke="currentColor">
           <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M17 20h5v-2a3 3 0 00-5.356-1.857M17 20H7m10 0v-2c0-.656-.126-1.283-.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20H2v-2a3 3 0 015.356-1.857M7 20v-2c0-.656.126-1.283.356-1.857m0 0a5.002 5.002 0 019.288 0M15 7a3 3 0 11-6 0 3 3 0 016 0zm6 3a2 2 0 11-4 0 2 2 0 014 0zM7 10a2 2 0 11-4 0 2 2 0 014 0z" />
         </svg>
       </div>
-      <h3 class="text-lg font-bold text-slate-900">Chưa Có Đơn Ứng Tuyển Nào</h3>
-      <p class="text-sm text-slate-500 mt-1 max-w-sm mx-auto font-medium">
+      <h3 class="text-base font-extrabold text-white">Chưa Có Đơn Ứng Tuyển Nào</h3>
+      <p class="text-xs text-slate-400 mt-1 max-w-sm mx-auto font-medium">
         Hiện chưa có ứng viên nộp đơn phù hợp với điều kiện lọc tìm kiếm của bạn.
       </p>
     </div>
 
-    <div v-else class="hidden lg:block overflow-hidden rounded-xl border border-white/10 bg-slate-900/85 shadow-lg shadow-slate-950/25 backdrop-blur">
-      <table class="min-w-full table-fixed divide-y divide-white/10">
-        <thead class="bg-slate-950">
-          <tr>
-            <th class="w-[27%] px-5 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Ứng viên</th>
-            <th class="w-[23%] px-5 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Vị trí ứng tuyển</th>
-            <th class="w-[14%] px-5 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Số điện thoại</th>
-            <th class="w-[13%] px-5 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Ngày nộp đơn</th>
-            <th class="w-[12%] px-5 py-4 text-left text-xs font-bold text-slate-300 uppercase tracking-wider">Trạng thái</th>
-            <th class="w-[11%] px-5 py-4 text-right text-xs font-bold text-slate-300 uppercase tracking-wider">Thao tác</th>
-          </tr>
-        </thead>
-        <tbody class="divide-y divide-white/10 bg-slate-900/70">
-          <tr v-for="app in paginatedApplicants" :key="app.id" class="transition-colors hover:bg-cyan-400/10">
-            <td class="px-5 py-4">
-              <div class="flex items-start">
-                <img v-if="app.student?.avatar_url" :src="app.student.avatar_url" class="h-10 w-10 rounded-full object-cover border border-white/10 mr-3 shadow-sm" />
-                <div v-else class="h-10 w-10 rounded-full bg-slate-800 border border-white/10 flex items-center justify-center text-cyan-200 font-bold mr-3 shadow-sm">
-                  {{ app.student?.full_name?.charAt(0) || 'S' }}
-                </div>
-                
-                <div class="min-w-0 flex flex-col space-y-1.5">
-                  <div class="flex items-center gap-2">
-                    <span class="truncate text-sm font-bold text-white tracking-tight">{{ app.student?.full_name || 'N/A' }}</span>
-                    
-                    <a 
-                      v-if="app.student?.cv_url" 
-                      :href="app.student.cv_url" 
-                      target="_blank" 
-                      class="inline-flex flex-shrink-0 items-center space-x-1 text-[10px] text-rose-200 hover:text-white font-bold bg-rose-500/10 hover:bg-rose-500/20 px-2 py-0.5 rounded border border-rose-400/20 transition-all duration-150 shadow-sm"
-                    >
-                      <svg class="h-3 w-3" fill="currentColor" viewBox="0 0 20 20">
-                        <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" />
-                      </svg>
-                      <span>Hồ sơ CV</span>
-                    </a>
-                  </div>
-
-                  <div class="flex flex-wrap gap-1 max-w-[260px]">
-                    <span 
-                      v-for="(skill, sIdx) in parseSkills(app.student?.skills)" 
-                      :key="sIdx"
-                      class="inline-block bg-slate-800 text-slate-300 border border-white/10 text-[10px] font-bold px-1.5 py-0.5 rounded-md shadow-sm"
-                    >
-                      {{ skill }}
-                    </span>
-                    <span v-if="!app.student?.skills || parseSkills(app.student?.skills).length === 0" class="text-xs text-slate-400 italic">
-                      Chưa cập nhật kỹ năng
-                    </span>
-                  </div>
-                </div>
-              </div>
-            </td>
-
-            <td class="px-5 py-4 text-sm font-semibold text-slate-200">
-              <div class="truncate">{{ app.job?.title || jobTitleLookup(app.job_id) }}</div>
-            </td>
-
-            <td class="px-5 py-4 whitespace-nowrap text-sm text-slate-400 font-medium">
-              {{ app.student?.phone || 'Chưa cập nhật' }}
-            </td>
-
-            <td class="px-5 py-4 whitespace-nowrap text-sm text-slate-400 font-medium">
-              {{ formatDate(app.applied_at || app.id) }}
-            </td>
-
-            <td class="px-5 py-4 whitespace-nowrap">
-              <span :class="[
-                statusBadgeClass(app.status),
-                'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border capitalize'
-              ]">
-                {{ app.status ? app.status.replace('_', ' ') : 'Chờ duyệt' }}
-              </span>
-            </td>
-
-            <td class="px-5 py-4 text-right text-sm font-medium">
-              <div class="flex items-center justify-end gap-2">
-                <button 
-                  @click="openChatModal(app)" 
-                  class="inline-flex h-9 items-center justify-center rounded-lg border border-white/10 bg-white/5 px-3 text-[11px] font-bold uppercase tracking-wider text-slate-200 transition-all hover:bg-white/10 hover:text-white"
-                >
-                  <span>Nhắn tin</span>
-                </button>
-
-                <button
-                  @click="openManagedApplicantModal(app)"
-                  class="inline-flex h-9 items-center justify-center rounded-lg bg-cyan-400 px-3 text-[11px] font-extrabold uppercase tracking-wider text-slate-950 shadow-sm shadow-cyan-500/20 transition-all hover:bg-cyan-300"
-                >
-                  Quản lý
-                </button>
-              </div>
-            </td>
-          </tr>
-        </tbody>
-      </table>
-    </div>
-
-    <!-- Mobile Applicants Cards -->
-    <div class="lg:hidden space-y-4">
+    <!-- Modern Compact Candidate Grid (3 Cards Per Row on Desktop/Tablet) -->
+    <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
       <div
         v-for="app in paginatedApplicants"
         :key="app.id"
-        class="bg-slate-900/85 border border-white/10 rounded-xl p-5 shadow-lg shadow-slate-950/25 space-y-4 hover:border-cyan-300/40 hover:shadow-cyan-950/30 transition-all backdrop-blur"
+        @click="handleManagedDetail(app)"
+        class="group relative rounded-2xl border border-cyan-500/20 bg-slate-900/90 p-5 shadow-xl hover:border-cyan-400/50 hover:bg-slate-900 hover:shadow-2xl hover:shadow-cyan-500/10 transition-all duration-300 flex flex-col justify-between cursor-pointer backdrop-blur-xl"
       >
-        <div class="flex items-center justify-between">
-          <div class="flex items-center">
-            <img v-if="app.student?.avatar_url" :src="app.student.avatar_url" class="h-10 w-10 rounded-full border border-white/10 mr-3" />
-            <div v-else class="h-10 w-10 bg-slate-800 rounded-full border border-white/10 flex items-center justify-center font-bold text-cyan-200 mr-3">
-              {{ app.student?.full_name?.charAt(0) || 'S' }}
+        <div class="space-y-4">
+          <!-- Top Row: Student Avatar + Name & Status Badge -->
+          <div class="flex items-start justify-between gap-3">
+            <div class="flex items-center gap-3 min-w-0 flex-1">
+              <div class="relative h-12 w-12 flex-shrink-0 overflow-hidden rounded-2xl border border-cyan-500/30 bg-slate-800 shadow-md">
+                <img
+                  v-if="app.student?.avatar_url"
+                  :src="app.student.avatar_url"
+                  :alt="app.student?.full_name"
+                  class="h-full w-full object-cover"
+                />
+                <div v-else class="h-full w-full bg-gradient-to-br from-cyan-600 via-blue-600 to-emerald-500 flex items-center justify-center text-sm font-black text-white">
+                  {{ app.student?.full_name?.charAt(0) || 'S' }}
+                </div>
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <h4 class="text-base font-extrabold text-white group-hover:text-cyan-300 transition-colors truncate">
+                  {{ app.student?.full_name || 'N/A' }}
+                </h4>
+                <p class="text-xs font-semibold text-cyan-300 truncate mt-0.5">
+                  🎯 {{ app.job?.title || jobTitleLookup(app.job_id) || 'Công việc chưa xác định' }}
+                </p>
+              </div>
             </div>
-            <div>
-              <h4 class="text-sm font-bold text-white">{{ app.student?.full_name || 'N/A' }}</h4>
-              <p class="text-xs text-slate-500">Kỹ năng: {{ app.student?.skills || 'Chưa cập nhật' }}</p>
+
+            <span
+              :class="[
+                statusBadgeClass(app.status),
+                'inline-flex items-center px-2.5 py-1 rounded-full text-[11px] font-black border uppercase tracking-wider flex-shrink-0 shadow-sm'
+              ]"
+            >
+              {{ app.status ? app.status.replace('_', ' ') : 'Chờ duyệt' }}
+            </span>
+          </div>
+
+          <!-- Candidate Meta Info & CV Link -->
+          <div class="space-y-2 pt-3 border-t border-cyan-500/10 text-xs">
+            <div class="flex items-center justify-between text-slate-300 font-medium">
+              <span class="text-slate-400">📞 Điện thoại:</span>
+              <span class="font-extrabold text-slate-100">{{ app.student?.phone || 'Chưa cập nhật' }}</span>
+            </div>
+
+            <div class="flex items-center justify-between text-slate-300 font-medium">
+              <span class="text-slate-400">📅 Ngày nộp:</span>
+              <span class="font-bold text-slate-300">{{ formatDate(app.applied_at || app.id) }}</span>
+            </div>
+
+            <!-- Skills & CV Link Row -->
+            <div class="pt-2 flex flex-wrap items-center justify-between gap-2">
+              <div class="flex flex-wrap gap-1 max-w-[65%]">
+                <span
+                  v-for="(skill, sIdx) in parseSkills(app.student?.skills).slice(0, 3)"
+                  :key="sIdx"
+                  class="inline-block bg-cyan-500/10 text-cyan-200 border border-cyan-500/20 text-[10px] font-extrabold px-2 py-0.5 rounded-md"
+                >
+                  {{ skill }}
+                </span>
+                <span v-if="!app.student?.skills || parseSkills(app.student?.skills).length === 0" class="text-[11px] text-slate-500 italic">
+                  Chưa có kỹ năng
+                </span>
+              </div>
+
+              <a
+                v-if="app.student?.cv_url"
+                :href="app.student.cv_url"
+                target="_blank"
+                @click.stop
+                class="inline-flex items-center gap-1 text-[11px] font-black text-rose-300 bg-rose-500/15 hover:bg-rose-500/25 px-2.5 py-1 rounded-lg border border-rose-500/30 transition-all shadow-sm"
+              >
+                📄 Xem CV
+              </a>
             </div>
           </div>
-          <span :class="[
-            statusBadgeClass(app.status),
-            'inline-flex items-center px-2.5 py-1 rounded-full text-xs font-semibold border'
-          ]">
-            {{ app.status }}
-          </span>
         </div>
 
-        <div class="pt-2 border-t border-white/10 text-xs font-medium text-slate-500 space-y-1">
-          <div>Vị trí: <span class="text-slate-200 font-bold">{{ jobTitleLookup(app.job_id) }}</span></div>
-          <div>Liên hệ: <span class="text-slate-200">{{ app.student?.phone }}</span></div>
-          <div>Ngày nộp: <span class="text-slate-200">{{ formatDate(app.applied_at || app.id) }}</span></div>
-        </div>
-
-        <!-- Mobile actions -->
-        <div class="grid grid-cols-2 gap-2 pt-2">
+        <!-- Bottom Action Buttons: Nhắn tin & Quản lý -->
+        <div class="mt-4 pt-3 border-t border-cyan-500/10 grid grid-cols-2 gap-2.5">
           <button
-            @click="openChatModal(app)"
-            class="w-full rounded-lg border border-white/10 bg-white/5 py-2 text-center text-xs font-bold text-slate-200 shadow-sm hover:bg-white/10 hover:text-white"
+            type="button"
+            @click.stop="handleOpenChat(app)"
+            class="py-2.5 px-3 rounded-xl border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 text-cyan-200 hover:text-white font-extrabold text-xs transition-all flex items-center justify-center gap-1.5 shadow-md cursor-pointer"
           >
-            Nhắn tin
+            <svg class="h-4 w-4 text-cyan-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8 12h.01M12 12h.01M16 12h.01M21 12c0 4.418-4.03 8-9 8a9.863 9.863 0 01-4.255-.949L3 20l1.395-3.72C3.512 15.042 3 13.574 3 12c0-4.418 4.03-8 9-8s9 3.582 9 8z" />
+            </svg>
+            <span>Nhắn tin</span>
           </button>
 
           <button
-            @click="openManagedApplicantModal(app)"
-            class="w-full rounded-lg bg-cyan-400 py-2 text-center text-xs font-extrabold text-slate-950 shadow-sm shadow-cyan-500/20 hover:bg-cyan-300"
+            type="button"
+            @click.stop="handleManagedDetail(app)"
+            class="py-2.5 px-3 rounded-xl bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 text-slate-950 font-black text-xs shadow-lg shadow-cyan-500/20 transition-all hover:scale-[1.02] active:scale-98 flex items-center justify-center gap-1.5 cursor-pointer"
           >
-            Quản lý
+            <svg class="h-4 w-4 text-slate-950" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 6V4m0 2a2 2 0 100 4m0-4a2 2 0 110 4m-6 8a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4m6 6v10m6-2a2 2 0 100-4m0 4a2 2 0 110-4m0 4v2m0-6V4" />
+            </svg>
+            <span>Quản lý</span>
           </button>
         </div>
       </div>
@@ -308,4 +277,22 @@ const {
   selectedChatApp,
   currentBusinessUserId
 } = toRefs(props.state)
+
+const handleOpenChat = (app: any) => {
+  if (!app) return
+  if (typeof openChatModal?.value === 'function') {
+    openChatModal.value(app)
+  } else if (typeof (openChatModal as any) === 'function') {
+    (openChatModal as any)(app)
+  }
+}
+
+const handleManagedDetail = (app: any) => {
+  if (!app) return
+  if (typeof openManagedApplicantModal?.value === 'function') {
+    openManagedApplicantModal.value(app)
+  } else if (typeof (openManagedApplicantModal as any) === 'function') {
+    (openManagedApplicantModal as any)(app)
+  }
+}
 </script>
