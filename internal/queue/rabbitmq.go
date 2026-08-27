@@ -4,10 +4,7 @@ import (
 	"encoding/json"
 	"fmt"
 	"log"
-	"net"
-	"net/url"
 	"sync"
-	"time"
 
 	amqp "github.com/rabbitmq/amqp091-go"
 )
@@ -36,20 +33,6 @@ func NewRabbitMQClient(rawURL string) RabbitMQClient {
 func (r *rabbitMQClient) connect() {
 	r.mu.Lock()
 	defer r.mu.Unlock()
-
-	parsedURL, err := url.Parse(r.url)
-	if err == nil {
-		host := parsedURL.Host
-		if host != "" {
-			conn, err := net.DialTimeout("tcp", host, 500*time.Millisecond)
-			if err != nil {
-				log.Printf("⚠️ [RabbitMQ Notice]: Không thể kết nối RabbitMQ (%s). Hệ thống sẽ tự động dùng Fallback Synchronous Processing.", host)
-				r.available = false
-				return
-			}
-			_ = conn.Close()
-		}
-	}
 
 	conn, err := amqp.Dial(r.url)
 	if err != nil {

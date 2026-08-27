@@ -23,21 +23,37 @@ type redisCache struct {
 }
 
 func NewRedisCache() CacheClient {
+	redisURL := os.Getenv("REDIS_URL")
 	redisAddr := os.Getenv("REDIS_ADDR")
-	if redisAddr == "" {
-		redisAddr = "localhost:6379"
-	}
 	redisPassword := os.Getenv("REDIS_PASSWORD")
 
-	rdb := redis.NewClient(&redis.Options{
-		Addr:         redisAddr,
-		Password:     redisPassword,
-		DB:           0,
-		MaxRetries:   0,
-		DialTimeout:  200 * time.Millisecond,
-		ReadTimeout:  200 * time.Millisecond,
-		WriteTimeout: 200 * time.Millisecond,
-	})
+	var rdb *redis.Client
+
+	if redisURL != "" {
+		opt, err := redis.ParseURL(redisURL)
+		if err == nil {
+			opt.DialTimeout = 2 * time.Second
+			opt.ReadTimeout = 2 * time.Second
+			opt.WriteTimeout = 2 * time.Second
+			rdb = redis.NewClient(opt)
+			redisAddr = opt.Addr
+		}
+	}
+
+	if rdb == nil {
+		if redisAddr == "" {
+			redisAddr = "localhost:6379"
+		}
+		rdb = redis.NewClient(&redis.Options{
+			Addr:         redisAddr,
+			Password:     redisPassword,
+			DB:           0,
+			MaxRetries:   0,
+			DialTimeout:  1 * time.Second,
+			ReadTimeout:  1 * time.Second,
+			WriteTimeout: 1 * time.Second,
+		})
+	}
 
 	ctx, cancel := context.WithTimeout(context.Background(), 1*time.Second)
 	defer cancel()
