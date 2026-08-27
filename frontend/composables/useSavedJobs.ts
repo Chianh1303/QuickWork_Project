@@ -48,7 +48,7 @@ export const useSavedJobs = () => {
       const token = useCookie<string | null>('auth_token')
       if (token.value) {
         const api = useApi()
-        const res: any = await api.get('/api/saved-jobs')
+        const res: any = await api.get('/api/saved-jobs', { skipAutoLogout: true })
         if (res && Array.isArray(res.saved_ids)) {
           const remoteIds = res.saved_ids.map((id: any) => Number(id)).filter((id: number) => id > 0)
           // Merge local and remote
@@ -85,7 +85,7 @@ export const useSavedJobs = () => {
         const token = useCookie<string | null>('auth_token')
         if (token.value) {
           const api = useApi()
-          await api.post(`/api/saved-jobs/${id}`)
+          await api.post(`/api/saved-jobs/${id}`, null, { skipAutoLogout: true })
         }
       } catch (err) {
         // Fail silently
