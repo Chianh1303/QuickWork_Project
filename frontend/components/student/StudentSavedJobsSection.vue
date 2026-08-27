@@ -107,7 +107,7 @@
           </div>
         </div>
 
-        <!-- Bottom Action Row: Share + Apply Button -->
+        <!-- Bottom Action Row: Share + Dynamic Apply Button -->
         <div class="mt-3 pt-2.5 border-t border-cyan-500/10 flex items-center justify-between gap-2">
           <button
             type="button"
@@ -119,10 +119,14 @@
           </button>
 
           <button
+            :disabled="isApplied(getJobId(job))"
             @click="handleApplyClick(job)"
-            class="flex-1 py-1.5 px-3 rounded-lg text-xs font-black text-slate-950 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 shadow-md shadow-cyan-500/20 transition-all text-center cursor-pointer"
+            :class="isApplied(getJobId(job))
+              ? 'bg-slate-800 text-slate-400 border border-slate-700/60 cursor-not-allowed'
+              : 'bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 text-slate-950 shadow-md shadow-cyan-500/20 cursor-pointer'"
+            class="flex-1 py-1.5 px-3 rounded-lg text-xs font-black transition-all text-center"
           >
-            Ứng tuyển ngay ⚡
+            {{ isApplied(getJobId(job)) ? '✓ Đã Nộp' : 'Ứng tuyển ngay ⚡' }}
           </button>
         </div>
       </div>
@@ -139,7 +143,7 @@ const props = defineProps<{ state: Record<string, any> }>()
 const emit = defineEmits<{ (e: 'apply', job: any): void }>()
 
 const { getMediaUrl, getCompanyInitial } = useMedia()
-const { activeSection, jobs } = toRefs(props.state)
+const { activeSection, jobs, checkIfApplied } = toRefs(props.state)
 const { savedJobIds, savedJobsList, toggleSaveJob, shareJob, fetchSavedJobs } = useSavedJobs()
 
 // Auto-reload saved jobs list when student switches to 'saved-jobs' section
@@ -148,6 +152,14 @@ watch(activeSection, (newSection) => {
     fetchSavedJobs()
   }
 }, { immediate: true })
+
+const isApplied = (jobId: number) => {
+  if (!jobId) return false
+  if (typeof checkIfApplied?.value === 'function') {
+    return checkIfApplied.value(jobId)
+  }
+  return false
+}
 
 const handleImgError = (event: Event) => {
   const target = event.target as HTMLImageElement
@@ -177,6 +189,8 @@ const getJobId = (job: any): number => {
 const handleApplyClick = (job: any) => {
   if (!job) return
   const id = getJobId(job)
+  if (isApplied(id)) return
+
   const mappedJob = {
     id: id,
     ID: id,
