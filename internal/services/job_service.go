@@ -65,7 +65,7 @@ func (s *jobService) CreateJob(userID uint, input dto.CreateJobInput) (*models.J
 		Location:    input.Location,
 		Salary:      input.Salary,
 		Slots:       input.Slots,
-		Status:      "approved", // Business posts are active
+		Status:      "pending", // Chờ Admin kiểm duyệt trước khi công khai cho sinh viên
 		WorkingDate: input.WorkingDate,
 		Category:    input.Category,
 		JobType:     input.JobType,
