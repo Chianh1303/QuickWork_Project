@@ -127,7 +127,10 @@ const { activeSection, jobs } = toRefs(props.state)
 const { savedJobIds, toggleSaveJob, shareJob } = useSavedJobs()
 
 const savedJobs = computed(() => {
-  if (!jobs?.value || !savedJobIds.value) return []
-  return jobs.value.filter((j: any) => savedJobIds.value.includes(Number(j.id)))
+  if (!jobs?.value || !savedJobIds.value || savedJobIds.value.length === 0) return []
+  return jobs.value.filter((j: any) => {
+    const id = Number(j?.id || j?.ID || j?.job_id || j?.JobID || 0)
+    return id > 0 && savedJobIds.value.includes(id)
+  })
 })
 </script>

@@ -175,12 +175,12 @@
                 <button
                   type="button"
                   @click.stop="toggleSaveJob(job)"
-                  :title="isJobSaved(job.id) ? 'Bỏ lưu việc làm' : 'Lưu vào mục yêu thích'"
+                  :title="isJobSaved(job) ? 'Bỏ lưu việc làm' : 'Lưu vào mục yêu thích'"
                   class="p-2 rounded-xl border border-indigo-500/20 bg-slate-950/60 hover:bg-slate-950 transition-colors"
                 >
                   <svg
                     class="h-4 w-4 transition-transform active:scale-125"
-                    :class="isJobSaved(job.id) ? 'text-rose-500 fill-rose-500' : 'text-slate-400 hover:text-rose-400'"
+                    :class="isJobSaved(job) ? 'text-rose-500 fill-rose-500' : 'text-slate-400 hover:text-rose-400'"
                     fill="none"
                     viewBox="0 0 24 24"
                     stroke="currentColor"
