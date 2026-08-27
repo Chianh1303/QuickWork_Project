@@ -48,7 +48,7 @@
     <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-6">
       <div
         v-for="job in savedJobs"
-        :key="job.id || job.job_id"
+        :key="job.id || job.ID || job.job_id || job.JobID"
         class="group relative rounded-3xl border border-cyan-500/15 bg-slate-900/90 p-6 shadow-xl hover:border-cyan-400/40 hover:shadow-2xl hover:shadow-cyan-500/10 transition-all duration-300 flex flex-col justify-between"
       >
         <div class="space-y-4">
@@ -123,16 +123,39 @@ const props = defineProps<{ state: Record<string, any> }>()
 defineEmits<{ (e: 'apply', job: any): void }>()
 
 const { activeSection, jobs } = toRefs(props.state)
-const { savedJobIds, toggleSaveJob, shareJob } = useSavedJobs()
+const { savedJobIds, savedJobsList, toggleSaveJob, shareJob } = useSavedJobs()
+
+const getJobId = (job: any): number => {
+  if (typeof job === 'number') return job
+  return Number(job?.id || job?.ID || job?.job_id || job?.JobID || 0)
+}
 
 const savedJobs = computed(() => {
-  const jobList = jobs?.value || []
   const ids = savedJobIds?.value || []
-  if (!Array.isArray(jobList) || !Array.isArray(ids) || ids.length === 0) return []
-  
-  return jobList.filter((j: any) => {
-    const id = Number(j?.id || j?.ID || j?.job_id || j?.JobID || 0)
-    return id > 0 && ids.includes(id)
-  })
+  if (!Array.isArray(ids) || ids.length === 0) return []
+
+  const map = new Map<number, any>()
+
+  // 1. Add full job objects stored in savedJobsList
+  if (Array.isArray(savedJobsList?.value)) {
+    savedJobsList.value.forEach((j: any) => {
+      const id = getJobId(j)
+      if (id > 0 && ids.includes(id)) {
+        map.set(id, j)
+      }
+    })
+  }
+
+  // 2. Add matching jobs from state.jobs
+  if (Array.isArray(jobs?.value)) {
+    jobs.value.forEach((j: any) => {
+      const id = getJobId(j)
+      if (id > 0 && ids.includes(id)) {
+        map.set(id, j)
+      }
+    })
+  }
+
+  return Array.from(map.values())
 })
 </script>
