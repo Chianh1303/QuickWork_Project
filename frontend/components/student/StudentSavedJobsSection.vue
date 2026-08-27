@@ -49,8 +49,8 @@
       </button>
     </div>
 
-    <!-- Direct Unconditional 3-Column Grid (grid-cols-3) -->
-    <div v-else class="grid grid-cols-3 gap-4 font-sans">
+    <!-- Guaranteed Scoped 3-Column Grid -->
+    <div v-else class="saved-jobs-grid font-sans">
       <div
         v-for="job in savedJobs"
         :key="getJobId(job)"
@@ -220,3 +220,24 @@ const savedJobs = computed(() => {
   return Array.from(map.values())
 })
 </script>
+
+<style scoped>
+.saved-jobs-grid {
+  display: grid !important;
+  grid-template-columns: repeat(1, minmax(0, 1fr)) !important;
+  gap: 1rem !important;
+  width: 100% !important;
+}
+
+@media (min-width: 640px) {
+  .saved-jobs-grid {
+    grid-template-columns: repeat(2, minmax(0, 1fr)) !important;
+  }
+}
+
+@media (min-width: 850px) {
+  .saved-jobs-grid {
+    grid-template-columns: repeat(3, minmax(0, 1fr)) !important;
+  }
+}
+</style>
