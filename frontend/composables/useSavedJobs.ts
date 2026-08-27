@@ -29,23 +29,30 @@ export const useSavedJobs = () => {
     }
   }
 
-  const isJobSaved = (jobId: number): boolean => {
-    return savedJobIds.value.includes(jobId)
+  const getJobId = (job: any): number => {
+    if (typeof job === 'number') return job
+    return Number(job?.id || job?.ID || job?.job_id || job?.JobID || 0)
+  }
+
+  const isJobSaved = (job: any): boolean => {
+    const id = getJobId(job)
+    if (!id) return false
+    return savedJobIds.value.includes(id)
   }
 
   const toggleSaveJob = (job: any) => {
-    const id = Number(job?.id || job)
+    const id = getJobId(job)
     if (!id) return
 
     const index = savedJobIds.value.indexOf(id)
     if (index > -1) {
       savedJobIds.value.splice(index, 1)
       saveToStorage()
-      info(`Đã bỏ lưu công việc "${job?.title || '#' + id}" khỏi danh sách yêu thích.`)
+      info(`Đã bỏ lưu công việc "${job?.title || job?.job_title || '#' + id}" khỏi danh sách yêu thích.`)
     } else {
       savedJobIds.value.push(id)
       saveToStorage()
-      success(`❤️ Đã lưu công việc "${job?.title || '#' + id}" vào mục Yêu thích!`)
+      success(`❤️ Đã lưu công việc "${job?.title || job?.job_title || '#' + id}" vào mục Yêu thích!`)
     }
   }
 
