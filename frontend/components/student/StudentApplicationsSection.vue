@@ -90,7 +90,12 @@
         </thead>
 
         <tbody class="bg-slate-900/90 divide-y divide-cyan-500/10">
-          <tr v-for="app in paginatedApps" :key="app.id" class="hover:bg-cyan-500/5 transition-colors">
+          <tr
+            v-for="app in paginatedApps"
+            :key="app.id"
+            @click="handleOpenDetail(app)"
+            class="hover:bg-cyan-500/5 transition-colors cursor-pointer"
+          >
             <td class="px-5 py-4">
               <div class="truncate text-xs font-extrabold text-white">
                 {{ app.job?.title || 'Công việc chưa xác định' }}
@@ -126,15 +131,15 @@
             <td class="px-5 py-4 text-right text-xs font-medium">
               <div class="flex items-center justify-end gap-2">
                 <button
-                  @click="openChatModal(app)"
-                  class="inline-flex h-8 items-center justify-center rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-3 text-[11px] font-extrabold uppercase tracking-wider text-cyan-200 transition-all hover:bg-cyan-500/20 hover:text-white"
+                  @click.stop="handleOpenChat(app)"
+                  class="inline-flex h-8 items-center justify-center rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-3 text-[11px] font-extrabold uppercase tracking-wider text-cyan-200 transition-all hover:bg-cyan-500/20 hover:text-white cursor-pointer"
                 >
                   <span>Chat</span>
                 </button>
 
                 <button
-                  @click="openManagedApplicationModal(app)"
-                  class="inline-flex h-8 items-center justify-center rounded-xl bg-[#22D3EE] px-3.5 text-[11px] font-black uppercase tracking-wider text-slate-950 shadow-md shadow-cyan-400/20 transition-all hover:bg-[#67E8F9] hover:scale-105 active:scale-95"
+                  @click.stop="handleOpenDetail(app)"
+                  class="inline-flex h-8 items-center justify-center rounded-xl bg-[#22D3EE] px-3.5 text-[11px] font-black uppercase tracking-wider text-slate-950 shadow-md shadow-cyan-400/20 transition-all hover:bg-[#67E8F9] hover:scale-105 active:scale-95 cursor-pointer"
                 >
                   Chi tiết
                 </button>
@@ -150,7 +155,8 @@
       <div
         v-for="app in paginatedApps"
         :key="app.id"
-        class="bg-slate-900/90 border border-cyan-500/20 rounded-2xl p-5 space-y-3 shadow-xl"
+        @click="handleOpenDetail(app)"
+        class="bg-slate-900/90 border border-cyan-500/20 rounded-2xl p-5 space-y-3 shadow-xl cursor-pointer"
       >
         <div class="flex justify-between items-start">
           <div>
@@ -173,15 +179,15 @@
 
         <div class="grid grid-cols-2 gap-2 pt-2">
           <button
-            @click="openChatModal(app)"
-            class="w-full rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-xs font-extrabold text-cyan-200 hover:bg-cyan-500/20 hover:text-white"
+            @click.stop="handleOpenChat(app)"
+            class="w-full rounded-xl border border-cyan-500/30 bg-cyan-500/10 px-3 py-2 text-xs font-extrabold text-cyan-200 hover:bg-cyan-500/20 hover:text-white cursor-pointer"
           >
             Nhắn tin
           </button>
 
           <button
-            @click="openManagedApplicationModal(app)"
-            class="w-full rounded-xl bg-[#22D3EE] px-3 py-2 text-xs font-black uppercase tracking-wider text-slate-950 shadow-md shadow-cyan-400/20 hover:bg-[#67E8F9] transition-all"
+            @click.stop="handleOpenDetail(app)"
+            class="w-full rounded-xl bg-[#22D3EE] px-3 py-2 text-xs font-black uppercase tracking-wider text-slate-950 shadow-md shadow-cyan-400/20 hover:bg-[#67E8F9] transition-all cursor-pointer"
           >
             Chi tiết
           </button>
@@ -264,4 +270,22 @@ const {
   openManagedApplicationModal,
   toast
 } = toRefs(props.state)
+
+const handleOpenDetail = (app: any) => {
+  if (!app) return
+  if (typeof openManagedApplicationModal?.value === 'function') {
+    openManagedApplicationModal.value(app)
+  } else if (typeof (openManagedApplicationModal as any) === 'function') {
+    (openManagedApplicationModal as any)(app)
+  }
+}
+
+const handleOpenChat = (app: any) => {
+  if (!app) return
+  if (typeof openChatModal?.value === 'function') {
+    openChatModal.value(app)
+  } else if (typeof (openChatModal as any) === 'function') {
+    (openChatModal as any)(app)
+  }
+}
 </script>
