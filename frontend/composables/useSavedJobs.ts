@@ -1,6 +1,5 @@
 import { ref } from 'vue'
 import { useToast } from '~/composables/useToast'
-import { useAuthStore } from '~/stores/auth'
 
 export const useSavedJobs = () => {
   const { success, info } = useToast()
@@ -11,41 +10,7 @@ export const useSavedJobs = () => {
       try {
         localStorage.setItem('qw_saved_jobs', JSON.stringify(savedJobIds.value))
       } catch (e) {
-        console.error('Error saving to localStorage', e)
-      }
-    }
-  }
-
-  // Read initial cache from localStorage & sync with backend if logged in as student
-  const initSavedJobs = async () => {
-    if (import.meta.client) {
-      try {
-        const stored = localStorage.getItem('qw_saved_jobs')
-        if (stored) {
-          savedJobIds.value = JSON.parse(stored)
-        }
-      } catch (e) {
-        console.error('Error reading saved jobs from localStorage', e)
-      }
-
-      // Check if user is logged in as a student before calling API
-      const token = useCookie('auth_token')
-      const authStore = useAuthStore()
-      
-      if (!token.value || (authStore.user && authStore.user.role !== 'student')) {
-        return // Guest user or non-student role -> use localStorage only without triggering 401
-      }
-
-      // Fetch latest list from backend API safely
-      try {
-        const api = useApi()
-        const res: any = await api.get('/api/saved-jobs')
-        if (res && Array.isArray(res.saved_ids)) {
-          savedJobIds.value = res.saved_ids.map((id: any) => Number(id))
-          saveToStorage()
-        }
-      } catch (e: any) {
-        // Silently catch 401/403 to prevent breaking UI for guest/expired sessions
+        console.error('Error writing localStorage', e)
       }
     }
   }
@@ -61,6 +26,42 @@ export const useSavedJobs = () => {
     return savedJobIds.value.includes(id)
   }
 
+  // Load from localStorage & sync from API safely on client side
+  const initSavedJobs = async () => {
+    if (!import.meta.client) return
+
+    // 1. Read from localStorage
+    try {
+      const stored = localStorage.getItem('qw_saved_jobs')
+      if (stored) {
+        const parsed = JSON.parse(stored)
+        if (Array.isArray(parsed)) {
+          savedJobIds.value = parsed.map(n => Number(n)).filter(n => n > 0)
+        }
+      }
+    } catch (e) {
+      // Ignore
+    }
+
+    // 2. Fetch from backend API if token exists
+    try {
+      const token = useCookie<string | null>('auth_token')
+      if (token.value) {
+        const api = useApi()
+        const res: any = await api.get('/api/saved-jobs')
+        if (res && Array.isArray(res.saved_ids)) {
+          const remoteIds = res.saved_ids.map((id: any) => Number(id)).filter((id: number) => id > 0)
+          // Merge local and remote
+          const merged = Array.from(new Set([...savedJobIds.value, ...remoteIds]))
+          savedJobIds.value = merged
+          saveToStorage()
+        }
+      }
+    } catch (e) {
+      // Fail silently (guest user or offline mode)
+    }
+  }
+
   const toggleSaveJob = async (job: any) => {
     const id = getJobId(job)
     if (!id) return
@@ -68,27 +69,26 @@ export const useSavedJobs = () => {
     const index = savedJobIds.value.indexOf(id)
     const title = job?.title || job?.job_title || '#' + id
 
-    // Optimistic UI update
     if (index > -1) {
       savedJobIds.value.splice(index, 1)
       saveToStorage()
-      info(`Đã bỏ lưu công việc "${title}" khỏi danh sách yêu thích.`)
+      info(`Đã bỏ lưu công việc "${title}" khỏi mục yêu thích.`)
     } else {
       savedJobIds.value.push(id)
       saveToStorage()
       success(`❤️ Đã lưu công việc "${title}" vào mục Yêu thích!`)
     }
 
-    // Call Backend API if logged in as student
-    const token = useCookie('auth_token')
-    const authStore = useAuthStore()
-
-    if (token.value && authStore.user?.role === 'student') {
+    // Backend API sync
+    if (import.meta.client) {
       try {
-        const api = useApi()
-        await api.post(`/api/saved-jobs/${id}`)
+        const token = useCookie<string | null>('auth_token')
+        if (token.value) {
+          const api = useApi()
+          await api.post(`/api/saved-jobs/${id}`)
+        }
       } catch (err) {
-        console.warn('Backend API sync failed, kept in local state', err)
+        // Fail silently
       }
     }
   }
@@ -110,7 +110,9 @@ export const useSavedJobs = () => {
     }
   }
 
-  initSavedJobs()
+  if (import.meta.client) {
+    initSavedJobs()
+  }
 
   return {
     savedJobIds,
