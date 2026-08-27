@@ -4,11 +4,13 @@ import { useToast } from '~/composables/useToast'
 export const useSavedJobs = () => {
   const { success, info } = useToast()
   const savedJobIds = ref<number[]>([])
+  const savedJobsList = ref<any[]>([])
 
   const saveToStorage = () => {
     if (import.meta.client) {
       try {
         localStorage.setItem('qw_saved_jobs', JSON.stringify(savedJobIds.value))
+        localStorage.setItem('qw_saved_jobs_list', JSON.stringify(savedJobsList.value))
       } catch (e) {
         console.error('Error writing localStorage', e)
       }
@@ -32,11 +34,19 @@ export const useSavedJobs = () => {
 
     // 1. Read from localStorage
     try {
-      const stored = localStorage.getItem('qw_saved_jobs')
-      if (stored) {
-        const parsed = JSON.parse(stored)
+      const storedIds = localStorage.getItem('qw_saved_jobs')
+      if (storedIds) {
+        const parsed = JSON.parse(storedIds)
         if (Array.isArray(parsed)) {
           savedJobIds.value = parsed.map(n => Number(n)).filter(n => n > 0)
+        }
+      }
+
+      const storedJobs = localStorage.getItem('qw_saved_jobs_list')
+      if (storedJobs) {
+        const parsedJobs = JSON.parse(storedJobs)
+        if (Array.isArray(parsedJobs)) {
+          savedJobsList.value = parsedJobs
         }
       }
     } catch (e) {
@@ -49,11 +59,24 @@ export const useSavedJobs = () => {
       if (token.value) {
         const api = useApi()
         const res: any = await api.get('/api/saved-jobs', { skipAutoLogout: true })
-        if (res && Array.isArray(res.saved_ids)) {
-          const remoteIds = res.saved_ids.map((id: any) => Number(id)).filter((id: number) => id > 0)
-          // Merge local and remote
-          const merged = Array.from(new Set([...savedJobIds.value, ...remoteIds]))
-          savedJobIds.value = merged
+        if (res) {
+          if (Array.isArray(res.saved_ids)) {
+            const remoteIds = res.saved_ids.map((id: any) => Number(id)).filter((id: number) => id > 0)
+            savedJobIds.value = Array.from(new Set([...savedJobIds.value, ...remoteIds]))
+          }
+          if (Array.isArray(res.jobs) && res.jobs.length > 0) {
+            // Deduplicate backend jobs with local jobs
+            const map = new Map<number, any>()
+            savedJobsList.value.forEach(j => {
+              const id = getJobId(j)
+              if (id > 0) map.set(id, j)
+            })
+            res.jobs.forEach((j: any) => {
+              const id = getJobId(j)
+              if (id > 0) map.set(id, j)
+            })
+            savedJobsList.value = Array.from(map.values())
+          }
           saveToStorage()
         }
       }
@@ -70,11 +93,17 @@ export const useSavedJobs = () => {
     const title = job?.title || job?.job_title || '#' + id
 
     if (index > -1) {
+      // Remove
       savedJobIds.value.splice(index, 1)
+      savedJobsList.value = savedJobsList.value.filter(j => getJobId(j) !== id)
       saveToStorage()
       info(`Đã bỏ lưu công việc "${title}" khỏi mục yêu thích.`)
     } else {
+      // Add
       savedJobIds.value.push(id)
+      if (typeof job === 'object' && job !== null) {
+        savedJobsList.value.unshift(job)
+      }
       saveToStorage()
       success(`❤️ Đã lưu công việc "${title}" vào mục Yêu thích!`)
     }
@@ -116,6 +145,7 @@ export const useSavedJobs = () => {
 
   return {
     savedJobIds,
+    savedJobsList,
     isJobSaved,
     toggleSaveJob,
     shareJob,
