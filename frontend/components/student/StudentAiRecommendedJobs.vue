@@ -64,123 +64,117 @@
     </div>
 
     <!-- STATE 3: EMPTY -->
-    <div v-else-if="jobs.length === 0" class="rounded-2xl border border-cyan-500/10 bg-slate-950/40 p-8 text-center space-y-2">
+    <div v-else-if="sortedJobs.length === 0" class="rounded-2xl border border-cyan-500/10 bg-slate-950/40 p-8 text-center space-y-2">
       <svg class="mx-auto h-12 w-12 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
         <path stroke-linecap="round" stroke-linejoin="round" stroke-width="1.5" d="M20 13V6a2 2 0 00-2-2H6a2 2 0 00-2 2v7m16 0v5a2 2 0 01-2 2H6a2 2 0 01-2-2v-5m16 0h-2.586a1 1 0 00-.707.293l-2.414 2.414a1 1 0 01-.707.293h-3.172a1 1 0 01-.707-.293l-2.414-2.414A1 1 0 006.586 13H4" />
       </svg>
-      <p class="text-sm font-semibold text-slate-300">Chưa có công việc nào phù hợp với hồ sơ của bạn lúc này.</p>
+      <p class="text-sm font-semibold text-slate-300">Chưa có công việc nào phù hợp (>0% Match) với hồ sơ của bạn lúc này.</p>
     </div>
 
     <!-- STATE 4: SUCCESS -->
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
-      <div
-        v-for="job in sortedJobs"
-        :key="job.job_id"
-        class="group relative rounded-2xl border p-5 shadow-xl transition-all duration-300 flex flex-col justify-between"
-        :class="isApplied(job.job_id) ? 'bg-slate-950/40 border-slate-800/80 opacity-75' : 'border-cyan-500/15 bg-slate-950/80 hover:border-cyan-400/50 hover:bg-slate-950 hover:shadow-2xl hover:shadow-cyan-500/10'"
-      >
-        <div class="space-y-3.5">
-          <!-- Top Row: Business Logo & Company Info & Match Score Badge -->
-          <div class="flex items-start gap-3">
-            <div class="relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-xl border border-cyan-500/20 bg-slate-800 shadow-md">
-              <img
-                v-if="job.logo_url"
-                :src="getMediaUrl(job.logo_url)"
-                :alt="job.company"
-                class="h-full w-full object-cover relative z-10"
-                @error="handleImgError"
-              />
-              <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-cyan-600 via-blue-600 to-emerald-500 text-xs font-black text-white">
-                {{ getCompanyInitial(job.company) }}
+    <div v-else class="space-y-6">
+      <div class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-5">
+        <div
+          v-for="job in paginatedJobs"
+          :key="job.job_id"
+          class="group relative rounded-2xl border p-5 shadow-xl transition-all duration-300 flex flex-col justify-between"
+          :class="isApplied(job.job_id) ? 'bg-slate-950/40 border-slate-800/80 opacity-75' : 'border-cyan-500/15 bg-slate-950/80 hover:border-cyan-400/50 hover:bg-slate-950 hover:shadow-2xl hover:shadow-cyan-500/10'"
+        >
+          <div class="space-y-3.5">
+            <!-- Top Row: Business Logo & Company Info & Match Score Badge -->
+            <div class="flex items-start gap-3">
+              <div class="relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-xl border border-cyan-500/20 bg-slate-800 shadow-md">
+                <img
+                  v-if="job.logo_url"
+                  :src="getMediaUrl(job.logo_url)"
+                  :alt="job.company"
+                  class="h-full w-full object-cover relative z-10"
+                  @error="handleImgError"
+                />
+                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-cyan-600 via-blue-600 to-emerald-500 text-xs font-black text-white">
+                  {{ getCompanyInitial(job.company) }}
+                </div>
+              </div>
+
+              <div class="min-w-0 flex-1">
+                <div class="flex items-center justify-between gap-2">
+                  <span class="inline-flex max-w-[62%] items-center truncate rounded-lg bg-cyan-500/10 px-2.5 py-0.5 text-xs font-bold text-cyan-200 border border-cyan-500/20">
+                    {{ job.company }}
+                  </span>
+                  <span
+                    :class="getScoreBadgeClass(job.match_score)"
+                    class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-black ring-1 shadow-sm whitespace-nowrap"
+                  >
+                    {{ job.match_score }}% Phù hợp
+                  </span>
+                </div>
+                <h3 class="mt-1.5 text-base font-extrabold text-white group-hover:text-cyan-300 transition-colors line-clamp-2 min-h-[2.5rem] leading-snug">
+                  {{ job.job_title }}
+                </h3>
               </div>
             </div>
 
-            <div class="min-w-0 flex-1">
-              <div class="flex items-center justify-between gap-2">
-                <span class="inline-flex max-w-[62%] items-center truncate rounded-lg bg-cyan-500/10 px-2.5 py-0.5 text-xs font-bold text-cyan-200 border border-cyan-500/20">
-                  {{ job.company }}
-                </span>
-                <span
-                  :class="getScoreBadgeClass(job.match_score)"
-                  class="inline-flex items-center px-2.5 py-0.5 rounded-full text-[11px] font-black ring-1 shadow-sm whitespace-nowrap"
-                >
-                  {{ job.match_score }}% Phù hợp
-                </span>
-              </div>
-              <h3 class="mt-1.5 text-base font-extrabold text-white group-hover:text-cyan-300 transition-colors line-clamp-2 min-h-[2.5rem] leading-snug">
-                {{ job.job_title }}
-              </h3>
+            <!-- Job Salary & Location -->
+            <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-cyan-500/10 text-xs">
+              <span class="font-black text-emerald-400">
+                💰 {{ (job.salary || 0).toLocaleString('vi-VN') }} VNĐ
+              </span>
+              <span class="text-slate-400 font-medium truncate">
+                📍 {{ job.location }}
+              </span>
             </div>
-          </div>
 
-          <!-- Matching Skills Section -->
-          <div v-if="job.matching_skills && job.matching_skills.length > 0" class="space-y-1.5 pt-1">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-emerald-400 flex items-center gap-1">
-              <svg class="h-3 w-3" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2.5" d="M5 13l4 4L19 7" />
-              </svg>
-              Kỹ năng đáp ứng
-            </span>
-            <div class="flex flex-wrap gap-1.5">
+            <!-- Description summary -->
+            <p class="text-xs text-slate-300 font-medium line-clamp-2 leading-relaxed">
+              {{ job.description }}
+            </p>
+
+            <!-- Skills Match Tags -->
+            <div v-if="job.matching_skills && job.matching_skills.length > 0" class="flex flex-wrap gap-1 pt-1">
               <span
-                v-for="skill in job.matching_skills"
+                v-for="skill in job.matching_skills.slice(0, 3)"
                 :key="skill"
-                class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-emerald-500/10 text-emerald-300 border border-emerald-500/25"
+                class="rounded-md bg-emerald-500/10 px-2 py-0.5 text-[10px] font-bold text-emerald-300 border border-emerald-500/20"
               >
-                {{ skill }}
+                ✓ {{ skill }}
               </span>
             </div>
           </div>
 
-          <!-- Missing Skills Section -->
-          <div v-if="job.missing_skills && job.missing_skills.length > 0" class="space-y-1.5">
-            <span class="text-[11px] font-extrabold uppercase tracking-wider text-slate-400 flex items-center gap-1">
-              <svg class="h-3 w-3 text-slate-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M12 9v2m0 4h.01" />
-              </svg>
-              Kỹ năng cần bổ sung
+          <!-- Bottom Action Row -->
+          <div class="mt-4 pt-3 border-t border-cyan-500/10 flex items-center justify-between">
+            <span class="text-[11px] font-bold" :class="isApplied(job.job_id) ? 'text-amber-400' : 'text-slate-400'">
+              {{ isApplied(job.job_id) ? '✓ Đã nộp đơn' : 'Sẵn sàng ứng tuyển' }}
             </span>
-            <div class="flex flex-wrap gap-1.5">
-              <span
-                v-for="skill in job.missing_skills"
-                :key="skill"
-                class="inline-flex items-center px-2.5 py-0.5 rounded-md text-xs font-bold bg-slate-800/80 text-slate-400 border border-slate-700/60"
-              >
-                {{ skill }}
-              </span>
-            </div>
+            <button
+              @click="handleApplyJob(job)"
+              :disabled="isApplied(job.job_id)"
+              class="px-3.5 py-1.5 rounded-xl text-xs font-black transition-all shadow-md"
+              :class="isApplied(job.job_id) ? 'bg-slate-800 text-slate-500 cursor-not-allowed border border-slate-700' : 'bg-gradient-to-r from-cyan-500 to-emerald-400 hover:from-cyan-400 hover:to-emerald-300 text-slate-950 shadow-cyan-500/20 hover:scale-105'"
+            >
+              {{ isApplied(job.job_id) ? 'Đã Ứng Tuyển' : 'Ứng Tuyển Ngay ⚡' }}
+            </button>
           </div>
-        </div>
-
-        <!-- Card Footer / CTA Button -->
-        <div class="mt-5 pt-3.5 border-t border-cyan-500/10">
-          <button
-            v-if="isApplied(job.job_id)"
-            disabled
-            class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-extrabold text-slate-400 bg-slate-800/60 border border-slate-700/50 cursor-not-allowed"
-          >
-            <span>Đã gửi đơn ứng tuyển</span>
-          </button>
-          <button
-            v-else
-            @click="handleApplyJob(job)"
-            class="w-full flex items-center justify-center gap-2 py-2.5 px-4 rounded-xl text-xs font-extrabold text-white bg-gradient-to-r from-cyan-500 to-blue-600 hover:from-cyan-400 hover:to-blue-500 transition-all focus-ring shadow-md shadow-cyan-500/20 cursor-pointer"
-          >
-            <span>⚡ Ứng tuyển nhanh</span>
-            <svg class="h-3.5 w-3.5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M14 5l7 7m0 0l-7 7m7-7H3" />
-            </svg>
-          </button>
         </div>
       </div>
+
+      <!-- Pagination Controls for AI Recommended Jobs (Limit 6 per page) -->
+      <PaginationControls
+        v-if="sortedJobs.length > pageSize"
+        :page="currentPage"
+        :page-size="pageSize"
+        :total-items="sortedJobs.length"
+        @update:page="currentPage = $event"
+      />
     </div>
   </div>
 </template>
 
 <script setup lang="ts">
-import { ref, computed, onMounted } from 'vue'
+import { ref, computed, unref, onMounted } from 'vue'
 import { useAi, type RecommendedJobItem } from '~/composables/useAi'
 import { useMedia } from '~/composables/useMedia'
+import PaginationControls from '~/components/common/PaginationControls.vue'
 
 const props = defineProps<{
   applications?: any[]
@@ -204,6 +198,9 @@ const jobs = ref<RecommendedJobItem[]>([])
 const isLoading = ref<boolean>(true)
 const hasError = ref<boolean>(false)
 
+const currentPage = ref<number>(1)
+const pageSize = 6
+
 const isApplied = (jobId: number) => {
   const rawApps = unref(props.applications)
   const apps = Array.isArray(rawApps) ? rawApps : []
@@ -218,9 +215,14 @@ const isApplied = (jobId: number) => {
   })
 }
 
+// Filter out 0% match jobs & sort by match score
 const sortedJobs = computed(() => {
   if (!jobs.value || jobs.value.length === 0) return []
-  return [...jobs.value].sort((a, b) => {
+  
+  // Filter out jobs with 0% match
+  const filtered = jobs.value.filter(j => (j.match_score || 0) > 0)
+
+  return [...filtered].sort((a, b) => {
     const aApplied = isApplied(a.job_id)
     const bApplied = isApplied(b.job_id)
     if (aApplied !== bApplied) {
@@ -228,6 +230,12 @@ const sortedJobs = computed(() => {
     }
     return (b.match_score || 0) - (a.match_score || 0)
   })
+})
+
+// Paginate jobs with 6 items per page
+const paginatedJobs = computed(() => {
+  const start = (currentPage.value - 1) * pageSize
+  return sortedJobs.value.slice(start, start + pageSize)
 })
 
 const fetchRecommendations = async () => {
