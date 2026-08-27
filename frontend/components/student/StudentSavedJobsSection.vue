@@ -49,86 +49,85 @@
       </button>
     </div>
 
-    <!-- Compact 3-Column Job Card Grid (Fit 3 Cards Per Row) -->
-    <div v-else class="grid grid-cols-1 md:grid-cols-2 xl:grid-cols-3 gap-4">
+    <!-- Compact 3-Column Card Grid (Strict lg:grid-cols-3) -->
+    <div v-else class="grid grid-cols-1 sm:grid-cols-2 lg:grid-cols-3 gap-4">
       <div
         v-for="job in savedJobs"
         :key="getJobId(job)"
-        class="group relative rounded-2xl border border-cyan-500/15 bg-slate-900/90 p-4 shadow-md shadow-cyan-950/20 backdrop-blur-xl transition-all duration-200 hover:border-cyan-400/50 hover:bg-slate-900 hover:shadow-xl hover:shadow-cyan-500/10 flex flex-col justify-between"
+        class="group relative rounded-2xl border border-cyan-500/15 bg-slate-950/80 p-4 shadow-xl transition-all duration-300 flex flex-col justify-between hover:border-cyan-400/50 hover:bg-slate-950 hover:shadow-2xl hover:shadow-cyan-500/10"
       >
         <div class="space-y-3">
-          <!-- Top Row: Business Logo + Company Name & Title + Heart Button -->
-          <div class="flex items-start justify-between gap-2.5">
-            <div class="flex items-center gap-2.5 min-w-0 flex-1">
-              <div class="relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-xl border border-cyan-500/20 bg-slate-800 shadow-md flex items-center justify-center group-hover:scale-105 transition-transform">
-                <img
-                  v-if="job.business?.logo_url || job.logo_url"
-                  :src="getMediaUrl(job.business?.logo_url || job.logo_url)"
-                  :alt="getCompanyName(job)"
-                  class="h-full w-full object-cover relative z-10"
-                  @error="handleImgError"
-                />
-                <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-cyan-600 via-blue-600 to-emerald-500 text-xs font-black text-white">
-                  {{ getCompanyInitial(getCompanyName(job)) }}
-                </div>
-              </div>
-
-              <div class="min-w-0 flex-1">
-                <p class="text-xs font-semibold text-slate-300 truncate" :title="getCompanyName(job)">
-                  {{ getCompanyName(job) }}
-                </p>
-                <h3 class="text-sm font-extrabold text-white group-hover:text-cyan-300 transition-colors line-clamp-1 mt-0.5" :title="displayJobTitle(job.title || job.job_title)">
-                  {{ displayJobTitle(job.title || job.job_title) }}
-                </h3>
+          <!-- Top Row: Logo & Company Name & Heart Button -->
+          <div class="flex items-start gap-3">
+            <div class="relative h-11 w-11 flex-shrink-0 overflow-hidden rounded-xl border border-cyan-500/20 bg-slate-800 shadow-md">
+              <img
+                v-if="job.business?.logo_url || job.logo_url"
+                :src="getMediaUrl(job.business?.logo_url || job.logo_url)"
+                :alt="getCompanyName(job)"
+                class="h-full w-full object-cover relative z-10"
+                @error="handleImgError"
+              />
+              <div class="absolute inset-0 flex items-center justify-center bg-gradient-to-br from-cyan-600 via-blue-600 to-emerald-500 text-xs font-black text-white">
+                {{ getCompanyInitial(getCompanyName(job)) }}
               </div>
             </div>
 
-            <!-- Remove from saved Heart Button -->
-            <button
-              type="button"
-              @click.stop="toggleSaveJob(job)"
-              title="Bỏ lưu việc làm khỏi mục Yêu thích"
-              class="p-1.5 rounded-xl border border-indigo-500/20 bg-slate-950/60 hover:bg-slate-950 transition-colors cursor-pointer flex-shrink-0"
-            >
-              <svg class="h-4 w-4 text-rose-500 fill-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
-              </svg>
-            </button>
+            <div class="min-w-0 flex-1">
+              <div class="flex items-center justify-between gap-1.5">
+                <span class="inline-flex max-w-[70%] items-center truncate rounded-lg bg-cyan-500/10 px-2 py-0.5 text-xs font-bold text-cyan-200 border border-cyan-500/20">
+                  {{ getCompanyName(job) }}
+                </span>
+
+                <button
+                  type="button"
+                  @click.stop="toggleSaveJob(job)"
+                  title="Bỏ lưu công việc khỏi danh sách"
+                  class="p-1 rounded-lg border border-indigo-500/20 bg-slate-900 hover:bg-slate-800 transition-colors cursor-pointer flex-shrink-0"
+                >
+                  <svg class="h-4 w-4 text-rose-500 fill-rose-500" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                    <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4.318 6.318a4.5 4.5 0 000 6.364L12 20.364l7.682-7.682a4.5 4.5 0 00-6.364-6.364L12 7.636l-1.318-1.318a4.5 4.5 0 00-6.364 0z" />
+                  </svg>
+                </button>
+              </div>
+
+              <h3 class="mt-1 text-sm font-extrabold text-white group-hover:text-cyan-300 transition-colors line-clamp-1">
+                {{ displayJobTitle(job.title || job.job_title) }}
+              </h3>
+            </div>
           </div>
 
-          <!-- Tags Row: Salary, Location & Working Date -->
-          <div class="flex flex-wrap items-center gap-1.5 pt-1 border-t border-cyan-500/10 text-xs">
-            <span class="inline-flex items-center text-xs font-black text-emerald-300 bg-emerald-500/10 border border-emerald-500/20 px-2 py-0.5 rounded-md whitespace-nowrap">
-              {{ formatCurrency(job.salary) }}
+          <!-- Salary & Location -->
+          <div class="flex flex-wrap items-center gap-2 pt-1 border-t border-cyan-500/10 text-xs">
+            <span class="font-black text-emerald-400">
+              💰 {{ formatCurrency(job.salary) }}
             </span>
-
-            <span v-if="job.location" class="inline-flex items-center gap-1 text-[11px] font-medium text-slate-400 bg-slate-800/80 border border-slate-700/60 px-2 py-0.5 rounded-md truncate max-w-[120px]" :title="job.location">
-              <svg class="h-3 w-3 flex-shrink-0 text-indigo-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17.657 16.657L13.414 20.9a1.998 1.998 0 01-2.827 0l-4.243-4.243a8 8 0 1111.314 0z" />
-              </svg>
-              <span class="truncate">{{ job.location }}</span>
+            <span v-if="job.location" class="text-slate-400 font-medium truncate max-w-[130px]">
+              📍 {{ job.location }}
             </span>
           </div>
+
+          <!-- Description Preview -->
+          <p class="text-xs text-slate-300 font-medium line-clamp-2 leading-relaxed">
+            {{ job.description }}
+          </p>
         </div>
 
-        <!-- Bottom Action Row: Share + Apply Button -->
-        <div class="mt-3 pt-3 border-t border-cyan-500/10 flex items-center justify-between gap-2">
+        <!-- Bottom Action Row -->
+        <div class="mt-4 pt-3 border-t border-cyan-500/10 flex items-center justify-between gap-2">
           <button
             type="button"
             @click.stop="shareJob(job)"
             title="Sao chép liên kết chia sẻ"
-            class="p-2 rounded-xl border border-indigo-500/20 bg-slate-950/60 hover:bg-slate-950 text-slate-400 hover:text-indigo-300 transition-colors cursor-pointer"
+            class="p-2 rounded-xl bg-slate-800 hover:bg-slate-700 text-slate-300 border border-slate-700 transition-all text-xs font-bold cursor-pointer"
           >
-            <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
-              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M8.684 13.342C8.886 12.938 9 12.482 9 12c0-.482-.114-.938-.316-1.342m0 2.684a3 3 0 110-2.684m0 2.684l6.632 3.316m-6.632-6l6.632-3.316m0 0a3 3 0 105.367-2.684 3 3 0 00-5.367 2.684zm0 9.316a3 3 0 105.368 2.684 3 3 0 00-5.368-2.684z" />
-            </svg>
+            🔗
           </button>
 
           <button
             @click="$emit('apply', job)"
-            class="flex-1 py-1.5 px-3 rounded-xl text-xs font-extrabold bg-gradient-to-r from-indigo-500 to-emerald-500 hover:from-indigo-400 hover:to-emerald-400 text-white shadow-md shadow-indigo-500/20 transition-all cursor-pointer text-center"
+            class="flex-1 py-2 px-3 rounded-xl text-xs font-black text-slate-950 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 shadow-lg shadow-cyan-500/20 transition-all text-center cursor-pointer"
           >
-            Ứng tuyển ngay ⚡
+            Ứng Tuyển Ngay ⚡
           </button>
         </div>
       </div>
