@@ -5,6 +5,7 @@ import (
 	"crypto/rand"
 	"errors"
 	"fmt"
+	"log"
 	"math/big"
 	"strings"
 	"sync"
@@ -279,7 +280,9 @@ func (s *authService) SendPasswordResetOTP(email string) error {
 		})
 	} else if s.emailService != nil {
 		go func() {
-			_ = s.emailService.SendOTPEmail(email, otpCode)
+			if err := s.emailService.SendOTPEmail(email, otpCode); err != nil {
+				log.Printf("❌ [AuthService] Lỗi gửi OTP email trực tiếp: %v", err)
+			}
 		}()
 	}
 
