@@ -41,82 +41,84 @@
           <!-- Nút bấm Chuyển sang Edit Mode -->
           <button
             @click="isEditing = true"
-            class="w-full py-2.5 px-4 rounded-xl text-xs font-extrabold text-cyan-200 border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 hover:text-white transition-all shadow-md"
+            class="w-full py-2.5 px-4 rounded-xl text-xs font-extrabold text-cyan-200 border border-cyan-500/30 bg-cyan-500/10 hover:bg-cyan-500/20 hover:text-white transition-all shadow-md cursor-pointer"
           >
             Chỉnh sửa Hồ sơ & Tải CV
+          </button>
+
+          <!-- Nút Đăng xuất nổi bật trên Mobile & Desktop -->
+          <button
+            v-if="handleLogout"
+            type="button"
+            @click="handleLogout"
+            class="w-full py-2.5 px-4 rounded-xl text-xs font-extrabold text-rose-300 border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 hover:text-white transition-all shadow-md flex items-center justify-center gap-2 cursor-pointer mt-2"
+          >
+            <svg class="h-4 w-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+              <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
+            </svg>
+            <span>Đăng xuất tài khoản</span>
           </button>
         </div>
 
         <!-- Card Chỉ số Chuẩn hóa ATS -->
-        <div class="rounded-3xl border border-cyan-500/20 bg-gradient-to-b from-cyan-950/30 to-slate-900/90 p-5 shadow-xl space-y-3">
+        <div class="rounded-3xl border border-cyan-500/20 bg-slate-900/90 p-6 space-y-3.5 shadow-xl shadow-cyan-950/30 backdrop-blur-xl">
           <div class="flex items-center justify-between">
-            <span class="text-xs font-black uppercase tracking-wider text-cyan-300">Điểm Đạt Chuẩn ATS CV</span>
-            <span class="rounded-full bg-emerald-400/10 px-2.5 py-0.5 text-xs font-black text-emerald-300 ring-1 ring-emerald-400/30">
-              85/100 Điểm
-            </span>
+            <span class="text-xs font-black uppercase tracking-wider text-cyan-300">Độ Hoàn Thiện Hồ Sơ (ATS)</span>
+            <span class="text-sm font-black text-cyan-400">{{ profileReadiness }}%</span>
           </div>
-          <div class="h-2 w-full overflow-hidden rounded-full bg-slate-800">
-            <div class="h-full rounded-full bg-gradient-to-r from-cyan-500 to-emerald-400 w-[85%]"></div>
+          <div class="w-full h-3 rounded-full bg-slate-950 p-0.5 border border-cyan-500/20">
+            <div 
+              class="h-full rounded-full bg-gradient-to-r from-cyan-500 via-blue-500 to-emerald-400 transition-all duration-500 shadow-md shadow-cyan-500/30"
+              :style="{ width: `${profileReadiness}%` }"
+            ></div>
           </div>
-          <p class="text-[11px] font-medium text-slate-400 leading-relaxed">
-            Hồ sơ đạt tiêu chuẩn cao giúp tăng 3.5x tỷ lệ Doanh nghiệp duyệt đơn ứng tuyển ca làm.
+          <p class="text-[11px] font-semibold text-slate-400 leading-relaxed">
+            Hồ sơ đầy đủ thông tin kỹ năng & file CV giúp tăng <strong class="text-cyan-300">85% cơ hội</strong> trúng tuyển nhanh.
           </p>
         </div>
       </div>
 
-      <!-- CỘT PHẢI (2/3): Skills Stack, CV Attachment & AI CV Evaluator Banner -->
+      <!-- CỘT PHẢI (2/3): Xem thông tin CV, Kỹ năng & Nút bấm xem báo cáo AI -->
       <div class="lg:col-span-2 space-y-6">
         
-        <!-- Khối AI Đánh giá & Chấm điểm CV (Nổi bật nhất) -->
-        <div class="rounded-3xl border border-cyan-500/30 bg-gradient-to-r from-slate-950 via-cyan-950/60 to-slate-950 p-6 shadow-2xl shadow-cyan-950/40 ring-1 ring-cyan-500/20">
-          <div class="flex flex-col sm:flex-row items-center justify-between gap-5">
-            <div class="flex items-center space-x-4">
-              <div class="h-14 w-14 rounded-2xl bg-gradient-to-tr from-cyan-500 via-blue-600 to-emerald-400 flex items-center justify-center text-white font-black text-2xl shadow-lg shadow-cyan-500/30 flex-shrink-0">
-                🤖
+        <!-- Khối File CV Đã Lưu -->
+        <div class="rounded-3xl border border-cyan-500/20 bg-slate-900/90 p-6 space-y-4 shadow-xl shadow-cyan-950/30 backdrop-blur-xl">
+          <div class="flex items-center justify-between">
+            <div class="flex items-center space-x-3">
+              <div class="flex h-10 w-10 items-center justify-center rounded-xl bg-cyan-500/10 text-cyan-300 border border-cyan-500/20">
+                📄
               </div>
               <div>
-                <div class="flex items-center gap-2">
-                  <h4 class="text-lg font-extrabold text-white tracking-tight">AI CV Evaluator & ATS Audit</h4>
-                  <span class="inline-flex rounded-full bg-emerald-400/10 px-2.5 py-0.5 text-[10px] font-black uppercase text-emerald-300 ring-1 ring-emerald-400/30">Gemini AI Engine</span>
-                </div>
-                <p class="text-xs text-slate-300 font-semibold mt-1 leading-relaxed">Phân tích CV tự động, phát hiện lỗi trình bày & tạo bản tóm tắt ấn tượng cho Nhà tuyển dụng</p>
+                <h4 class="text-sm font-extrabold text-white">File Hồ Sơ CV Ứng Tuyển</h4>
+                <p class="text-xs font-medium text-slate-400">Bản CV được sử dụng để ứng tuyển công việc hàng ngày</p>
               </div>
             </div>
+
             <button
               type="button"
-              @click="openOrRunAiEvaluation(true)"
+              @click="openOrRunAiEvaluation(false)"
               :disabled="isEvaluating"
-              class="w-full sm:w-auto inline-flex items-center justify-center rounded-xl bg-gradient-to-r from-cyan-500 via-blue-600 to-emerald-500 px-6 py-3 text-xs font-black text-white shadow-xl shadow-cyan-500/25 transition-all hover:from-cyan-400 hover:to-emerald-400 active:scale-95 disabled:opacity-60 flex-shrink-0"
+              class="px-4 py-2.5 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 text-slate-950 font-black text-xs rounded-xl transition-all shadow-md shadow-cyan-500/20 flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
-              <svg v-if="isEvaluating" class="animate-spin -ml-1 mr-2 h-4 w-4 text-white" fill="none" viewBox="0 0 24 24">
-                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
-                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8V0C5.373 0 0 5.373 0 12h4zm2 5.291A7.962 7.962 0 014 12H0c0 3.042 1.135 5.824 3 7.938l3-2.647z"></path>
-              </svg>
-              <span>{{ isEvaluating ? 'Đang phân tích AI...' : (aiResult ? '✨ Phân Tích Lại CV' : '✨ Phân Tích CV Bằng AI') }}</span>
+              <span>{{ isEvaluating ? '🤖 Đang Phân Tích...' : '🤖 Phân Tích CV Bằng AI' }}</span>
             </button>
           </div>
-        </div>
 
-        <!-- Khối File CV Đính Kèm -->
-        <div class="rounded-3xl border border-cyan-500/20 bg-slate-900/90 p-6 space-y-4 shadow-xl">
-          <div class="flex items-center justify-between">
-            <h4 class="text-xs font-black text-cyan-300 uppercase tracking-wider">File Hồ Sơ CV Đính Kèm</h4>
-            <span class="text-[11px] font-bold text-slate-400">Định dạng PDF</span>
-          </div>
-          
-          <div v-if="profileForm.cv_url" class="flex items-center justify-between bg-emerald-500/10 border border-emerald-500/20 p-4 rounded-2xl">
-            <div class="flex items-center space-x-3.5">
-              <span class="text-3xl">📄</span>
-              <div>
-                <p class="text-sm font-extrabold text-emerald-200">CV Đang Hoạt Động Trên Hệ Thống</p>
-                <p class="text-xs font-medium text-emerald-400/90 mt-0.5">Sẵn sàng ứng tuyển tất cả các công việc trên QuickWork</p>
+          <!-- Chi tiết file CV -->
+          <div v-if="profileForm.cv_url" class="flex flex-col sm:flex-row items-start sm:items-center justify-between p-4 rounded-2xl bg-slate-950/80 border border-cyan-500/20 gap-3">
+            <div class="flex items-center space-x-3 min-w-0">
+              <svg class="h-8 w-8 text-rose-400 flex-shrink-0" fill="currentColor" viewBox="0 0 20 20">
+                <path d="M4 4a2 2 0 012-2h4.586A2 2 0 0112 2.586L15.414 6A2 2 0 0116 7.414V16a2 2 0 01-2 2H6a2 2 0 01-2-2V4z" />
+              </svg>
+              <div class="min-w-0">
+                <p class="text-xs font-extrabold text-white truncate">Hoso_CV_SinhVien.pdf</p>
+                <p class="text-[11px] font-semibold text-emerald-300 mt-0.5">✓ Đã tải lên thành công</p>
               </div>
             </div>
             <a 
               :href="getMediaUrl(profileForm.cv_url)" 
               target="_blank" 
-              rel="noopener noreferrer"
-              class="px-4 py-2 bg-emerald-400 text-slate-950 font-black text-xs rounded-xl hover:bg-emerald-300 transition-all shadow-md shadow-emerald-500/20 flex items-center gap-1.5"
+              class="w-full sm:w-auto px-4 py-2 bg-slate-800 hover:bg-slate-700 text-cyan-200 text-xs font-bold rounded-xl border border-cyan-500/20 transition-all text-center"
             >
               <span>Xem trước file CV</span>
             </a>
@@ -174,9 +176,8 @@
       </div>
 
       <form @submit.prevent="handleUpdateProfile" class="space-y-6">
-        
-        <!-- Upload Ảnh Avatar -->
-        <div class="flex items-center space-x-6 bg-slate-950/80 p-4 rounded-2xl border border-cyan-500/15">
+        <!-- Upload Ảnh Đại Diện -->
+        <div class="flex items-center space-x-6 bg-slate-950/60 p-4 rounded-2xl border border-cyan-500/10">
           <img 
             :src="avatarPreview || (profileForm.avatar_url ? getMediaUrl(profileForm.avatar_url) : 'https://images.unsplash.com/photo-1535713875002-d1d0cf377fde?auto=format&fit=crop&w=150&h=150&q=80')" 
             class="w-20 h-20 rounded-full object-cover border-2 border-cyan-500/30 shadow-md"
@@ -218,25 +219,28 @@
         </div>
 
         <!-- Upload File CV -->
-        <div class="space-y-2">
-          <label class="block text-xs font-extrabold text-cyan-300 uppercase tracking-wider">File Hồ Sơ CV (Định dạng PDF)</label>
-          <div class="border-2 border-dashed border-cyan-500/25 hover:border-cyan-400 rounded-2xl p-6 transition-colors text-center relative bg-slate-950/80">
-            <input type="file" id="profile_cv_file" accept=".pdf" class="absolute inset-0 w-full h-full opacity-0 cursor-pointer" @change="onCvFileChange" />
-            <div class="space-y-1.5">
-              <span class="text-2xl">📄</span>
-              <p class="text-xs font-bold text-slate-200">
-                {{ cvFileSelected ? cvFileSelected.name : 'Bấm vào đây để tải lên file CV PDF mới' }}
-              </p>
-            </div>
+        <div class="bg-slate-950/60 p-5 rounded-2xl border border-cyan-500/20 space-y-3">
+          <label for="profile_cv_file" class="block text-xs font-extrabold text-cyan-300 uppercase tracking-wider">File Hồ Sơ CV (Bản mềm PDF/DOCX)</label>
+          <div class="flex items-center space-x-4">
+            <input type="file" id="profile_cv_file" accept=".pdf,.doc,.docx" class="hidden" @change="onCvFileChange" />
+            <label for="profile_cv_file" class="px-4 py-2.5 text-xs font-extrabold text-cyan-200 bg-cyan-500/15 border border-cyan-500/30 rounded-xl shadow-sm hover:bg-cyan-500/25 cursor-pointer transition-all flex items-center space-x-2">
+              <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M4 16v1a3 3 0 003 3h10a3 3 0 003-3v-1m-4-8l-4-4m0 0L8 8m4-4v12" />
+              </svg>
+              <span>Tải file CV mới từ máy tính</span>
+            </label>
+            <span v-if="profileForm.cv_url" class="text-xs font-bold text-emerald-300">✓ Đã có file CV</span>
+            <span v-else class="text-xs font-medium text-slate-400">Chưa chọn file mới</span>
           </div>
+          <p class="text-[11px] font-medium text-slate-400">Định dạng hỗ trợ: .PDF, .DOC, .DOCX. Dung lượng tối đa 5MB.</p>
         </div>
 
-        <!-- Các nút Lưu / Hủy -->
-        <div class="pt-4 border-t border-cyan-500/15 flex justify-end space-x-3">
-          <button 
-            type="button" 
+        <!-- Nút bấm Submit -->
+        <div class="flex items-center justify-end space-x-3 pt-4 border-t border-cyan-500/15">
+          <button
+            type="button"
             @click="isEditing = false"
-            class="px-5 py-2.5 border border-white/10 text-xs font-bold rounded-xl text-slate-300 bg-white/5 hover:bg-white/10 transition-all"
+            class="px-5 py-2.5 text-xs font-bold rounded-xl text-slate-300 bg-slate-800 hover:bg-slate-700 transition-colors"
           >
             Hủy bỏ
           </button>
@@ -322,33 +326,29 @@ const {
   isResponding,
   isChatModalOpen,
   selectedChatApp,
+  handleStudentComplete,
+  openReviewModal,
+  openManagedApplicationModal,
+  handleLogout,
   toast
 } = toRefs(props.state)
 
-import { onMounted } from 'vue'
-
 const { evaluateCv, getLatestCvEvaluation } = useAi()
-const { error } = useToast()
 const { getMediaUrl } = useMedia()
+const { error } = useToast()
 
-const isEvaluating = ref(false)
 const isAiModalOpen = ref(false)
+const isEvaluating = ref(false)
 const aiResult = ref<EvaluateCvResult | null>(null)
 
-// Tự động nạp báo cáo đánh giá CV mới nhất từ MySQL Database ngay khi mở trang
-onMounted(async () => {
-  try {
-    const latest = await getLatestCvEvaluation()
-    if (latest) {
-      aiResult.value = latest
-    }
-  } catch (err) {
-    // Chưa có dữ liệu cũ
-  }
-})
+// Tải báo cáo AI đã lưu gần nhất khi vừa khởi tạo trang
+if (import.meta.client) {
+  getLatestCvEvaluation().then((latest) => {
+    if (latest) aiResult.value = latest
+  }).catch(() => {})
+}
 
 const openOrRunAiEvaluation = async (forceReevaluate = false) => {
-  // Nếu đã có báo cáo đã lưu trong DB và người dùng bấm "Xem Kết Quả Đã Lưu" -> Mở ngay tức thì (1-2ms)
   if (aiResult.value && !forceReevaluate) {
     isAiModalOpen.value = true
     return
