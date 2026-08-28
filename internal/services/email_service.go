@@ -1,6 +1,7 @@
 package services
 
 import (
+	"crypto/tls"
 	"fmt"
 	"log"
 	"net/smtp"
@@ -36,6 +37,8 @@ func (e *emailService) SendOTPEmail(toEmail string, otpCode string) error {
 		return nil
 	}
 
+	log.Printf("📧 [Email Engine]: Đang khởi chạy tiến trình gửi mã OTP đến %s (User: %s)...", toEmail, e.authEmail)
+
 	body := fmt.Sprintf(`<!DOCTYPE html>
 <html>
 <head>
@@ -66,7 +69,7 @@ func (e *emailService) SendOTPEmail(toEmail string, otpCode string) error {
 	headers := make(map[string]string)
 	headers["From"] = fmt.Sprintf("QuickWork Platform <%s>", e.authEmail)
 	headers["To"] = toEmail
-	headers["Subject"] = "Mã xác thực khôi phục mật khẩu - QuickWork"
+	headers["Subject"] = "Ma xac thuc khoi phuc mat khau - QuickWork"
 	headers["MIME-Version"] = "1.0"
 	headers["Content-Type"] = "text/html; charset=\"UTF-8\""
 
@@ -79,12 +82,57 @@ func (e *emailService) SendOTPEmail(toEmail string, otpCode string) error {
 	msgBytes := []byte(message)
 	auth := smtp.PlainAuth("", e.authEmail, e.authPassword, e.smtpHost)
 
-	err := smtp.SendMail(e.smtpHost+":"+e.smtpPort, auth, e.authEmail, []string{toEmail}, msgBytes)
-	if err != nil {
-		log.Printf("⚠️ [Email Error]: Lỗi gửi mail qua SMTP (%v). [Mã OTP Fallback]: %s -> %s", err, toEmail, otpCode)
-		return err
+	// Mode 1: Try Port 587 Standard SendMail
+	err587 := smtp.SendMail(e.smtpHost+":"+e.smtpPort, auth, e.authEmail, []string{toEmail}, msgBytes)
+	if err587 == nil {
+		log.Printf("🎉 [Email Engine]: Gửi mã OTP thành công 100%% qua Port %s đến Gmail: %s", e.smtpPort, toEmail)
+		return nil
 	}
 
-	log.Printf("📧 [Email Engine]: Đã gửi mã OTP thành công đến Gmail: %s", toEmail)
+	log.Printf("⚠️ [Email Engine]: Gửi qua Port %s không thành công (%v). Chuyển sang kết nối Port 465 SSL/TLS...", e.smtpPort, err587)
+
+	// Mode 2: Try Port 465 Direct TLS SSL Connection
+	tlsconfig := &tls.Config{
+		InsecureSkipVerify: true,
+		ServerName:         e.smtpHost,
+	}
+
+	conn, errTls := tls.Dial("tcp", e.smtpHost+":465", tlsconfig)
+	if errTls != nil {
+		log.Printf("❌ [Email Engine]: Lỗi kết nối Port 465 TLS (%v). [Mã OTP Fallback]: %s -> %s", errTls, toEmail, otpCode)
+		return errTls
+	}
+	defer conn.Close()
+
+	client, errClient := smtp.NewClient(conn, e.smtpHost)
+	if errClient != nil {
+		log.Printf("❌ [Email Engine]: Lỗi tạo Client SMTP Port 465 (%v). [Mã OTP Fallback]: %s -> %s", errClient, toEmail, otpCode)
+		return errClient
+	}
+	defer client.Quit()
+
+	if errAuth := client.Auth(auth); errAuth != nil {
+		log.Printf("❌ [Email Engine]: Lỗi Mật khẩu App Gmail / Auth (%v). [Mã OTP Fallback]: %s -> %s", errAuth, toEmail, otpCode)
+		return errAuth
+	}
+
+	if errMail := client.Mail(e.authEmail); errMail != nil {
+		return errMail
+	}
+	if errRcpt := client.Rcpt(toEmail); errRcpt != nil {
+		return errRcpt
+	}
+
+	w, errData := client.Data()
+	if errData != nil {
+		return errData
+	}
+	_, errWrite := w.Write(msgBytes)
+	if errWrite != nil {
+		return errWrite
+	}
+	_ = w.Close()
+
+	log.Printf("🎉 [Email Engine]: Gửi mã OTP thành công 100%% qua Port 465 SSL đến Gmail: %s", toEmail)
 	return nil
 }
