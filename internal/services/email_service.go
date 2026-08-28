@@ -33,8 +33,8 @@ func NewEmailService() EmailService {
 
 func (e *emailService) SendOTPEmail(toEmail string, otpCode string) error {
 	if e.authEmail == "" || e.authPassword == "" {
-		log.Printf("⚠️ [Email Notice]: Chưa cấu hình SMTP_EMAIL / SMTP_PASSWORD trong .env. [Mã OTP Console Fallback]: %s -> %s", toEmail, otpCode)
-		return nil
+		log.Printf("❌ [Email Error]: CHƯA CẤU HÌNH SMTP_EMAIL / SMTP_PASSWORD TRÊN RENDER ENVIRONMENT! [Mã OTP Console Fallback]: %s -> %s", toEmail, otpCode)
+		return fmt.Errorf("chưa cấu hình SMTP_EMAIL / SMTP_PASSWORD trên Render Environment")
 	}
 
 	log.Printf("📧 [Email Engine]: Đang khởi chạy tiến trình gửi mã OTP đến %s (User: %s)...", toEmail, e.authEmail)
