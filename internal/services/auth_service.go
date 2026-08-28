@@ -271,16 +271,21 @@ func (s *authService) SendPasswordResetOTP(email string) error {
 		otpStoreMutex.Unlock()
 	}
 
-	// Off-thread Async Queueing via RabbitMQ or Direct Service Call
+	// Send Email via EmailService directly
+	if s.emailService != nil {
+		go func() {
+			if err := s.emailService.SendOTPEmail(email, otpCode); err != nil {
+				log.Printf("❌ [AuthService] Lỗi gửi OTP email trực tiếp: %v", err)
+			}
+		}()
+	}
+
+	// Off-thread Async Queueing via RabbitMQ if available
 	if s.rmqClient != nil && s.rmqClient.IsAvailable() {
 		_ = s.rmqClient.Publish(queue.QueueEmailOTP, queue.EmailOTPPayload{
 			Email:   email,
 			OTPCode: otpCode,
 		})
-	} else if s.emailService != nil {
-		go func() {
-			_ = s.emailService.SendOTPEmail(email, otpCode)
-		}()
 	}
 
 	return nil
