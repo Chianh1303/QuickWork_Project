@@ -13,12 +13,29 @@ export const useApi = () => {
     secure: process.env.NODE_ENV === 'production'
   })
 
+  const getApiBase = (): string => {
+    try {
+      const runtimeConfig = useRuntimeConfig()
+      if (runtimeConfig.public?.apiBaseUrl) {
+        return (runtimeConfig.public.apiBaseUrl as string).replace(/\/$/, '')
+      }
+    } catch (e) {
+      // fallback if runtimeConfig not available
+    }
+    const envUrl = process.env.NUXT_PUBLIC_API_BASE_URL || 'https://quickwork-project.onrender.com'
+    return envUrl.replace(/\/$/, '')
+  }
+
   /**
-   * Main request runner using Nuxt's $fetch with automatic JWT attachment.
-   * Leverages the routeRules proxy configured in nuxt.config.ts.
+   * Main request runner using Nuxt's $fetch with automatic JWT attachment and API Base URL resolution.
    */
   const request = async <T = any>(url: string, options: CustomApiOptions = {}): Promise<T> => {
     const { skipAutoLogout = false, ...fetchOptions } = options
+
+    let targetUrl = url
+    if (url.startsWith('/')) {
+      targetUrl = `${getApiBase()}${url}`
+    }
 
     // Standardize headers
     const headers: Record<string, string> = {
@@ -32,7 +49,7 @@ export const useApi = () => {
     }
 
     try {
-      return await $fetch<T>(url, {
+      return await $fetch<T>(targetUrl, {
         ...fetchOptions,
         headers
       })
