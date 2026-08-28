@@ -1,6 +1,6 @@
 <template>
   <div v-if="isOpen" class="fixed inset-0 z-50 flex items-center justify-center bg-slate-950/80 p-4 backdrop-blur-md">
-    <div class="w-full max-w-md rounded-3xl border border-white/10 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/50">
+    <div class="w-full max-w-md rounded-3xl border border-cyan-500/30 bg-slate-900 p-6 shadow-2xl shadow-cyan-950/80">
       
       <!-- Modal Header -->
       <div class="flex items-center justify-between border-b border-white/10 pb-4">
@@ -12,7 +12,7 @@
           </div>
           <h3 class="text-lg font-extrabold text-white">Khôi Phục Mật Khẩu OTP</h3>
         </div>
-        <button @click="closeModal" class="rounded-lg p-1 text-slate-400 hover:bg-white/10 hover:text-white transition-colors">
+        <button @click="closeModal" class="rounded-lg p-1 text-slate-400 hover:bg-white/10 hover:text-white transition-colors cursor-pointer">
           <svg class="h-5 w-5" fill="none" viewBox="0 0 24 24" stroke="currentColor">
             <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M6 18L18 6M6 6l12 12" />
           </svg>
@@ -39,6 +39,7 @@
             type="email"
             v-model="email"
             placeholder="nhap.email@domain.com"
+            @keyup.enter="handleSendOTP"
             class="w-full rounded-xl border border-white/10 bg-slate-950/80 px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
           />
         </div>
@@ -46,7 +47,7 @@
         <button
           @click="handleSendOTP"
           :disabled="isLoading || !email"
-          class="w-full rounded-xl bg-cyan-400 py-3 text-xs font-bold text-slate-950 hover:bg-cyan-300 disabled:opacity-50 transition-all shadow-lg shadow-cyan-500/20"
+          class="w-full rounded-xl bg-cyan-400 py-3 text-xs font-bold text-slate-950 hover:bg-cyan-300 disabled:opacity-50 transition-all shadow-lg shadow-cyan-500/20 cursor-pointer"
         >
           <span v-if="isLoading">📧 Đang gửi mã OTP...</span>
           <span v-else>Gửi Mã OTP Đến Gmail ➔</span>
@@ -76,6 +77,7 @@
             type="password"
             v-model="newPassword"
             placeholder="••••••••"
+            @keyup.enter="handleResetPassword"
             class="w-full rounded-xl border border-white/10 bg-slate-950/80 px-4 py-2.5 text-xs text-white placeholder-slate-500 focus:border-cyan-400 focus:outline-none focus:ring-2 focus:ring-cyan-400/20"
           />
         </div>
@@ -83,14 +85,14 @@
         <div class="flex items-center space-x-3 pt-2">
           <button
             @click="step = 1"
-            class="w-1/3 rounded-xl border border-white/10 bg-slate-800 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-700 transition-colors"
+            class="w-1/3 rounded-xl border border-white/10 bg-slate-800 py-2.5 text-xs font-bold text-slate-300 hover:bg-slate-700 transition-colors cursor-pointer"
           >
             ← Quay lại
           </button>
           <button
             @click="handleResetPassword"
             :disabled="isLoading || !otpCode || !newPassword"
-            class="w-2/3 rounded-xl bg-cyan-400 py-2.5 text-xs font-bold text-slate-950 hover:bg-cyan-300 disabled:opacity-50 transition-all shadow-lg shadow-cyan-500/20"
+            class="w-2/3 rounded-xl bg-cyan-400 py-2.5 text-xs font-bold text-slate-950 hover:bg-cyan-300 disabled:opacity-50 transition-all shadow-lg shadow-cyan-500/20 cursor-pointer"
           >
             <span v-if="isLoading">⏳ Đang xử lý...</span>
             <span v-else>Xác Nhận Đổi Mật Khẩu 🔒</span>
@@ -104,12 +106,14 @@
 
 <script setup lang="ts">
 import { ref } from 'vue'
+import { useApi } from '~/composables/useApi'
 
 const props = defineProps({
   isOpen: Boolean
 })
 
 const emit = defineEmits(['close'])
+const api = useApi()
 
 const step = ref(1)
 const email = ref('')
@@ -133,14 +137,14 @@ const handleSendOTP = async () => {
   successMessage.value = ''
 
   try {
-    const res: any = await $fetch('/api/auth/forgot-password', {
-      method: 'POST',
-      body: { email: email.value }
-    })
-    successMessage.value = res.message || 'Mã OTP đã được gửi thành công!'
+    const res: any = await api.post('/api/auth/forgot-password', {
+      email: email.value
+    }, { skipAutoLogout: true })
+    successMessage.value = res?.message || 'Mã OTP đã được gửi thành công đến Gmail của bạn!'
     step.value = 2
   } catch (err: any) {
-    errorMessage.value = err.data?.message || 'Không thể gửi mã OTP. Vui lòng kiểm tra lại Email!'
+    console.error('Lỗi gửi OTP:', err)
+    errorMessage.value = err?.data?.message || err?.message || 'Không thể gửi mã OTP. Vui lòng kiểm tra lại Email!'
   } finally {
     isLoading.value = false
   }
@@ -153,20 +157,18 @@ const handleResetPassword = async () => {
   successMessage.value = ''
 
   try {
-    const res: any = await $fetch('/api/auth/reset-password', {
-      method: 'POST',
-      body: {
-        email: email.value,
-        otp_code: otpCode.value,
-        new_password: newPassword.value
-      }
-    })
-    successMessage.value = res.message || 'Đặt lại mật khẩu thành công!'
+    const res: any = await api.post('/api/auth/reset-password', {
+      email: email.value,
+      otp_code: otpCode.value,
+      new_password: newPassword.value
+    }, { skipAutoLogout: true })
+    successMessage.value = res?.message || 'Đặt lại mật khẩu thành công!'
     setTimeout(() => {
       closeModal()
     }, 2000)
   } catch (err: any) {
-    errorMessage.value = err.data?.message || 'Mã OTP không đúng hoặc đã hết hạn!'
+    console.error('Lỗi reset password:', err)
+    errorMessage.value = err?.data?.message || err?.message || 'Mã OTP không đúng hoặc đã hết hạn!'
   } finally {
     isLoading.value = false
   }
