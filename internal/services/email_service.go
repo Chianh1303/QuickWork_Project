@@ -36,38 +36,50 @@ func (e *emailService) SendOTPEmail(toEmail string, otpCode string) error {
 		return nil
 	}
 
-	subject := "Subject: [QuickWork] Ma xac nhan khoi phuc mat khau\n"
-	mime := "MIME-version: 1.0;\nContent-Type: text/html; charset=\"UTF-8\";\n\n"
-	body := fmt.Sprintf(`
-	<!DOCTYPE html>
-	<html>
-	<head>
-		<style>
-			body { font-family: Arial, sans-serif; background-color: #f4f6f8; margin: 0; padding: 20px; }
-			.card { max-width: 500px; margin: 0 auto; background: #ffffff; border-radius: 12px; padding: 30px; box-shadow: 0 4px 15px rgba(0,0,0,0.05); }
-			.logo { font-size: 24px; font-weight: bold; color: #4F46E5; margin-bottom: 20px; text-align: center; }
-			.otp-box { background: #EEF2FF; border: 2px dashed #6366F1; border-radius: 8px; font-size: 32px; font-weight: bold; color: #4F46E5; letter-spacing: 6px; text-align: center; padding: 15px; margin: 20px 0; }
-			.footer { font-size: 12px; color: #6B7280; text-align: center; margin-top: 25px; }
-		</style>
-	</head>
-	<body>
-		<div class="card">
-			<div class="logo">⚡ QuickWork Platform</div>
-			<h2>Mã Xác Thực Khôi Phục Mật Khẩu</h2>
-			<p>Bạn đã yêu cầu đặt lại mật khẩu cho tài khoản <strong>%s</strong>.</p>
-			<p>Vui lòng nhập mã OTP gồm 6 chữ số dưới đây để tiếp tục:</p>
-			<div class="otp-box">%s</div>
-			<p>⚠️ Mã này có hiệu lực trong vòng <strong>5 phút</strong>. Vui lòng không chia sẻ mã này cho bất kỳ ai.</p>
-			<div class="footer">Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này.<br>&copy; 2026 QuickWork Platform. All rights reserved.</div>
-		</div>
-	</body>
-	</html>
-	`, toEmail, otpCode)
+	body := fmt.Sprintf(`<!DOCTYPE html>
+<html>
+<head>
+	<meta charset="UTF-8">
+	<style>
+		body { font-family: 'Helvetica Neue', Helvetica, Arial, sans-serif; background-color: #0f172a; margin: 0; padding: 20px; color: #f8fafc; }
+		.card { max-width: 500px; margin: 0 auto; background: #1e293b; border: 1px solid rgba(34, 211, 238, 0.2); border-radius: 16px; padding: 32px; box-shadow: 0 20px 25px -5px rgba(0, 0, 0, 0.5); }
+		.logo { font-size: 24px; font-weight: 900; color: #22d3ee; margin-bottom: 24px; text-align: center; letter-spacing: -0.5px; }
+		.title { font-size: 18px; font-weight: 800; color: #ffffff; text-align: center; margin-bottom: 8px; }
+		.desc { font-size: 13px; color: #94a3b8; text-align: center; margin-bottom: 24px; line-height: 1.5; }
+		.otp-box { background: rgba(34, 211, 238, 0.1); border: 2px dashed #22d3ee; border-radius: 12px; font-size: 36px; font-weight: 900; color: #38bdf8; letter-spacing: 8px; text-align: center; padding: 18px; margin: 24px 0; }
+		.warning { font-size: 12px; color: #f43f5e; text-align: center; font-weight: 600; margin-top: 16px; }
+		.footer { font-size: 11px; color: #64748b; text-align: center; margin-top: 32px; border-t: 1px solid rgba(255,255,255,0.05); padding-top: 16px; }
+	</style>
+</head>
+<body>
+	<div class="card">
+		<div class="logo">⚡ QUICKWORK PLATFORM</div>
+		<div class="title">Mã Xác Thực Khôi Phục Mật Khẩu</div>
+		<div class="desc">Bạn đã gửi yêu cầu đặt lại mật khẩu cho tài khoản <strong style="color: #38bdf8;">%s</strong>. Vui lòng nhập mã OTP bên dưới để hoàn tất:</div>
+		<div class="otp-box">%s</div>
+		<div class="warning">⚠️ Mã xác thực có hiệu lực trong 5 phút. Tuyệt đối không chia sẻ mã này cho người khác.</div>
+		<div class="footer">Nếu bạn không yêu cầu mã này, vui lòng bỏ qua email này.<br>&copy; 2026 QuickWork Platform. All rights reserved.</div>
+	</div>
+</body>
+</html>`, toEmail, otpCode)
 
-	msg := []byte(subject + mime + body)
+	headers := make(map[string]string)
+	headers["From"] = fmt.Sprintf("QuickWork Platform <%s>", e.authEmail)
+	headers["To"] = toEmail
+	headers["Subject"] = "Mã xác thực khôi phục mật khẩu - QuickWork"
+	headers["MIME-Version"] = "1.0"
+	headers["Content-Type"] = "text/html; charset=\"UTF-8\""
+
+	message := ""
+	for k, v := range headers {
+		message += fmt.Sprintf("%s: %s\r\n", k, v)
+	}
+	message += "\r\n" + body
+
+	msgBytes := []byte(message)
 	auth := smtp.PlainAuth("", e.authEmail, e.authPassword, e.smtpHost)
 
-	err := smtp.SendMail(e.smtpHost+":"+e.smtpPort, auth, e.authEmail, []string{toEmail}, msg)
+	err := smtp.SendMail(e.smtpHost+":"+e.smtpPort, auth, e.authEmail, []string{toEmail}, msgBytes)
 	if err != nil {
 		log.Printf("⚠️ [Email Error]: Lỗi gửi mail qua SMTP (%v). [Mã OTP Fallback]: %s -> %s", err, toEmail, otpCode)
 		return err
