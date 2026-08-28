@@ -214,12 +214,13 @@
                 <span class="text-sm font-medium text-slate-200">{{ userEmail || 'Người dùng' }}</span>
               </div>
 
-              <!-- Profile Dropdown trigger / Logout button -->
+              <!-- Logout button (High Mobile Visibility) -->
               <button
                 @click="handleLogout"
-                class="inline-flex items-center space-x-1.5 px-3 py-2 border border-white/10 rounded-lg text-sm font-semibold text-slate-200 hover:bg-white/10 hover:text-white focus-ring"
+                title="Đăng xuất khỏi tài khoản"
+                class="inline-flex items-center space-x-1.5 px-3 py-1.5 sm:px-3.5 sm:py-2 border border-rose-500/30 bg-rose-500/10 hover:bg-rose-500/20 text-xs sm:text-sm font-extrabold text-rose-300 rounded-xl transition-all shadow-sm cursor-pointer flex-shrink-0"
               >
-                <svg class="h-4 w-4" fill="none" viewBox="0 0 24 24" stroke="currentColor">
+                <svg class="h-4 w-4 text-rose-400" fill="none" viewBox="0 0 24 24" stroke="currentColor">
                   <path stroke-linecap="round" stroke-linejoin="round" stroke-width="2" d="M17 16l4-4m0 0l-4-4m4 4H7m6 4v1a3 3 0 01-3 3H6a3 3 0 01-3-3V7a3 3 0 013-3h4a3 3 0 013 3v1" />
                 </svg>
                 <span>Đăng xuất</span>
