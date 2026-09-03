@@ -96,11 +96,15 @@
 
             <button
               type="button"
-              @click="openOrRunAiEvaluation(false)"
+              @click="runNewAiEvaluation"
               :disabled="isEvaluating"
               class="px-4 py-2.5 bg-gradient-to-r from-cyan-400 to-emerald-400 hover:from-cyan-300 hover:to-emerald-300 text-slate-950 font-black text-xs rounded-xl transition-all shadow-md shadow-cyan-500/20 flex items-center gap-2 cursor-pointer disabled:opacity-50"
             >
-              <span>{{ isEvaluating ? '🤖 Đang Phân Tích...' : '🤖 Phân Tích CV Bằng AI' }}</span>
+              <svg v-if="isEvaluating" class="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+              </svg>
+              <span>{{ isEvaluating ? '🤖 Đang Phân Tích Lượt Mới...' : '🤖 Phân Tích CV Bằng AI' }}</span>
             </button>
           </div>
 
@@ -156,7 +160,7 @@
           </div>
           <button
             type="button"
-            @click="openOrRunAiEvaluation(false)"
+            @click="openSavedAiEvaluation"
             class="w-full sm:w-auto px-6 py-3 bg-emerald-400 hover:bg-emerald-300 text-slate-950 font-black text-xs rounded-xl transition-all shadow-lg shadow-emerald-500/20 flex items-center justify-center gap-2 flex-shrink-0"
           >
             <span>Xem Kết Quả Chi Tiết</span>
@@ -260,6 +264,8 @@
     <AiCvReviewModal
       :is-open="isAiModalOpen"
       :result="aiResult"
+      :is-evaluating="isEvaluating"
+      @reevaluate="runNewAiEvaluation"
       @close="isAiModalOpen = false"
     />
   </div>
@@ -348,16 +354,24 @@ if (import.meta.client) {
   }).catch(() => {})
 }
 
-const openOrRunAiEvaluation = async (forceReevaluate = false) => {
-  if (aiResult.value && !forceReevaluate) {
+// Mở xem báo cáo phân tích CV cũ đã lưu
+const openSavedAiEvaluation = () => {
+  if (aiResult.value) {
     isAiModalOpen.value = true
+  }
+}
+
+// Luôn thực hiện phân tích lượt mới bằng AI
+const runNewAiEvaluation = async () => {
+  const formVal = profileForm?.value || {}
+  if (!formVal.cv_url) {
+    error('Vui lòng tải lên file CV trước khi thực hiện phân tích bằng AI.')
     return
   }
 
   isEvaluating.value = true
   try {
     const rawSkills = skillsArray?.value || []
-    const formVal = profileForm?.value || {}
     const res = await evaluateCv({
       full_name: formVal.full_name,
       phone: formVal.phone,
