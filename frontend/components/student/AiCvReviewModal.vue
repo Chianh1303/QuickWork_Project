@@ -243,8 +243,8 @@
           </div>
         </div>
 
-        <!-- Sticky Footer với nút Scroll To Top & Đóng -->
-        <div class="flex items-center justify-between border-t border-white/10 p-4 sm:p-5 bg-slate-900/90 rounded-b-3xl backdrop-blur sticky bottom-0 z-20">
+        <!-- Sticky Footer với nút Scroll To Top, Phân Tích Lại & Đóng -->
+        <div class="flex flex-wrap items-center justify-between gap-3 border-t border-white/10 p-4 sm:p-5 bg-slate-900/90 rounded-b-3xl backdrop-blur sticky bottom-0 z-20">
           <button
             @click="scrollToTop"
             class="inline-flex items-center gap-1.5 rounded-xl bg-white/10 hover:bg-white/20 px-4 py-2 text-xs font-semibold text-slate-200 transition-colors"
@@ -252,12 +252,27 @@
             <span>⬆ Scroll Lên Đầu</span>
           </button>
 
-          <button
-            @click="close"
-            class="rounded-xl bg-cyan-400 px-6 py-2.5 text-xs font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 hover:bg-cyan-300 transition-colors"
-          >
-            Đóng Cửa Sổ
-          </button>
+          <div class="flex items-center gap-3">
+            <button
+              type="button"
+              @click="$emit('reevaluate')"
+              :disabled="isEvaluating"
+              class="rounded-xl bg-gradient-to-r from-emerald-500 to-teal-500 hover:from-emerald-400 hover:to-teal-400 text-slate-950 font-bold px-4 py-2.5 text-xs shadow-md transition-all disabled:opacity-50 flex items-center gap-1.5 cursor-pointer"
+            >
+              <svg v-if="isEvaluating" class="animate-spin h-3.5 w-3.5" viewBox="0 0 24 24" fill="none">
+                <circle class="opacity-25" cx="12" cy="12" r="10" stroke="currentColor" stroke-width="4"></circle>
+                <path class="opacity-75" fill="currentColor" d="M4 12a8 8 0 018-8v8H4z"></path>
+              </svg>
+              <span>{{ isEvaluating ? 'Đang Phân Tích...' : '🔄 Phân Tích Lượt Mới' }}</span>
+            </button>
+
+            <button
+              @click="close"
+              class="rounded-xl bg-cyan-400 px-6 py-2.5 text-xs font-semibold text-slate-950 shadow-lg shadow-cyan-500/20 hover:bg-cyan-300 transition-colors cursor-pointer"
+            >
+              Đóng Cửa Sổ
+            </button>
+          </div>
         </div>
 
       </div>
@@ -270,12 +285,18 @@ import { ref } from 'vue'
 import type { EvaluateCvResult } from '~/composables/useAi'
 import { useToast } from '~/composables/useToast'
 
-const props = defineProps<{
+const props = withDefaults(defineProps<{
   isOpen: boolean
   result: EvaluateCvResult | null
-}>()
+  isEvaluating?: boolean
+}>(), {
+  isEvaluating: false
+})
 
-const emit = defineEmits(['close'])
+const emit = defineEmits<{
+  (e: 'close'): void
+  (e: 'reevaluate'): void
+}>()
 const { success } = useToast()
 const copied = ref(false)
 const scrollContainer = ref<HTMLElement | null>(null)
