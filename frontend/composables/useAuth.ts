@@ -9,9 +9,29 @@ export const useAuth = () => {
   const token = useCookie<string | null>('auth_token', {
     maxAge: 60 * 60 * 24 * 3, // 3 days
     path: '/',
-    sameSite: 'lax',
-    secure: process.env.NODE_ENV === 'production'
+    sameSite: 'lax'
   })
+
+  /**
+   * Helper to decode payload from JWT token directly as instant fallback.
+   */
+  const decodeJwtPayload = (jwtString: string): any => {
+    try {
+      const parts = jwtString.split('.')
+      if (parts.length < 2) return null
+      const base64Url = parts[1]
+      const base64 = base64Url.replace(/-/g, '+').replace(/_/g, '/')
+      const jsonPayload = decodeURIComponent(
+        atob(base64)
+          .split('')
+          .map((c) => '%' + ('00' + c.charCodeAt(0).toString(16)).slice(-2))
+          .join('')
+      )
+      return JSON.parse(jsonPayload)
+    } catch {
+      return null
+    }
+  }
 
   /**
    * Log in user, store JWT token in cookie, update store state, and redirect based on role.
@@ -94,23 +114,41 @@ export const useAuth = () => {
    */
   const fetchUser = async () => {
     if (!token.value) {
-      authStore.setUser(null)
+      authStore.clearAuth()
       return null
     }
 
+    // Try decoding role and user_id directly from JWT token payload as instant fallback
+    if (!authStore.user) {
+      const payload = decodeJwtPayload(token.value)
+      if (payload && payload.user_id && payload.role) {
+        authStore.setUser({
+          id: payload.user_id,
+          email: payload.email || '',
+          role: payload.role
+        })
+      }
+    }
+
     try {
-      const response = await api.get('/api/users/me')
+      const response = await api.get('/api/users/me', { skipAutoLogout: true })
       if (response && response.user_id) {
         authStore.setUser({
           id: response.user_id,
-          email: '', // Not returned by endpoint, but ID and role are populated
+          email: authStore.user?.email || '',
           role: response.role
         })
       }
       return authStore.user
-    } catch (error) {
-      authStore.clearAuth()
-      return null
+    } catch (error: any) {
+      // ONLY clear auth if the server explicitly tells us the token is invalid/expired (401)
+      const status = error?.response?.status || error?.status || error?.statusCode
+      if (status === 401) {
+        authStore.clearAuth()
+        return null
+      }
+      // If it's a network glitch or temporary 5xx server warmup, KEEP current session!
+      return authStore.user
     }
   }
 

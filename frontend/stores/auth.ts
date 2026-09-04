@@ -8,20 +8,30 @@ export interface UserState {
 }
 
 export const useAuthStore = defineStore('auth', () => {
-  const user = ref<UserState | null>(null)
-  
-  // Retrieve token cookie
-  const tokenCookie = useCookie<string | null>('auth_token')
+  const tokenCookie = useCookie<string | null>('auth_token', {
+    maxAge: 60 * 60 * 24 * 3,
+    path: '/',
+    sameSite: 'lax'
+  })
+
+  const userCookie = useCookie<UserState | null>('auth_user', {
+    maxAge: 60 * 60 * 24 * 3,
+    path: '/',
+    sameSite: 'lax'
+  })
+
+  const user = ref<UserState | null>(userCookie.value || null)
 
   // Reactive state getters
   const isAuthenticated = computed(() => !!tokenCookie.value)
-  const userRole = computed(() => user.value?.role || null)
+  const userRole = computed(() => user.value?.role || userCookie.value?.role || null)
 
   /**
-   * Set user information in state.
+   * Set user information in state and persist to cookie.
    */
   function setUser(userData: UserState | null) {
     user.value = userData
+    userCookie.value = userData
   }
 
   /**
@@ -29,6 +39,7 @@ export const useAuthStore = defineStore('auth', () => {
    */
   function clearAuth() {
     user.value = null
+    userCookie.value = null
     tokenCookie.value = null
   }
 

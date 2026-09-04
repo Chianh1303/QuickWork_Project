@@ -1,21 +1,22 @@
 <template>
   <div class="dashboard-body min-h-screen bg-slate-950 text-slate-100 lg:flex font-sans">
     <!-- Sidebar navigation (desktop) -->
-    <aside class="hidden lg:flex lg:w-64 lg:flex-shrink-0 lg:flex-col lg:border-r lg:border-cyan-500/15 lg:bg-slate-950/90 lg:px-4 lg:py-6 backdrop-blur-xl sticky top-0 h-screen overflow-y-auto z-30">
-      <!-- Enterprise Platform Logo Badge -->
-      <div class="px-3 pb-6 border-b border-cyan-500/10 mb-4">
-        <button @click="activeSection = 'dashboard'" class="flex items-center gap-2.5 group text-left w-full">
+    <aside class="hidden lg:flex lg:w-64 lg:flex-shrink-0 lg:flex-col lg:border-r lg:border-cyan-500/15 lg:bg-slate-950/90 lg:px-4 lg:py-6 backdrop-blur-xl sticky top-0 h-screen z-30">
+      <!-- Enterprise Platform Logo Badge & Notification Bell -->
+      <div class="px-3 pb-6 border-b border-cyan-500/10 mb-4 flex items-center justify-between">
+        <button @click="activeSection = 'dashboard'" class="flex items-center gap-2.5 group text-left min-w-0">
           <div class="h-9 w-9 rounded-xl bg-gradient-to-tr from-blue-600 via-cyan-500 to-emerald-400 flex items-center justify-center text-white font-black text-lg shadow-lg shadow-cyan-500/30 group-hover:scale-105 transition-transform">
             QW
           </div>
-          <div>
+          <div class="min-w-0">
             <span class="text-[10px] font-black uppercase tracking-wider text-cyan-400">Business SaaS</span>
-            <p class="text-sm font-extrabold text-white tracking-tight group-hover:text-cyan-300 transition-colors">QuickWork Portal</p>
+            <p class="text-sm font-extrabold text-white tracking-tight group-hover:text-cyan-300 transition-colors truncate">QuickWork Portal</p>
           </div>
         </button>
+        <NotificationBell align="left" />
       </div>
 
-      <nav class="flex flex-1 flex-col gap-1.5">
+      <nav class="flex flex-1 flex-col gap-1.5 overflow-y-auto pr-0.5">
         <button
           v-for="item in navItems"
           :key="item.id"
@@ -96,6 +97,10 @@
                     Không gian Doanh nghiệp
                   </span>
                   <span class="text-xs font-semibold text-slate-400">Trung tâm quản lý tuyển dụng & Smart Escrow</span>
+                </div>
+                <!-- Notification Bell on mobile / tablet -->
+                <div class="lg:hidden flex items-center gap-2">
+                  <NotificationBell />
                 </div>
               </div>
               <h1 class="mt-2 text-2xl sm:text-3xl font-extrabold tracking-tight text-white">
