@@ -1,15 +1,18 @@
 <template>
   <!-- DESKTOP SIDEBAR -->
-  <aside class="hidden lg:flex lg:w-64 lg:flex-shrink-0 lg:flex-col lg:border-r lg:border-white/10 lg:bg-slate-950 lg:px-4 lg:py-6 sticky top-0 h-screen overflow-y-auto z-30">
-    <button @click="activeSection = 'jobs'" class="flex items-center gap-2.5 px-2 pb-6 mb-4 border-b border-white/10 text-left w-full group">
-      <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-brand-400 text-sm font-bold text-slate-950">QW</span>
-      <div class="min-w-0">
-        <p class="text-sm font-bold leading-tight text-white">QuickWork</p>
-        <p class="text-xs text-slate-500">Student Workspace</p>
-      </div>
-    </button>
+  <aside class="hidden lg:flex lg:w-64 lg:flex-shrink-0 lg:flex-col lg:border-r lg:border-white/10 lg:bg-slate-950 lg:px-4 lg:py-6 sticky top-0 h-screen z-30">
+    <div class="flex items-center justify-between px-2 pb-6 mb-4 border-b border-white/10">
+      <button @click="activeSection = 'jobs'" class="flex items-center gap-2.5 text-left group min-w-0">
+        <span class="flex h-9 w-9 flex-shrink-0 items-center justify-center rounded-xl bg-brand-400 text-sm font-bold text-slate-950">QW</span>
+        <div class="min-w-0">
+          <p class="text-sm font-bold leading-tight text-white">QuickWork</p>
+          <p class="text-xs text-slate-500">Student Workspace</p>
+        </div>
+      </button>
+      <NotificationBell align="left" />
+    </div>
 
-    <nav class="flex flex-1 flex-col gap-5">
+    <nav class="flex flex-1 flex-col gap-5 overflow-y-auto pr-0.5">
       <div v-for="group in navGroups" :key="group.label">
         <p class="px-3 mb-1.5 text-[10px] font-semibold uppercase tracking-wider text-slate-500">{{ group.label }}</p>
         <div class="space-y-0.5">

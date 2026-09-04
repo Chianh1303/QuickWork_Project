@@ -37,8 +37,9 @@
           </NuxtLink>
         </nav>
 
-        <!-- Admin Logout Button -->
+        <!-- Admin Notification & Logout Button -->
         <div class="flex items-center space-x-3">
+          <NotificationBell />
           <button
             @click="handleLogout"
             class="inline-flex items-center space-x-1.5 px-3.5 py-2 border border-rose-500/20 rounded-xl text-xs font-extrabold text-rose-300 bg-rose-500/10 hover:bg-rose-500/20 hover:text-rose-200 transition-all shadow-sm"
@@ -75,6 +76,7 @@
 <script setup lang="ts">
 import { useRoute } from 'vue-router'
 import { useAuth } from '~/composables/useAuth'
+import NotificationBell from '~/components/common/NotificationBell.vue'
 
 const route = useRoute()
 const { logout } = useAuth()

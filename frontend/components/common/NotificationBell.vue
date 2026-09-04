@@ -87,10 +87,17 @@ const props = withDefaults(defineProps<{
 const api = useApi()
 const { isAuthenticated, userRole } = useAuth()
 
+const bellRef = ref<HTMLElement | null>(null)
 const isOpen = ref(false)
 const notifications = ref<any[]>([])
 const unreadCount = ref(0)
 let timer: any = null
+
+const handleClickOutside = (event: MouseEvent) => {
+  if (isOpen.value && bellRef.value && !bellRef.value.contains(event.target as Node)) {
+    isOpen.value = false
+  }
+}
 
 const toggleDropdown = async () => {
   isOpen.value = !isOpen.value
@@ -167,9 +174,15 @@ const formatTime = (timeStr: string) => {
 onMounted(() => {
   fetchNotifs()
   timer = setInterval(fetchNotifs, 8000)
+  if (typeof window !== 'undefined') {
+    window.addEventListener('click', handleClickOutside)
+  }
 })
 
 onBeforeUnmount(() => {
   if (timer) clearInterval(timer)
+  if (typeof window !== 'undefined') {
+    window.removeEventListener('click', handleClickOutside)
+  }
 })
 </script>
